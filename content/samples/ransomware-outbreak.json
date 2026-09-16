@@ -1,0 +1,789 @@
+{
+  "scenario_slug": "ransomware-outbreak",
+  "analyst_handle": "sample.analyst",
+  "organization_name": "Northwind Polytechnic (Demo)",
+  "events": [
+    {
+      "id": "sample-ransomware-outbreak-0001",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SESSION_START",
+      "phase": "triage",
+      "payload": {
+        "scenario_slug": "ransomware-outbreak",
+        "resumed": false
+      },
+      "created_at": "2025-05-07T10:00:03.000Z",
+      "prev_hash": "",
+      "hash": "85032b60cedd20f9c6b095072b3ed8e36568033c8c59f1bfd6752f6e5e207e38",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0002",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "VIEW_ALERT",
+      "phase": "triage",
+      "payload": {
+        "alert_id": "alert-shadow-delete",
+        "severity": "critical"
+      },
+      "created_at": "2025-05-07T10:00:36.000Z",
+      "prev_hash": "85032b60cedd20f9c6b095072b3ed8e36568033c8c59f1bfd6752f6e5e207e38",
+      "hash": "87908bcc83095d67c360bb4c2ca4d9b0561e117b0cf95b6eb6d17cb77b265d6a",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0003",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "VIEW_ALERT",
+      "phase": "triage",
+      "payload": {
+        "alert_id": "alert-mass-encryption",
+        "severity": "critical"
+      },
+      "created_at": "2025-05-07T10:01:00.000Z",
+      "prev_hash": "87908bcc83095d67c360bb4c2ca4d9b0561e117b0cf95b6eb6d17cb77b265d6a",
+      "hash": "72467310b823574695abe6138ac6ee777ff3b3766ad5610f1150894420055de7",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0004",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "RUN_QUERY",
+      "phase": "triage",
+      "payload": {
+        "query": "source:edr",
+        "result_count": 14,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:01:48.000Z",
+      "prev_hash": "72467310b823574695abe6138ac6ee777ff3b3766ad5610f1150894420055de7",
+      "hash": "875dfe77ede0e1803f0ee0eaa1d4e33aa13561fde1cf433c2084c3a6b6603d98",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0005",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "triage",
+      "payload": {
+        "decision_key": "alert_severity",
+        "decision_value": "critical"
+      },
+      "created_at": "2025-05-07T10:03:07.000Z",
+      "prev_hash": "875dfe77ede0e1803f0ee0eaa1d4e33aa13561fde1cf433c2084c3a6b6603d98",
+      "hash": "1d632248f02a308cecfd0357386d1d27365032b8b57b3c20f377e6bb3a175493",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0006",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "triage",
+      "payload": {
+        "decision_key": "immediate_priority",
+        "decision_value": "stop_the_spread",
+        "rationale": "Recorded during the ransomware incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:04:17.000Z",
+      "prev_hash": "1d632248f02a308cecfd0357386d1d27365032b8b57b3c20f377e6bb3a175493",
+      "hash": "24bdc735de1f633a5103c5c0083abb927d64da2690f9261aed0b6290f1cc78fe",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0007",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "ESCALATE",
+      "phase": "triage",
+      "payload": {
+        "action_key": "declare-major-incident",
+        "target": "Incident Management / Senior Leadership Team"
+      },
+      "created_at": "2025-05-07T10:05:16.000Z",
+      "prev_hash": "24bdc735de1f633a5103c5c0083abb927d64da2690f9261aed0b6290f1cc78fe",
+      "hash": "f57ec8f015744a3078188e93604ff95256492500edd37b5ae38bf34228999e2c",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0008",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "investigation",
+      "payload": {
+        "from": "triage",
+        "to": "investigation"
+      },
+      "created_at": "2025-05-07T10:05:36.000Z",
+      "prev_hash": "f57ec8f015744a3078188e93604ff95256492500edd37b5ae38bf34228999e2c",
+      "hash": "11415550371fab3a418419e06cb2d5d661e29edecbfdc589af0059ad53f56361",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0009",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "host:BKP-SRV-01",
+        "result_count": 1,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:06:25.000Z",
+      "prev_hash": "11415550371fab3a418419e06cb2d5d661e29edecbfdc589af0059ad53f56361",
+      "hash": "53addc800994e2bc2da919e03605ea0936e3fd165ca52b5e4aebe7313f21f9ce",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0010",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:dns",
+        "result_count": 2,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:07:05.000Z",
+      "prev_hash": "53addc800994e2bc2da919e03605ea0936e3fd165ca52b5e4aebe7313f21f9ce",
+      "hash": "bf938c1f5de9332bcca6d56b05ad2648541de476811dfa80a1404dc76a5b4c8f",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0011",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:proxy",
+        "result_count": 2,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:07:36.000Z",
+      "prev_hash": "bf938c1f5de9332bcca6d56b05ad2648541de476811dfa80a1404dc76a5b4c8f",
+      "hash": "8de44c02131fc4bcae36114c181eae21ee58191e93922f752f75999df00d8401",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0012",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:edr",
+        "result_count": 14,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:08:21.000Z",
+      "prev_hash": "8de44c02131fc4bcae36114c181eae21ee58191e93922f752f75999df00d8401",
+      "hash": "45d0e197d33dd66805bda9fe5adea9da90035b075a0ffce5581dc091bcbb3a76",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0013",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-auth-praman-logon",
+        "source": "auth"
+      },
+      "created_at": "2025-05-07T10:08:37.000Z",
+      "prev_hash": "45d0e197d33dd66805bda9fe5adea9da90035b075a0ffce5581dc091bcbb3a76",
+      "hash": "f675d193859e635add5e98db6c75d1264f953d58fe01db0112282b2fcb465b13",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0014",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-edr-runkey-persist",
+        "source": "edr"
+      },
+      "created_at": "2025-05-07T10:09:07.000Z",
+      "prev_hash": "f675d193859e635add5e98db6c75d1264f953d58fe01db0112282b2fcb465b13",
+      "hash": "30efa4d9c6499c06c6c25394c9f2663e2d0de22f579863e2fdf01f1d8fd01b33",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0015",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-dns-c2-return",
+        "source": "dns"
+      },
+      "created_at": "2025-05-07T10:09:28.000Z",
+      "prev_hash": "30efa4d9c6499c06c6c25394c9f2663e2d0de22f579863e2fdf01f1d8fd01b33",
+      "hash": "b565a7cf43f7cd76ee5d3f49efe7f468e85c24104d1fea8f02410f6ed490dcc3",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0016",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-proxy-payload-pull",
+        "source": "proxy"
+      },
+      "created_at": "2025-05-07T10:09:40.000Z",
+      "prev_hash": "b565a7cf43f7cd76ee5d3f49efe7f468e85c24104d1fea8f02410f6ed490dcc3",
+      "hash": "3758477d8daeab9c1b828e6b08d4ca99a13abe7ebdfb62c6ee68081f144cf2b9",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0017",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-edr-service-stop",
+        "source": "edr"
+      },
+      "created_at": "2025-05-07T10:10:06.000Z",
+      "prev_hash": "3758477d8daeab9c1b828e6b08d4ca99a13abe7ebdfb62c6ee68081f144cf2b9",
+      "hash": "f17b7c24a77090ba9d6db96d7df912311f24fd46a007c42fff6aa23252c55e1e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0018",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-edr-vssadmin",
+        "source": "edr"
+      },
+      "created_at": "2025-05-07T10:10:23.000Z",
+      "prev_hash": "f17b7c24a77090ba9d6db96d7df912311f24fd46a007c42fff6aa23252c55e1e",
+      "hash": "3794ed49d75dcdb233545bdce8f7274523903ee8c540e1c21fd36ddeaafb0f46",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0019",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "onedrivesync.exe",
+        "ioc_type": "file"
+      },
+      "created_at": "2025-05-07T10:11:09.000Z",
+      "prev_hash": "3794ed49d75dcdb233545bdce8f7274523903ee8c540e1c21fd36ddeaafb0f46",
+      "hash": "30cfeb41a96419a5b5ec783f84c8458b875b6501d6667ef5dbc2d34f1ffba57e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0020",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync",
+        "ioc_type": "registry"
+      },
+      "created_at": "2025-05-07T10:11:46.000Z",
+      "prev_hash": "30cfeb41a96419a5b5ec783f84c8458b875b6501d6667ef5dbc2d34f1ffba57e",
+      "hash": "54135dfb865824ee031f29e997f3a98b51252aaf11e4a91aca3df322511dfb72",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0021",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "update-cdn.paylo4d.example",
+        "ioc_type": "domain"
+      },
+      "created_at": "2025-05-07T10:12:14.000Z",
+      "prev_hash": "54135dfb865824ee031f29e997f3a98b51252aaf11e4a91aca3df322511dfb72",
+      "hash": "0e9d6b67867e9f12abf33b9c9cdf95e03969bf5c617db4858a7d3ba01b8095db",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0022",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "203.0.113.47",
+        "ioc_type": "ip"
+      },
+      "created_at": "2025-05-07T10:12:56.000Z",
+      "prev_hash": "0e9d6b67867e9f12abf33b9c9cdf95e03969bf5c617db4858a7d3ba01b8095db",
+      "hash": "039530d27a58a5f8df07088e4fca77d128351829a9e42482899788b9fe42e815",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0023",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": ".nocturnelock",
+        "ioc_type": "file"
+      },
+      "created_at": "2025-05-07T10:13:29.000Z",
+      "prev_hash": "039530d27a58a5f8df07088e4fca77d128351829a9e42482899788b9fe42e815",
+      "hash": "c464dcb239d3d8079118979834393a00bdc774d0d1f813553a7fc6bcc99b9ce2",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0024",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "BKP-SRV-01",
+        "ioc_type": "host"
+      },
+      "created_at": "2025-05-07T10:13:53.000Z",
+      "prev_hash": "c464dcb239d3d8079118979834393a00bdc774d0d1f813553a7fc6bcc99b9ce2",
+      "hash": "578e45d2da7a27b440a86fb182d891b30e93b126ac1e7391485f2572802ee221",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0025",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "ADD_NOTE",
+      "phase": "investigation",
+      "payload": {
+        "text": "Investigation: working through the evidence and recording what it supports before moving on."
+      },
+      "created_at": "2025-05-07T10:14:56.000Z",
+      "prev_hash": "578e45d2da7a27b440a86fb182d891b30e93b126ac1e7391485f2572802ee221",
+      "hash": "13a5b2f2cb032088b840a2925ddf8faa7f300a2f70abd123e015d749b35a968b",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0026",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "attack_techniques",
+        "decision_value": [
+          "T1486",
+          "T1490",
+          "T1489",
+          "T1566.001"
+        ]
+      },
+      "created_at": "2025-05-07T10:16:10.000Z",
+      "prev_hash": "13a5b2f2cb032088b840a2925ddf8faa7f300a2f70abd123e015d749b35a968b",
+      "hash": "18feb240fb16f457aa52435f4c9be3e4aa614a954abbeb08556a4cbd9d13ccff",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0027",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "spread_mechanism",
+        "decision_value": "mapped_drive_from_workstation",
+        "rationale": "Recorded during the ransomware incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:17:38.000Z",
+      "prev_hash": "18feb240fb16f457aa52435f4c9be3e4aa614a954abbeb08556a4cbd9d13ccff",
+      "hash": "4b71c0848d8e2710403729da86b0331b76f742c790019c12e463a56d692bc5a6",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0028",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "initial_access",
+        "decision_value": "march_11_phishing_never_eradicated",
+        "rationale": "Recorded during the ransomware incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:18:57.000Z",
+      "prev_hash": "4b71c0848d8e2710403729da86b0331b76f742c790019c12e463a56d692bc5a6",
+      "hash": "f91676fde8985be6c0a486f0178ae018af558f8d465017f2fd327136098db1a7",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0029",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "proxy_block_failure",
+        "decision_value": "blocked_at_proxy_only"
+      },
+      "created_at": "2025-05-07T10:20:07.000Z",
+      "prev_hash": "f91676fde8985be6c0a486f0178ae018af558f8d465017f2fd327136098db1a7",
+      "hash": "b4ad24c45835f1ed6fc1b7189bd086bafa094b450273ee8016c95ddbaaa134ef",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0030",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "containment",
+      "payload": {
+        "from": "investigation",
+        "to": "containment"
+      },
+      "created_at": "2025-05-07T10:20:36.000Z",
+      "prev_hash": "b4ad24c45835f1ed6fc1b7189bd086bafa094b450273ee8016c95ddbaaa134ef",
+      "hash": "4840306b677adbbf4f1226e95f8adf1ccf6722302d445f414e7fdeab5abd1648",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0031",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "containment",
+      "payload": {
+        "decision_key": "containment_scope",
+        "decision_value": "isolate_all_affected_plus_shares_and_backup",
+        "rationale": "Recorded during the ransomware incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:21:51.000Z",
+      "prev_hash": "4840306b677adbbf4f1226e95f8adf1ccf6722302d445f414e7fdeab5abd1648",
+      "hash": "2f14e8c940d6a54833b6b38160e95a76790ab0ea6f30343d0f525aaa7f2ce08c",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0032",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "CONTAIN_HOST",
+      "phase": "containment",
+      "payload": {
+        "action_key": "isolate-affected-hosts",
+        "target": "WKS-HR-014, WKS-HR-015, WKS-FIN-003, WKS-ADM-021, FS-SHARED-01"
+      },
+      "created_at": "2025-05-07T10:22:55.000Z",
+      "prev_hash": "2f14e8c940d6a54833b6b38160e95a76790ab0ea6f30343d0f525aaa7f2ce08c",
+      "hash": "cb40a438a885220302e3746fabfe6e12737925e4a9671e552c3bfb24e21062b1",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0033",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "CONTAIN_HOST",
+      "phase": "containment",
+      "payload": {
+        "action_key": "isolate-backup-server",
+        "target": "BKP-SRV-01"
+      },
+      "created_at": "2025-05-07T10:23:50.000Z",
+      "prev_hash": "cb40a438a885220302e3746fabfe6e12737925e4a9671e552c3bfb24e21062b1",
+      "hash": "279f0dfd8a16d05744612376e5f4246ca3215a97cd744c93397c464bda06ae07",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0034",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "BLOCK_INDICATOR",
+      "phase": "containment",
+      "payload": {
+        "action_key": "disable-share-access",
+        "target": "\\\\FS-SHARED-01\\Departments and all mapped shares"
+      },
+      "created_at": "2025-05-07T10:24:36.000Z",
+      "prev_hash": "279f0dfd8a16d05744612376e5f4246ca3215a97cd744c93397c464bda06ae07",
+      "hash": "5b94a1b6a2ef97f3aa1610aee0e5e80f9d987d555364393a88b7ac51e59b5a20",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0035",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "BLOCK_INDICATOR",
+      "phase": "containment",
+      "payload": {
+        "action_key": "block-c2-all-layers",
+        "target": "update-cdn.paylo4d.example, 203.0.113.47"
+      },
+      "created_at": "2025-05-07T10:25:36.000Z",
+      "prev_hash": "5b94a1b6a2ef97f3aa1610aee0e5e80f9d987d555364393a88b7ac51e59b5a20",
+      "hash": "57743da58abf99f4e1965647cc5ecd76c539e794eedfb872b518a1f891498f3d",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0036",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "ISOLATE_ACCOUNT",
+      "phase": "containment",
+      "payload": {
+        "action_key": "disable-praman",
+        "target": "NORTHWIND\\p.raman"
+      },
+      "created_at": "2025-05-07T10:26:27.000Z",
+      "prev_hash": "57743da58abf99f4e1965647cc5ecd76c539e794eedfb872b518a1f891498f3d",
+      "hash": "7860e1ecf6d3e5b6bec59c95d0d4725f0fd3f96d386a35460bf9974ef2aec1a2",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0037",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "eradication",
+      "payload": {
+        "from": "containment",
+        "to": "eradication"
+      },
+      "created_at": "2025-05-07T10:27:02.000Z",
+      "prev_hash": "7860e1ecf6d3e5b6bec59c95d0d4725f0fd3f96d386a35460bf9974ef2aec1a2",
+      "hash": "3f88c4ea79365790ed6d8e9bc55f6bfd357ec9bb6e51406ab6758f05a73ef853",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0038",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "eradication",
+      "payload": {
+        "decision_key": "eradication_scope",
+        "decision_value": "entire_estate_hunt",
+        "rationale": "Recorded during the ransomware incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:28:23.000Z",
+      "prev_hash": "3f88c4ea79365790ed6d8e9bc55f6bfd357ec9bb6e51406ab6758f05a73ef853",
+      "hash": "446e72436b41e09564db23fe0b07a9052fc28d44afcbb92216d722fef09663b4",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0039",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "eradication",
+      "payload": {
+        "decision_key": "eradication_steps",
+        "decision_value": [
+          "rebuild_all_affected",
+          "hunt_run_key_estate_wide",
+          "reset_praman_credentials",
+          "block_all_layers_verified",
+          "purge_original_phish"
+        ]
+      },
+      "created_at": "2025-05-07T10:29:35.000Z",
+      "prev_hash": "446e72436b41e09564db23fe0b07a9052fc28d44afcbb92216d722fef09663b4",
+      "hash": "e4e6936cc53880f7c8043c756fa48f9a0511c92348054f104f4fa5f2232f77ca",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0040",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "eradication",
+      "payload": {
+        "decision_key": "verification_of_eradication",
+        "decision_value": "no_indicators_and_no_c2_for_period"
+      },
+      "created_at": "2025-05-07T10:31:01.000Z",
+      "prev_hash": "e4e6936cc53880f7c8043c756fa48f9a0511c92348054f104f4fa5f2232f77ca",
+      "hash": "40cfff08a31bd768cd6ff89aa7c10443c474a92d889f77e1e0f95aa076b58bd1",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0041",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "DOWNLOAD_ARTIFACT",
+      "phase": "eradication",
+      "payload": {
+        "action_key": "request-forensic-images-ransom",
+        "target": "WKS-HR-014 and the four other affected systems"
+      },
+      "created_at": "2025-05-07T10:31:53.000Z",
+      "prev_hash": "40cfff08a31bd768cd6ff89aa7c10443c474a92d889f77e1e0f95aa076b58bd1",
+      "hash": "9bd4cb8c80d40475ac891f39ad41da682478990e331229467dc5942516a2cbee",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0042",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "recovery",
+      "payload": {
+        "from": "eradication",
+        "to": "recovery"
+      },
+      "created_at": "2025-05-07T10:32:29.000Z",
+      "prev_hash": "9bd4cb8c80d40475ac891f39ad41da682478990e331229467dc5942516a2cbee",
+      "hash": "502d3cb4e23fc6282b8aa4a91a686c749a0102a63acbcaba1d704cb8d7ecfbf4",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0043",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "recovery",
+      "payload": {
+        "decision_key": "backup_assessment",
+        "decision_value": "usable_but_never_fully_tested",
+        "rationale": "Recorded during the ransomware incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:33:51.000Z",
+      "prev_hash": "502d3cb4e23fc6282b8aa4a91a686c749a0102a63acbcaba1d704cb8d7ecfbf4",
+      "hash": "029f2c2c6586295b3c786aad59de712866fc020e9f915647d9d0f855ca75b16b",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0044",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "recovery",
+      "payload": {
+        "decision_key": "recovery_sequence",
+        "decision_value": "eradicate_then_rebuild_then_restore_then_reconnect",
+        "rationale": "Recorded during the ransomware incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:35:04.000Z",
+      "prev_hash": "029f2c2c6586295b3c786aad59de712866fc020e9f915647d9d0f855ca75b16b",
+      "hash": "c2c3599c5968b2a9d80580eb880fe3543ad02c3543a8e9d2b173bf4b3fa66978",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0045",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "recovery",
+      "payload": {
+        "decision_key": "ransom_decision",
+        "decision_value": "leadership_with_legal_soc_advises"
+      },
+      "created_at": "2025-05-07T10:36:31.000Z",
+      "prev_hash": "c2c3599c5968b2a9d80580eb880fe3543ad02c3543a8e9d2b173bf4b3fa66978",
+      "hash": "5906cf3ab5c95cbc4c54d13fbb445e55d37cca4ea482752ed1f3003f610f7ded",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0046",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "lessons_learned",
+      "payload": {
+        "from": "recovery",
+        "to": "lessons_learned"
+      },
+      "created_at": "2025-05-07T10:36:54.000Z",
+      "prev_hash": "5906cf3ab5c95cbc4c54d13fbb445e55d37cca4ea482752ed1f3003f610f7ded",
+      "hash": "c935980d9ca7d383dc542ad8fd08327fc4c7683c9401541cb9780f2cdfb58ffd",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0047",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "lessons_learned",
+      "payload": {
+        "decision_key": "primary_control_gap",
+        "decision_value": "incomplete_eradication_march",
+        "rationale": "The gateway is the earliest point where one configuration change stops the whole chain. The other gaps are real but further down and harder to close without breaking legitimate work."
+      },
+      "created_at": "2025-05-07T10:38:03.000Z",
+      "prev_hash": "c935980d9ca7d383dc542ad8fd08327fc4c7683c9401541cb9780f2cdfb58ffd",
+      "hash": "944aebbb6e9c93fbbc20290a90bb026d9f6dd59f3a23eaf94a83b768b2f5a765",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0048",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "lessons_learned",
+      "payload": {
+        "decision_key": "process_change",
+        "decision_value": "eradication_closure_criteria",
+        "rationale": "Recorded during the ransomware incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:39:26.000Z",
+      "prev_hash": "944aebbb6e9c93fbbc20290a90bb026d9f6dd59f3a23eaf94a83b768b2f5a765",
+      "hash": "fbfe9801e9bece05bd95c553f067237e98324bb784b9e5926d6a3fee9ce1ba72",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0049",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SUBMIT_REPORT",
+      "phase": "lessons_learned",
+      "payload": {
+        "reflection": {
+          "what_happened": "A ransomware incident affecting Northwind Polytechnic. Incident INC-2025-0311 was closed on 11 March after blocking the command-and-control domain at the web proxy, but the affected workstation was never isolated or rebuilt, the Run-key persistence was never removed, the user's credentials were never reset, and the domain was never blocked at DNS or the firewall. The implant remained on WKS-HR-014 for seven days. On 18 March it launched at logon, resolved the same C2 domain through a path that had not been blocked, downloaded a ransomware payload, deleted shadow copies, stopped backup and database services, and encrypted the workstation and every share it had a mapped drive to.",
+          "what_worked": "Detection telemetry gave us the incident early enough to contain it before the attacker achieved their objective, and the evidence available was sufficient to establish the root cause without guesswork.",
+          "what_to_change": "The controls that failed are the ones closest to the initial access, and fixing those is worth more than adding another layer of detection further down the chain.",
+          "recommended_controls": [
+            "Require that any host with confirmed code execution is rebuilt from a known-good image before it returns to service, with an explicit named exception process rather than an informal one.",
+            "Block confirmed C2 indicators at every layer - DNS, proxy and firewall - and verify the block from the affected host rather than assuming it applied.",
+            "Define closure criteria for incidents that include eradication of persistence and credential rotation, so a ticket cannot be closed while the implant is still resident."
+          ]
+        },
+        "executive_summary": "A ransomware incident affecting Northwind Polytechnic. Incident INC-2025-0311 was closed on 11 March after blocking the command-and-control domain at the web proxy, but the affected workstation was never isolated or rebuilt, the Run-key persistence was never removed, the user's credentials were never reset, and the domain was never blocked at DNS or the firewall. The implant remained on WKS-HR-014 for seven days. On 18 March it launched at logon, resolved the same C2 domain through a path that had not been blocked, downloaded a ransomware payload, deleted shadow copies, stopped backup and database services, and encrypted the workstation and every share it had a mapped drive to."
+      },
+      "created_at": "2025-05-07T10:41:00.000Z",
+      "prev_hash": "fbfe9801e9bece05bd95c553f067237e98324bb784b9e5926d6a3fee9ce1ba72",
+      "hash": "31d48518090d64ab09f6847cb80dca44979498ed9d8cafe7cc7ef8c047bdb850",
+      "client_meta": null
+    },
+    {
+      "id": "sample-ransomware-outbreak-0050",
+      "session_id": "sample-ransomware-outbreak",
+      "user_id": "sample-user-ransomware-outbreak",
+      "event_type": "SESSION_COMPLETE",
+      "phase": "lessons_learned",
+      "payload": {
+        "total_phases": 6
+      },
+      "created_at": "2025-05-07T10:41:18.000Z",
+      "prev_hash": "31d48518090d64ab09f6847cb80dca44979498ed9d8cafe7cc7ef8c047bdb850",
+      "hash": "c60332c69660c15337a968ea426c687e5e3cdc5b6e12b1615c2eb481b216b0a6",
+      "client_meta": null
+    }
+  ]
+}

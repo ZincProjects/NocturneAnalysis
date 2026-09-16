@@ -1,0 +1,719 @@
+{
+  "scenario_slug": "webapp-sql-injection",
+  "analyst_handle": "sample.analyst",
+  "organization_name": "Northwind Polytechnic (Demo)",
+  "events": [
+    {
+      "id": "sample-webapp-sql-injection-0001",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SESSION_START",
+      "phase": "triage",
+      "payload": {
+        "scenario_slug": "webapp-sql-injection",
+        "resumed": false
+      },
+      "created_at": "2025-05-07T10:00:03.000Z",
+      "prev_hash": "",
+      "hash": "2037ba9e10d91f5564186cd169bb068b911b4f4c9ed26301e43934e47d0b08a3",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0002",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "VIEW_ALERT",
+      "phase": "triage",
+      "payload": {
+        "alert_id": "alert-error-rate",
+        "severity": "high"
+      },
+      "created_at": "2025-05-07T10:00:36.000Z",
+      "prev_hash": "2037ba9e10d91f5564186cd169bb068b911b4f4c9ed26301e43934e47d0b08a3",
+      "hash": "aed34b0f05d61d1a4d4054d4767df8573ba104f90b23ff2698733507bcefa31d",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0003",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "VIEW_ALERT",
+      "phase": "triage",
+      "payload": {
+        "alert_id": "alert-waf-absent",
+        "severity": "medium"
+      },
+      "created_at": "2025-05-07T10:01:00.000Z",
+      "prev_hash": "aed34b0f05d61d1a4d4054d4767df8573ba104f90b23ff2698733507bcefa31d",
+      "hash": "e626dc21aa1f7412675387fed96349a9391b1b28b702c57e4099a41e27f10c25",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0004",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "RUN_QUERY",
+      "phase": "triage",
+      "payload": {
+        "query": "source:edr",
+        "result_count": 0,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:01:48.000Z",
+      "prev_hash": "e626dc21aa1f7412675387fed96349a9391b1b28b702c57e4099a41e27f10c25",
+      "hash": "7ceca259643fab82009c7775b40d12839d9efa382bf91f17067166702c54886f",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0005",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "triage",
+      "payload": {
+        "decision_key": "alert_severity",
+        "decision_value": "high",
+        "rationale": "One staff endpoint with near-certain code execution, but no evidence yet of a second host or of anything touching student records. High rather than critical - I would raise it the moment the blast radius grows."
+      },
+      "created_at": "2025-05-07T10:03:07.000Z",
+      "prev_hash": "7ceca259643fab82009c7775b40d12839d9efa382bf91f17067166702c54886f",
+      "hash": "803ddec3fd0213cb03a423446d81931a2b22c397f7409340e186685add36529c",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0006",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "triage",
+      "payload": {
+        "decision_key": "request_pattern",
+        "decision_value": "sql_injection_probing"
+      },
+      "created_at": "2025-05-07T10:04:17.000Z",
+      "prev_hash": "803ddec3fd0213cb03a423446d81931a2b22c397f7409340e186685add36529c",
+      "hash": "47e98b18c33a0c703b4fec6a8cd079fffb553a7da1016df6b9f2181de69f091a",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0007",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "ESCALATE",
+      "phase": "triage",
+      "payload": {
+        "action_key": "escalate-appsec",
+        "target": "Portal development team / IR lead"
+      },
+      "created_at": "2025-05-07T10:05:16.000Z",
+      "prev_hash": "47e98b18c33a0c703b4fec6a8cd079fffb553a7da1016df6b9f2181de69f091a",
+      "hash": "13b2095a62a2933b298ae142aaf2551eb78993838a0ca7e2f830e7f78e3f6009",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0008",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "investigation",
+      "payload": {
+        "from": "triage",
+        "to": "investigation"
+      },
+      "created_at": "2025-05-07T10:05:36.000Z",
+      "prev_hash": "13b2095a62a2933b298ae142aaf2551eb78993838a0ca7e2f830e7f78e3f6009",
+      "hash": "1817927a6fe84fb2f1daaaaba013fd446fd98102a08b91efd812ff5db1089354",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0009",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "host:WEB-PORTAL-01",
+        "result_count": 0,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:06:25.000Z",
+      "prev_hash": "1817927a6fe84fb2f1daaaaba013fd446fd98102a08b91efd812ff5db1089354",
+      "hash": "996bd65a879c6edb6635dd9fef9abcbfa93888e1d38b2b5bfc3288d6171e1f31",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0010",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:dns",
+        "result_count": 0,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:07:05.000Z",
+      "prev_hash": "996bd65a879c6edb6635dd9fef9abcbfa93888e1d38b2b5bfc3288d6171e1f31",
+      "hash": "d0d87878dd54f525b9859d4a8e20035941113755f948f2ca34ab0915a73833c4",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0011",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:proxy",
+        "result_count": 0,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:07:36.000Z",
+      "prev_hash": "d0d87878dd54f525b9859d4a8e20035941113755f948f2ca34ab0915a73833c4",
+      "hash": "fdc16a5395509423a6b1735aca2c57dce2a3c2882b562f4a8fe7ebbcd9f2c089",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0012",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:edr",
+        "result_count": 0,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:08:21.000Z",
+      "prev_hash": "fdc16a5395509423a6b1735aca2c57dce2a3c2882b562f4a8fe7ebbcd9f2c089",
+      "hash": "3f1e3d4dfc6448145b04996329cea5e9c8395d669f0200dd528ceeee0385a55d",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0013",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-http-spike",
+        "source": "http"
+      },
+      "created_at": "2025-05-07T10:08:37.000Z",
+      "prev_hash": "3f1e3d4dfc6448145b04996329cea5e9c8395d669f0200dd528ceeee0385a55d",
+      "hash": "3e3f39289fa252d63cc942a0e1d9fca6321c830f201ccd278124f66c6132f6c3",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0014",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-http-probe-1",
+        "source": "http"
+      },
+      "created_at": "2025-05-07T10:09:07.000Z",
+      "prev_hash": "3e3f39289fa252d63cc942a0e1d9fca6321c830f201ccd278124f66c6132f6c3",
+      "hash": "aa9e9e46b314f820a03a9fa35338dd0b227173a493f1a50b16f0a6a84792acb0",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0015",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-app-error",
+        "source": "http"
+      },
+      "created_at": "2025-05-07T10:09:28.000Z",
+      "prev_hash": "aa9e9e46b314f820a03a9fa35338dd0b227173a493f1a50b16f0a6a84792acb0",
+      "hash": "8b55103da8dfceb3955fbeb040578ab1d9337b7b9645d77fbb6b0cf922bcba8b",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0016",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-http-sqli-001",
+        "source": "http"
+      },
+      "created_at": "2025-05-07T10:09:40.000Z",
+      "prev_hash": "8b55103da8dfceb3955fbeb040578ab1d9337b7b9645d77fbb6b0cf922bcba8b",
+      "hash": "f621e9df9e017b0aa50290e35d35790d1c5fc13a2b26441dfa47ecc806b8423b",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0017",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-http-sqli-002",
+        "source": "http"
+      },
+      "created_at": "2025-05-07T10:10:06.000Z",
+      "prev_hash": "f621e9df9e017b0aa50290e35d35790d1c5fc13a2b26441dfa47ecc806b8423b",
+      "hash": "ed4015e937d35db77efc1659aadd1ce223254208a6618203bbdd3bcf469cea19",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0018",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-http-sqli-003",
+        "source": "http"
+      },
+      "created_at": "2025-05-07T10:10:23.000Z",
+      "prev_hash": "ed4015e937d35db77efc1659aadd1ce223254208a6618203bbdd3bcf469cea19",
+      "hash": "d41b8462c9012d80ca17d85b92adc091b12cfb3f0ecb7c0fefef86db3b3d0a74",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0019",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "203.0.113.188",
+        "ioc_type": "ip"
+      },
+      "created_at": "2025-05-07T10:11:09.000Z",
+      "prev_hash": "d41b8462c9012d80ca17d85b92adc091b12cfb3f0ecb7c0fefef86db3b3d0a74",
+      "hash": "a611f77d7d532ffa2ca0ec146992868af17bbb92828181cc43f5897506e06f2c",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0020",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "python-requests/2.31.0",
+        "ioc_type": "process"
+      },
+      "created_at": "2025-05-07T10:11:46.000Z",
+      "prev_hash": "a611f77d7d532ffa2ca0ec146992868af17bbb92828181cc43f5897506e06f2c",
+      "hash": "fe2c3e2178732192c5d4c011826912d4af52fb9b6d1dfb253a252c6e8516a6ef",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0021",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "sess_9f2b41",
+        "ioc_type": "user"
+      },
+      "created_at": "2025-05-07T10:12:14.000Z",
+      "prev_hash": "fe2c3e2178732192c5d4c011826912d4af52fb9b6d1dfb253a252c6e8516a6ef",
+      "hash": "e4e0fc6f09eb6eb599c4afd4ced9fb75d7baf1ea9c556e2787a74eb5ad929e86",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0022",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "admin' -- ",
+        "ioc_type": "url"
+      },
+      "created_at": "2025-05-07T10:12:56.000Z",
+      "prev_hash": "e4e0fc6f09eb6eb599c4afd4ced9fb75d7baf1ea9c556e2787a74eb5ad929e86",
+      "hash": "66d341233faa108cd317894257f3924556bb4eb0d001b7c9ef7a702f330eed02",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0023",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "10.20.3.15",
+        "ioc_type": "ip"
+      },
+      "created_at": "2025-05-07T10:13:29.000Z",
+      "prev_hash": "66d341233faa108cd317894257f3924556bb4eb0d001b7c9ef7a702f330eed02",
+      "hash": "69d97692000702b235b512e89a11741eb8e2830917d30a536d9c7f3ef472e47f",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0024",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "ADD_NOTE",
+      "phase": "investigation",
+      "payload": {
+        "text": "Investigation: working through the evidence and recording what it supports before moving on."
+      },
+      "created_at": "2025-05-07T10:14:18.000Z",
+      "prev_hash": "69d97692000702b235b512e89a11741eb8e2830917d30a536d9c7f3ef472e47f",
+      "hash": "ccd824f5de3560500e0721ffd8c52792bfe572ca0bd6aa0d55c3f39642c3cc4e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0025",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "attack_techniques",
+        "decision_value": [
+          "T1190",
+          "T1078"
+        ]
+      },
+      "created_at": "2025-05-07T10:15:41.000Z",
+      "prev_hash": "ccd824f5de3560500e0721ffd8c52792bfe572ca0bd6aa0d55c3f39642c3cc4e",
+      "hash": "8ea21a78f95590d23608287a9fa02c118e458bb0711fc3e20eea8f5f99cf6bc5",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0026",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "owasp_mapping",
+        "decision_value": [
+          "A03:2021",
+          "A05:2021",
+          "A07:2021"
+        ]
+      },
+      "created_at": "2025-05-07T10:16:55.000Z",
+      "prev_hash": "8ea21a78f95590d23608287a9fa02c118e458bb0711fc3e20eea8f5f99cf6bc5",
+      "hash": "b55ebd955487b49e5891d276bf28c22f18e5030cb431c33e5d5124989ad3597d",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0027",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "bypass_mechanism",
+        "decision_value": "comment_truncates_password_check",
+        "rationale": "Recorded during the web incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:18:23.000Z",
+      "prev_hash": "b55ebd955487b49e5891d276bf28c22f18e5030cb431c33e5d5124989ad3597d",
+      "hash": "d5bfc20257ab719c876fd156bffd3edc6bf093d0ae4800df0d9066344936e77d",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0028",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "false_positive_check",
+        "decision_value": "obrien_search"
+      },
+      "created_at": "2025-05-07T10:19:42.000Z",
+      "prev_hash": "d5bfc20257ab719c876fd156bffd3edc6bf093d0ae4800df0d9066344936e77d",
+      "hash": "c3aeba865297eb2a94954e976aa0ec06bfe589d73d5a33ef8eb89cd15c17cb38",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0029",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "containment",
+      "payload": {
+        "from": "investigation",
+        "to": "containment"
+      },
+      "created_at": "2025-05-07T10:19:57.000Z",
+      "prev_hash": "c3aeba865297eb2a94954e976aa0ec06bfe589d73d5a33ef8eb89cd15c17cb38",
+      "hash": "5c4a1fe52fc384612f334227c960235ce373bb4c7bf9618be7cf9b7769afc4ac",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0030",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "containment",
+      "payload": {
+        "decision_key": "containment_approach",
+        "decision_value": "block_source_and_disable_endpoints",
+        "rationale": "Isolating from the EDR console cuts the C2 channel but leaves memory intact, which is the only place the unencrypted payload exists. Pulling power would destroy the evidence we need to answer what was taken."
+      },
+      "created_at": "2025-05-07T10:21:21.000Z",
+      "prev_hash": "5c4a1fe52fc384612f334227c960235ce373bb4c7bf9618be7cf9b7769afc4ac",
+      "hash": "2524b1662e8b01a91fd58d12992d5e14ca2412a52cf5679c65290002c2340d23",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0031",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "BLOCK_INDICATOR",
+      "phase": "containment",
+      "payload": {
+        "action_key": "block-attacker-ip",
+        "target": "203.0.113.188"
+      },
+      "created_at": "2025-05-07T10:22:11.000Z",
+      "prev_hash": "2524b1662e8b01a91fd58d12992d5e14ca2412a52cf5679c65290002c2340d23",
+      "hash": "93abd8bbb5e9272a2e1960c8d55f1100579aabadabe931e7abd69d0e04bdd5ba",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0032",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "BLOCK_INDICATOR",
+      "phase": "containment",
+      "payload": {
+        "action_key": "disable-search-endpoint",
+        "target": "/api/search, /admin/students/export"
+      },
+      "created_at": "2025-05-07T10:23:15.000Z",
+      "prev_hash": "93abd8bbb5e9272a2e1960c8d55f1100579aabadabe931e7abd69d0e04bdd5ba",
+      "hash": "30ba683ab3db4e9503b4579d55197be9380629b02833c633317336879a24f208",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0033",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "ISOLATE_ACCOUNT",
+      "phase": "containment",
+      "payload": {
+        "action_key": "revoke-admin-session",
+        "target": "admin (sess_9f2b41)"
+      },
+      "created_at": "2025-05-07T10:24:10.000Z",
+      "prev_hash": "30ba683ab3db4e9503b4579d55197be9380629b02833c633317336879a24f208",
+      "hash": "93b4131268dd49d1a49d9f63ddd5aa65a417387e3563e3ef750acc8ca4162403",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0034",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "eradication",
+      "payload": {
+        "from": "containment",
+        "to": "eradication"
+      },
+      "created_at": "2025-05-07T10:24:26.000Z",
+      "prev_hash": "93b4131268dd49d1a49d9f63ddd5aa65a417387e3563e3ef750acc8ca4162403",
+      "hash": "6193b69935f5129d50080f732b795aed80276c9f48be07fdcd7f06065df44c58",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0035",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "eradication",
+      "payload": {
+        "decision_key": "injection_fix",
+        "decision_value": "parameterised_queries",
+        "rationale": "Recorded during the web incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:25:51.000Z",
+      "prev_hash": "6193b69935f5129d50080f732b795aed80276c9f48be07fdcd7f06065df44c58",
+      "hash": "ce86394baf49a849b84ac1ab8aac470facfbf52eafb4c6e2dbc308e71e349899",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0036",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "eradication",
+      "payload": {
+        "decision_key": "eradication_steps",
+        "decision_value": [
+          "parameterise_both_handlers",
+          "disable_debug_production",
+          "enrol_admin_mfa",
+          "least_privilege_db_user",
+          "rotate_all_portal_credentials",
+          "static_analysis_gate"
+        ]
+      },
+      "created_at": "2025-05-07T10:27:07.000Z",
+      "prev_hash": "ce86394baf49a849b84ac1ab8aac470facfbf52eafb4c6e2dbc308e71e349899",
+      "hash": "ea96efcf9a6a6d77584eeb95cf935017c47f468246d7e08b6dff046173b62535",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0037",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "DOWNLOAD_ARTIFACT",
+      "phase": "eradication",
+      "payload": {
+        "action_key": "request-portal-image",
+        "target": "WEB-PORTAL-01"
+      },
+      "created_at": "2025-05-07T10:28:12.000Z",
+      "prev_hash": "ea96efcf9a6a6d77584eeb95cf935017c47f468246d7e08b6dff046173b62535",
+      "hash": "8893c48dd21b467ba558e0948d12ac92cc8127c30923ccdee28eea324c7fc556",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0038",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "recovery",
+      "payload": {
+        "from": "eradication",
+        "to": "recovery"
+      },
+      "created_at": "2025-05-07T10:28:38.000Z",
+      "prev_hash": "8893c48dd21b467ba558e0948d12ac92cc8127c30923ccdee28eea324c7fc556",
+      "hash": "9821d889926d36720d04692be0a4c24c36d21a4216e6d4a6bcd1301c31530b58",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0039",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "recovery",
+      "payload": {
+        "decision_key": "recovery_steps",
+        "decision_value": [
+          "verify_fix_with_payloads",
+          "confirm_generic_errors",
+          "force_password_reset",
+          "review_admin_actions",
+          "monitor_endpoint_30_days"
+        ]
+      },
+      "created_at": "2025-05-07T10:29:50.000Z",
+      "prev_hash": "9821d889926d36720d04692be0a4c24c36d21a4216e6d4a6bcd1301c31530b58",
+      "hash": "67d4035511c47d63d2c49df55de6abd2bbb97f612c85a20b97264df6b13a43cf",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0040",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "recovery",
+      "payload": {
+        "decision_key": "disclosure",
+        "decision_value": "notify_students_and_dpo"
+      },
+      "created_at": "2025-05-07T10:31:16.000Z",
+      "prev_hash": "67d4035511c47d63d2c49df55de6abd2bbb97f612c85a20b97264df6b13a43cf",
+      "hash": "ea735e2c07c0c29aaeb8b1c88e5d0d784de6554dda4fd0c9748fede90f1d91ba",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0041",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "lessons_learned",
+      "payload": {
+        "from": "recovery",
+        "to": "lessons_learned"
+      },
+      "created_at": "2025-05-07T10:31:38.000Z",
+      "prev_hash": "ea735e2c07c0c29aaeb8b1c88e5d0d784de6554dda4fd0c9748fede90f1d91ba",
+      "hash": "58921ce2b3925c3896675dc71db388dcfed8761abcdfdff2f19afedf05570362",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0042",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "lessons_learned",
+      "payload": {
+        "decision_key": "primary_control_gap",
+        "decision_value": "concatenated_sql",
+        "rationale": "The gateway is the earliest point where one configuration change stops the whole chain. The other gaps are real but further down and harder to close without breaking legitimate work."
+      },
+      "created_at": "2025-05-07T10:33:09.000Z",
+      "prev_hash": "58921ce2b3925c3896675dc71db388dcfed8761abcdfdff2f19afedf05570362",
+      "hash": "17e4e4a9d6bf414830baed69de53de706a7372d80288f8de7b1ac4bf0d1a153b",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0043",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "lessons_learned",
+      "payload": {
+        "decision_key": "process_gap",
+        "decision_value": "automated_sast_in_ci"
+      },
+      "created_at": "2025-05-07T10:34:31.000Z",
+      "prev_hash": "17e4e4a9d6bf414830baed69de53de706a7372d80288f8de7b1ac4bf0d1a153b",
+      "hash": "33dd2cbb1156d463ad79162b286b232ad5f4e09887ac63bce97345356d871852",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0044",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SUBMIT_REPORT",
+      "phase": "lessons_learned",
+      "payload": {
+        "reflection": {
+          "what_happened": "A web incident affecting Northwind Polytechnic. The student portal builds SQL by concatenating user input directly into query strings, in both the search handler and the login handler. The application also runs with DEBUG enabled in production, so failed queries returned the offending SQL statement, the ORM library and the framework version to the attacker - turning a blind probe into a guided one. Once the login query was understood, a comment character removed the password comparison, and the portal's administrator account had no second factor to fall back on.",
+          "what_worked": "Detection telemetry gave us the incident early enough to contain it before the attacker achieved their objective, and the evidence available was sufficient to establish the root cause without guesswork.",
+          "what_to_change": "The controls that failed are the ones closest to the initial access, and fixing those is worth more than adding another layer of detection further down the chain.",
+          "recommended_controls": [
+            "Replace string concatenation with parameterised queries in the search and login handlers, so user input is passed to the driver separately from the statement and can never be parsed as SQL (closes A03).",
+            "Set DEBUG to false in the production configuration and return a generic error page, logging the detail server-side only (closes A05).",
+            "Enrol the portal administrator account in phishing-resistant MFA, so a bypassed password check is not sufficient on its own (closes A07)."
+          ]
+        },
+        "executive_summary": "A web incident affecting Northwind Polytechnic. The student portal builds SQL by concatenating user input directly into query strings, in both the search handler and the login handler. The application also runs with DEBUG enabled in production, so failed queries returned the offending SQL statement, the ORM library and the framework version to the attacker - turning a blind probe into a guided one. Once the login query was understood, a comment character removed the password comparison, and the portal's administrator account had no second factor to fall back on."
+      },
+      "created_at": "2025-05-07T10:36:04.000Z",
+      "prev_hash": "33dd2cbb1156d463ad79162b286b232ad5f4e09887ac63bce97345356d871852",
+      "hash": "65a9d84c5a42cd06097ca2aa69ea537f1635820deb70d675286ef92a2af2d943",
+      "client_meta": null
+    },
+    {
+      "id": "sample-webapp-sql-injection-0045",
+      "session_id": "sample-webapp-sql-injection",
+      "user_id": "sample-user-webapp-sql-injection",
+      "event_type": "SESSION_COMPLETE",
+      "phase": "lessons_learned",
+      "payload": {
+        "total_phases": 6
+      },
+      "created_at": "2025-05-07T10:36:21.000Z",
+      "prev_hash": "65a9d84c5a42cd06097ca2aa69ea537f1635820deb70d675286ef92a2af2d943",
+      "hash": "e3837914d22c4031c902e64553b45fdc052371464ecf867bffdb9f96dfd9ee27",
+      "client_meta": null
+    }
+  ]
+}

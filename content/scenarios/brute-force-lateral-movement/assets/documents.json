@@ -1,0 +1,103 @@
+[
+  {
+    "id": "doc-auth-report",
+    "asset_type": "auth_log",
+    "title": "Authentication summary: JMP-RDP-01, 01:00-02:00",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "host": "JMP-RDP-01",
+      "window": "2025-04-22 01:00 to 02:00 UTC",
+      "source_address": "198.51.100.23",
+      "failed_logons": 43,
+      "successful_logons": 1,
+      "accounts_targeted": [
+        "a.lim",
+        "j.tan",
+        "svc_helpdesk",
+        "m.rahman",
+        "p.chan",
+        "svc_backup",
+        "k.ng",
+        "administrator",
+        "r.devi"
+      ],
+      "successful_account": "svc_helpdesk",
+      "account_detail": {
+        "svc_helpdesk": {
+          "type": "service account",
+          "created": "2019-08-14",
+          "password_last_set": "2019-08-14",
+          "password_age_days": 2078,
+          "mfa_enrolled": false,
+          "lockout_policy": "none - excluded from lockout to prevent service interruption",
+          "intended_use": "Unattended helpdesk automation. Not intended for interactive logon.",
+          "member_of": [
+            "Domain Users",
+            "Server Operators",
+            "Helpdesk Automation"
+          ]
+        }
+      },
+      "analyst_notes": [
+        "Nine accounts, a handful of attempts each, spread over 36 minutes. That is password spraying - designed to stay under a lockout threshold.",
+        "The account that worked had a password set in 2019 and was explicitly excluded from the lockout policy.",
+        "Server Operators is a privileged group. This service account could do considerably more than raise tickets.",
+        "Logon type 10 means RemoteInteractive - somebody sitting at an RDP session, not an automated service."
+      ]
+    }
+  },
+  {
+    "id": "doc-firewall-rule",
+    "asset_type": "firewall_log",
+    "title": "Firewall policy: Remote-Access-Legacy",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "policy_name": "Remote-Access-Legacy",
+      "created": "2021-03-08",
+      "created_by": "infra-oncall",
+      "change_ticket": "CHG-2021-0412",
+      "change_justification": "Temporary remote access for estates contractors during campus closure. To be removed when contractors finish (April 2021).",
+      "action": "allow",
+      "source": "any",
+      "destination": "203.0.113.5",
+      "destination_nat": "10.20.1.60 (JMP-RDP-01)",
+      "service": "TCP/3389",
+      "last_reviewed": "never",
+      "hit_count_30d": 184203,
+      "analyst_notes": [
+        "A rule created as a temporary measure in 2021 and never removed. This is the single most common way an institution ends up with RDP on the internet.",
+        "Source is 'any'. Even keeping remote access, restricting it to the contractor's address range would have prevented this.",
+        "184,000 hits in thirty days on a rule nobody reviews. Most of that is the internet knocking."
+      ]
+    }
+  },
+  {
+    "id": "doc-share-listing",
+    "asset_type": "file_share_log",
+    "title": "Contents of the staged archive",
+    "reveal_phase": "investigation",
+    "is_decoy": false,
+    "content": {
+      "archive": "\\\\FS-ACAD-02\\temp$\\acad_records.zip",
+      "created": "2025-04-22T02:05:47.000Z",
+      "created_by": "NORTHWIND\\svc_helpdesk",
+      "size_bytes": 2214592512,
+      "file_count": 14822,
+      "source_share": "\\\\FS-ACAD-02\\AcademicRecords",
+      "sample_contents": [
+        "AcademicRecords/2024/transcripts/DIT-Y2-A.xlsx",
+        "AcademicRecords/2024/transcripts/DIT-Y2-B.xlsx",
+        "AcademicRecords/2025/admissions/applicant-register.xlsx",
+        "AcademicRecords/2025/appeals/case-notes.docx",
+        "AcademicRecords/staff/moderation-2025.xlsx"
+      ],
+      "analyst_notes": [
+        "This is student personal data. Whatever else this incident is, it is now a notifiable data breach and the institution's data protection officer needs to know tonight.",
+        "temp$ is a hidden administrative share - the dollar suffix keeps it out of network browsing. Staging there is a choice, not an accident.",
+        "The archive was created at 02:05 and the outbound transfer began at 02:31. Twenty-six minutes was all the warning anyone had."
+      ]
+    }
+  }
+]

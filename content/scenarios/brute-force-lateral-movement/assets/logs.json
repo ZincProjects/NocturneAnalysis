@@ -1,0 +1,1199 @@
+[
+  {
+    "id": "log-auth-n001",
+    "ts": "2025-04-22T00:30:00.000Z",
+    "source": "auth",
+    "message": "EventID=4624 Logon Type=5 (Service) Account=NORTHWIND\\svc_backup Workstation=FS-ACAD-02 Status=Success",
+    "host": "FS-ACAD-02",
+    "user": "svc_backup",
+    "action": "logon_success",
+    "fields": {
+      "event_id": 4624,
+      "logon_type": 5,
+      "note": "Nightly backup job. Runs at 00:30 every night."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fs-n001",
+    "ts": "2025-04-22T00:31:12.000Z",
+    "source": "fileshare",
+    "message": "READ host=FS-ACAD-02 user=NORTHWIND\\svc_backup share=\\\\FS-ACAD-02\\AcademicRecords operation=backup files=14822",
+    "host": "FS-ACAD-02",
+    "user": "svc_backup",
+    "action": "backup",
+    "fields": {
+      "share": "AcademicRecords",
+      "note": "Expected: this is what a backup looks like."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-n001",
+    "ts": "2025-04-22T00:55:41.000Z",
+    "source": "firewall",
+    "message": "DENY proto=TCP src=198.51.100.140 dst=203.0.113.5 dport=22 policy=Default-Deny-Inbound",
+    "src_ip": "198.51.100.140",
+    "dst_ip": "203.0.113.5",
+    "action": "deny",
+    "fields": {
+      "policy": "Default-Deny-Inbound",
+      "note": "Background internet scanning. Denied, every time, all night."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-n001",
+    "ts": "2025-04-22T01:05:55.000Z",
+    "source": "edr",
+    "message": "PROCESS host=FS-ACAD-02 user=NT AUTHORITY\\SYSTEM parent=services.exe image=MsMpEng.exe args=\"scheduled scan\"",
+    "host": "FS-ACAD-02",
+    "action": "process_create",
+    "severity": "info",
+    "fields": {
+      "note": "Scheduled antivirus scan."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-rdp-allow",
+    "ts": "2025-04-22T01:12:03.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=198.51.100.23 dst=203.0.113.5 dport=3389 policy=Remote-Access-Legacy nat_to=10.20.1.60",
+    "src_ip": "198.51.100.23",
+    "dst_ip": "203.0.113.5",
+    "host": "JMP-RDP-01",
+    "action": "allow",
+    "severity": "medium",
+    "fields": {
+      "policy": "Remote-Access-Legacy",
+      "dport": 3389,
+      "policy_created": "2021-03-08",
+      "policy_source_restriction": "any",
+      "note": "RDP published to the whole internet. Created as a temporary measure in 2021."
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-auth-fail-001",
+    "ts": "2025-04-22T01:12:09.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\a.lim Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "a.lim",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-002",
+    "ts": "2025-04-22T01:12:58.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\j.tan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "j.tan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-003",
+    "ts": "2025-04-22T01:13:47.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_helpdesk Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_helpdesk",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-004",
+    "ts": "2025-04-22T01:14:36.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\m.rahman Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "m.rahman",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-005",
+    "ts": "2025-04-22T01:15:25.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\p.chan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "p.chan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-006",
+    "ts": "2025-04-22T01:16:14.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_backup Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_backup",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-007",
+    "ts": "2025-04-22T01:17:03.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\k.ng Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "k.ng",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-008",
+    "ts": "2025-04-22T01:17:52.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\administrator Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "administrator",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-009",
+    "ts": "2025-04-22T01:18:41.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\r.devi Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "r.devi",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-010",
+    "ts": "2025-04-22T01:19:30.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\a.lim Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "a.lim",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-n002",
+    "ts": "2025-04-22T01:20:08.000Z",
+    "source": "firewall",
+    "message": "DENY proto=TCP src=198.51.100.140 dst=203.0.113.5 dport=445 policy=Default-Deny-Inbound",
+    "src_ip": "198.51.100.140",
+    "dst_ip": "203.0.113.5",
+    "action": "deny",
+    "fields": {
+      "policy": "Default-Deny-Inbound"
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-011",
+    "ts": "2025-04-22T01:20:19.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\j.tan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "j.tan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-012",
+    "ts": "2025-04-22T01:21:08.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_helpdesk Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_helpdesk",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-013",
+    "ts": "2025-04-22T01:21:57.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\m.rahman Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "m.rahman",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-014",
+    "ts": "2025-04-22T01:22:46.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\p.chan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "p.chan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-015",
+    "ts": "2025-04-22T01:23:35.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_backup Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_backup",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-016",
+    "ts": "2025-04-22T01:24:24.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\k.ng Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "k.ng",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-017",
+    "ts": "2025-04-22T01:25:13.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\administrator Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "administrator",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-018",
+    "ts": "2025-04-22T01:26:02.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\r.devi Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "r.devi",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-019",
+    "ts": "2025-04-22T01:26:51.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\a.lim Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "a.lim",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-020",
+    "ts": "2025-04-22T01:27:40.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\j.tan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "j.tan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-021",
+    "ts": "2025-04-22T01:28:29.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_helpdesk Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_helpdesk",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-022",
+    "ts": "2025-04-22T01:29:18.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\m.rahman Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "m.rahman",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-023",
+    "ts": "2025-04-22T01:30:07.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\p.chan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "p.chan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-024",
+    "ts": "2025-04-22T01:30:56.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_backup Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_backup",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-025",
+    "ts": "2025-04-22T01:31:45.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\k.ng Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "k.ng",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-026",
+    "ts": "2025-04-22T01:32:34.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\administrator Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "administrator",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-027",
+    "ts": "2025-04-22T01:33:23.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\r.devi Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "r.devi",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-028",
+    "ts": "2025-04-22T01:34:12.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\a.lim Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "a.lim",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-029",
+    "ts": "2025-04-22T01:35:01.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\j.tan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "j.tan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-030",
+    "ts": "2025-04-22T01:35:50.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_helpdesk Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_helpdesk",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-031",
+    "ts": "2025-04-22T01:36:39.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\m.rahman Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "m.rahman",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-032",
+    "ts": "2025-04-22T01:37:28.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\p.chan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "p.chan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-033",
+    "ts": "2025-04-22T01:38:17.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_backup Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_backup",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-034",
+    "ts": "2025-04-22T01:39:06.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\k.ng Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "k.ng",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-035",
+    "ts": "2025-04-22T01:39:55.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\administrator Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "administrator",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-036",
+    "ts": "2025-04-22T01:40:44.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\r.devi Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "r.devi",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-037",
+    "ts": "2025-04-22T01:41:33.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\a.lim Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "a.lim",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-038",
+    "ts": "2025-04-22T01:42:22.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\j.tan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "j.tan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-039",
+    "ts": "2025-04-22T01:43:11.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_helpdesk Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_helpdesk",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-040",
+    "ts": "2025-04-22T01:44:00.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\m.rahman Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "m.rahman",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-041",
+    "ts": "2025-04-22T01:44:49.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\p.chan Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "p.chan",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-042",
+    "ts": "2025-04-22T01:45:38.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_backup Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "svc_backup",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-fail-043",
+    "ts": "2025-04-22T01:46:27.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\k.ng Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Failure Reason=Unknown user name or bad password",
+    "host": "JMP-RDP-01",
+    "user": "k.ng",
+    "src_ip": "198.51.100.23",
+    "action": "logon_failure",
+    "severity": "medium",
+    "fields": {
+      "event_id": 4625,
+      "logon_type": 10,
+      "failure_reason": "0xC000006A"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-spike",
+    "ts": "2025-04-22T01:47:58.000Z",
+    "source": "auth",
+    "message": "SUMMARY 43 failed interactive logons to JMP-RDP-01 from 198.51.100.23 between 01:12 and 01:47, followed by 1 success at 01:48:22",
+    "host": "JMP-RDP-01",
+    "src_ip": "198.51.100.23",
+    "severity": "high",
+    "action": "summary",
+    "fields": {
+      "failed_count": 43,
+      "success_count": 1,
+      "distinct_accounts": 9,
+      "window_minutes": 36,
+      "note": "Password spraying: many accounts, few attempts each, then one hit."
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-auth-success",
+    "ts": "2025-04-22T01:48:22.000Z",
+    "source": "auth",
+    "message": "EventID=4624 Logon Type=10 (RemoteInteractive) Account=NORTHWIND\\svc_helpdesk Workstation=JMP-RDP-01 Source=198.51.100.23 Status=Success",
+    "host": "JMP-RDP-01",
+    "user": "svc_helpdesk",
+    "src_ip": "198.51.100.23",
+    "action": "logon_success",
+    "severity": "critical",
+    "fields": {
+      "event_id": 4624,
+      "logon_type": 10,
+      "account_type": "service account",
+      "note": "A service account signing in interactively, from the internet, at 01:48. None of those three things should be true."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-wmic",
+    "ts": "2025-04-22T01:52:41.000Z",
+    "source": "edr",
+    "message": "PROCESS host=JMP-RDP-01 user=NORTHWIND\\svc_helpdesk parent=cmd.exe image=wmic.exe args=\"/node:FS-ACAD-02 process call create \\\"cmd.exe /c C:\\\\Windows\\\\psexesvc.exe\\\"\"",
+    "host": "JMP-RDP-01",
+    "user": "svc_helpdesk",
+    "severity": "high",
+    "action": "process_create",
+    "fields": {
+      "image": "wmic.exe",
+      "target": "FS-ACAD-02",
+      "signed": true,
+      "note": "Living off the land: wmic is a legitimate Windows binary being used to execute code on another host."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-psexec",
+    "ts": "2025-04-22T01:53:12.000Z",
+    "source": "edr",
+    "message": "FILE_CREATE host=FS-ACAD-02 path=C:\\Windows\\psexesvc.exe sha256=7b8e41a09c2d5f36e8a1b47d90c5e2f8134a6b7c9d0e2f4a5b6c7d8e9f012345 signed=false",
+    "host": "FS-ACAD-02",
+    "user": "svc_helpdesk",
+    "severity": "high",
+    "action": "file_create",
+    "fields": {
+      "sha256": "7b8e41a09c2d5f36e8a1b47d90c5e2f8134a6b7c9d0e2f4a5b6c7d8e9f012345",
+      "signed": false,
+      "size_bytes": 187904
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-smb",
+    "ts": "2025-04-22T01:53:15.000Z",
+    "source": "auth",
+    "message": "EventID=4624 Logon Type=3 (Network) Account=NORTHWIND\\svc_helpdesk Workstation=FS-ACAD-02 Source=10.20.1.60 Status=Success",
+    "host": "FS-ACAD-02",
+    "user": "svc_helpdesk",
+    "src_ip": "10.20.1.60",
+    "action": "logon_success",
+    "severity": "high",
+    "fields": {
+      "event_id": 4624,
+      "logon_type": 3,
+      "note": "Lateral movement. The source is now the jump host, not the internet."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fs-enum",
+    "ts": "2025-04-22T01:56:02.000Z",
+    "source": "fileshare",
+    "message": "ACCESS host=FS-ACAD-02 user=NORTHWIND\\svc_helpdesk share=\\\\FS-ACAD-02\\AcademicRecords operation=enumerate files=14822",
+    "host": "FS-ACAD-02",
+    "user": "svc_helpdesk",
+    "action": "enumerate",
+    "severity": "high",
+    "fields": {
+      "share": "AcademicRecords",
+      "file_count": 14822
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-7z",
+    "ts": "2025-04-22T02:04:11.000Z",
+    "source": "edr",
+    "message": "PROCESS host=FS-ACAD-02 user=NORTHWIND\\svc_helpdesk parent=psexesvc.exe image=7z.exe args=\"a -tzip -mx1 C:\\temp\\acad_records.zip C:\\Shares\\AcademicRecords\\*\"",
+    "host": "FS-ACAD-02",
+    "user": "svc_helpdesk",
+    "severity": "high",
+    "action": "process_create",
+    "fields": {
+      "image": "7z.exe",
+      "note": "Fast compression, minimum ratio - optimised for speed, not size. They are in a hurry."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fs-archive",
+    "ts": "2025-04-22T02:05:47.000Z",
+    "source": "fileshare",
+    "message": "WRITE host=FS-ACAD-02 user=NORTHWIND\\svc_helpdesk path=\\\\FS-ACAD-02\\temp$\\acad_records.zip size=2214592512 operation=create",
+    "host": "FS-ACAD-02",
+    "user": "svc_helpdesk",
+    "action": "write",
+    "severity": "critical",
+    "fields": {
+      "path": "\\\\FS-ACAD-02\\temp$\\acad_records.zip",
+      "size_bytes": 2214592512,
+      "note": "2.1 GB staged in a hidden temp share at 02:05. Collection before exfiltration."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-n002",
+    "ts": "2025-04-22T02:15:03.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=2 (Interactive) Account=NORTHWIND\\n.ops Workstation=NOC-WS-01 Status=Failure Reason=Bad password",
+    "host": "NOC-WS-01",
+    "user": "n.ops",
+    "action": "logon_failure",
+    "fields": {
+      "event_id": 4625,
+      "note": "Night-shift operator mistyping their own password once."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-n003",
+    "ts": "2025-04-22T02:15:19.000Z",
+    "source": "auth",
+    "message": "EventID=4624 Logon Type=2 (Interactive) Account=NORTHWIND\\n.ops Workstation=NOC-WS-01 Status=Success",
+    "host": "NOC-WS-01",
+    "user": "n.ops",
+    "action": "logon_success",
+    "fields": {
+      "event_id": 4624
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-exfil-001",
+    "ts": "2025-04-22T02:31:04.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=10.20.2.40 dst=198.51.100.23 dport=443 policy=Server-Outbound bytes=367001600",
+    "host": "FS-ACAD-02",
+    "src_ip": "10.20.2.40",
+    "dst_ip": "198.51.100.23",
+    "action": "allow",
+    "severity": "critical",
+    "fields": {
+      "policy": "Server-Outbound",
+      "dport": 443,
+      "bytes": 367001600,
+      "note": "A file server uploading hundreds of megabytes to the same address that brute-forced the jump host."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-exfil-002",
+    "ts": "2025-04-22T02:36:04.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=10.20.2.40 dst=198.51.100.23 dport=443 policy=Server-Outbound bytes=367002624",
+    "host": "FS-ACAD-02",
+    "src_ip": "10.20.2.40",
+    "dst_ip": "198.51.100.23",
+    "action": "allow",
+    "severity": "critical",
+    "fields": {
+      "policy": "Server-Outbound",
+      "dport": 443,
+      "bytes": 367002624,
+      "note": "A file server uploading hundreds of megabytes to the same address that brute-forced the jump host."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-n003",
+    "ts": "2025-04-22T02:40:19.000Z",
+    "source": "firewall",
+    "message": "DENY proto=TCP src=198.51.100.140 dst=203.0.113.5 dport=8080 policy=Default-Deny-Inbound",
+    "src_ip": "198.51.100.140",
+    "dst_ip": "203.0.113.5",
+    "action": "deny",
+    "fields": {
+      "policy": "Default-Deny-Inbound"
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-exfil-003",
+    "ts": "2025-04-22T02:41:04.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=10.20.2.40 dst=198.51.100.23 dport=443 policy=Server-Outbound bytes=367003648",
+    "host": "FS-ACAD-02",
+    "src_ip": "10.20.2.40",
+    "dst_ip": "198.51.100.23",
+    "action": "allow",
+    "severity": "critical",
+    "fields": {
+      "policy": "Server-Outbound",
+      "dport": 443,
+      "bytes": 367003648,
+      "note": "A file server uploading hundreds of megabytes to the same address that brute-forced the jump host."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-exfil-004",
+    "ts": "2025-04-22T02:46:04.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=10.20.2.40 dst=198.51.100.23 dport=443 policy=Server-Outbound bytes=367004672",
+    "host": "FS-ACAD-02",
+    "src_ip": "10.20.2.40",
+    "dst_ip": "198.51.100.23",
+    "action": "allow",
+    "severity": "critical",
+    "fields": {
+      "policy": "Server-Outbound",
+      "dport": 443,
+      "bytes": 367004672,
+      "note": "A file server uploading hundreds of megabytes to the same address that brute-forced the jump host."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-exfil-005",
+    "ts": "2025-04-22T02:51:04.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=10.20.2.40 dst=198.51.100.23 dport=443 policy=Server-Outbound bytes=367005696",
+    "host": "FS-ACAD-02",
+    "src_ip": "10.20.2.40",
+    "dst_ip": "198.51.100.23",
+    "action": "allow",
+    "severity": "critical",
+    "fields": {
+      "policy": "Server-Outbound",
+      "dport": 443,
+      "bytes": 367005696,
+      "note": "A file server uploading hundreds of megabytes to the same address that brute-forced the jump host."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-exfil-006",
+    "ts": "2025-04-22T02:56:04.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=10.20.2.40 dst=198.51.100.23 dport=443 policy=Server-Outbound bytes=367006720",
+    "host": "FS-ACAD-02",
+    "src_ip": "10.20.2.40",
+    "dst_ip": "198.51.100.23",
+    "action": "allow",
+    "severity": "critical",
+    "fields": {
+      "policy": "Server-Outbound",
+      "dport": 443,
+      "bytes": 367006720,
+      "note": "A file server uploading hundreds of megabytes to the same address that brute-forced the jump host."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-exfil-total",
+    "ts": "2025-04-22T02:58:30.000Z",
+    "source": "firewall",
+    "message": "SUMMARY src=10.20.2.40 dst=198.51.100.23 dport=443 total_bytes=2214604800 duration=27m26s",
+    "host": "FS-ACAD-02",
+    "src_ip": "10.20.2.40",
+    "dst_ip": "198.51.100.23",
+    "action": "allow",
+    "severity": "critical",
+    "fields": {
+      "total_bytes": 2214604800,
+      "duration_seconds": 1646,
+      "note": "The staged archive, in full, leaving the network."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fs-n002",
+    "ts": "2025-04-22T03:12:40.000Z",
+    "source": "fileshare",
+    "message": "READ host=FS-ACAD-02 user=NORTHWIND\\a.lim share=\\\\FS-ACAD-02\\Coursework operation=open files=3",
+    "host": "FS-ACAD-02",
+    "user": "a.lim",
+    "action": "read",
+    "fields": {
+      "note": "A lecturer opening three coursework files at 03:12. Unusual hour, entirely legitimate."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  }
+]

@@ -1,0 +1,87 @@
+[
+  {
+    "id": "doc-access-log",
+    "asset_type": "http_access_log",
+    "title": "Raw access log extract: /api/search, 14:22-14:35",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "endpoint": "/api/search",
+      "source": "203.0.113.188",
+      "user_agent": "python-requests/2.31.0",
+      "sample_requests": [
+        "' OR '1'='1",
+        "' OR '1'='1' --",
+        "' UNION SELECT NULL--",
+        "' UNION SELECT NULL,NULL--",
+        "' UNION SELECT NULL,NULL,NULL--",
+        "' UNION SELECT table_name,NULL,NULL FROM information_schema.tables--",
+        "' UNION SELECT column_name,NULL,NULL FROM information_schema.columns WHERE table_name='users'--",
+        "' UNION SELECT username,password,NULL FROM users--"
+      ],
+      "normal_request_for_comparison": "GET /api/search?q=timetable HTTP/1.1 200 1876",
+      "analyst_notes": [
+        "The user agent is python-requests. No browser sends that. This is a script.",
+        "Read the payloads in order - they tell a story. A single quote to see if anything breaks, then a always-true condition, then counting columns upward, then reading the schema, then reading the users table.",
+        "Response sizes are the giveaway. A normal search returns about 1.9 KB. The final request returned 918 KB.",
+        "The 500 errors are not failures from the attacker's point of view. Each one told them something about the query."
+      ]
+    }
+  },
+  {
+    "id": "doc-error-page",
+    "asset_type": "http_access_log",
+    "title": "Error response returned to the client",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "status": 500,
+      "content_type": "text/html",
+      "body_text": "Traceback (most recent call last):\n  File \"/srv/portal/app/views/search.py\", line 42, in search\n    cur.execute(\"SELECT id, title, body FROM articles WHERE title LIKE '%\" + q + \"%'\")\npsycopg2.errors.SyntaxError: unterminated quoted string at or near \"'\"\nLINE 1: SELECT id, title, body FROM articles WHERE title LIKE '%'%'\n\nFlask 2.0.1 | psycopg2 2.9.3 | DEBUG=True",
+      "analyst_notes": [
+        "Line 42 is the vulnerability, printed for the attacker to read: the query is built by string concatenation.",
+        "DEBUG=True in production is the configuration error. It turns every mistake into documentation for whoever is probing you.",
+        "Framework and library versions are disclosed too, which tells an attacker exactly which published vulnerabilities to try next.",
+        "Nothing here would be visible if the application returned a generic error page and logged the detail server-side."
+      ]
+    }
+  },
+  {
+    "id": "doc-login-request",
+    "asset_type": "http_access_log",
+    "title": "The authentication bypass request",
+    "reveal_phase": "investigation",
+    "is_decoy": false,
+    "content": {
+      "method": "POST",
+      "path": "/api/login",
+      "source": "203.0.113.188",
+      "body": "username=admin'+--+&password=anything",
+      "decoded_username": "admin' -- ",
+      "resulting_query": "SELECT id, role FROM users WHERE username = 'admin' -- ' AND password_hash = '<hash of anything>'",
+      "status": 302,
+      "session_issued": "sess_9f2b41",
+      "analyst_notes": [
+        "The two dashes start a SQL comment. Everything after them - including the entire password check - is ignored by the database.",
+        "The query becomes 'find the user called admin', and the application treats a returned row as a successful login.",
+        "The password submitted was irrelevant. It was never compared to anything.",
+        "MFA would have stopped this dead: the attacker had no second factor and the account was not enrolled."
+      ]
+    }
+  },
+  {
+    "id": "doc-source-snippet",
+    "asset_type": "ticket",
+    "title": "Portal source: the vulnerable handler",
+    "reveal_phase": "eradication",
+    "is_decoy": false,
+    "content": {
+      "ticket_id": "DEV-4471",
+      "opened_at": "2025-06-17T15:10:00.000Z",
+      "opened_by": "soc@northwind.example",
+      "channel": "incident",
+      "subject": "Parameterise the search and login queries in the student portal",
+      "body": "Two handlers build SQL by concatenating user input.\n\nsearch.py line 42:\n    cur.execute(\"SELECT id, title, body FROM articles WHERE title LIKE '%\" + q + \"%'\")\n\nauth.py line 88:\n    cur.execute(\"SELECT id, role FROM users WHERE username = '\" + username + \"' AND password_hash = '\" + h + \"'\")\n\nBoth must use parameterised queries. The correct form for search.py is:\n\n    cur.execute(\"SELECT id, title, body FROM articles WHERE title LIKE %s\", (f'%{q}%',))\n\nThe placeholder is passed to the driver separately from the statement, so the input can never be parsed as SQL no matter what it contains. Escaping the input instead is not an acceptable substitute.\n\nAlso required: set DEBUG=False in the production configuration and return a generic error page."
+    }
+  }
+]

@@ -1,0 +1,126 @@
+[
+  {
+    "id": "doc-ransom-note",
+    "asset_type": "ransom_note",
+    "title": "_HOW_TO_RESTORE_FILES.txt",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "body_text": "=== YOUR NETWORK HAS BEEN ENCRYPTED ===\n\nEvery document, spreadsheet and database on this computer and on your shared\ndrives has been encrypted with AES-256. Your backups have been removed.\n\nDo not rename the files. Do not run recovery software. Both will make the\nfiles permanently unrecoverable.\n\nWe have also downloaded 340 GB of your data before encrypting it. If we are\nnot contacted within 72 hours it will be published.\n\nTo obtain the decryption key, contact us with your organisation ID:\n\n  Organisation ID: NWP-4471-AC\n  Contact: recovery-desk.paylo4d.example\n\nThe price increases after 72 hours.\n\n=== DO NOT INVOLVE LAW ENFORCEMENT ===",
+      "analyst_notes": [
+        "The double extortion claim - encrypted AND stolen - is standard practice and may or may not be true. Treat it as a claim to verify, not a fact, and check your egress logs before repeating it to leadership.",
+        "'Do not run recovery software' is partly self-serving and partly true: some recovery tools do overwrite recoverable data. Do not take operational advice from the attacker, but do not dismiss it either.",
+        "'Do not involve law enforcement' is the line to ignore most confidently. In practice, notifying is standard and often mandatory.",
+        "The 72-hour clock is a pressure device. It exists to make the institution decide before it has finished understanding what happened."
+      ]
+    }
+  },
+  {
+    "id": "doc-impact-summary",
+    "asset_type": "file_share_log",
+    "title": "Impact summary: affected systems at 08:05",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "assessed_at": "2025-03-18T08:05:00.000Z",
+      "hosts": [
+        {
+          "host": "WKS-HR-014",
+          "files": 1842,
+          "role": "HR officer workstation",
+          "first_seen": "07:41:12"
+        },
+        {
+          "host": "WKS-HR-015",
+          "files": 964,
+          "role": "HR workstation",
+          "first_seen": "07:43:27"
+        },
+        {
+          "host": "WKS-FIN-003",
+          "files": 2211,
+          "role": "Finance workstation",
+          "first_seen": "07:45:05"
+        },
+        {
+          "host": "WKS-ADM-021",
+          "files": 1408,
+          "role": "Admissions workstation",
+          "first_seen": "07:47:19"
+        },
+        {
+          "host": "FS-SHARED-01",
+          "files": 41882,
+          "role": "Departmental file server",
+          "first_seen": "07:49:33"
+        }
+      ],
+      "total_files": 48307,
+      "backup_status": {
+        "last_successful_full": "2025-03-18T02:00:14Z",
+        "target": "FS-SHARED-01",
+        "files": 402118,
+        "location": "BKP-SRV-01, separate VLAN, credentials not shared with the domain",
+        "encrypted_by_ransomware": false,
+        "last_restore_test": "2024-09-02"
+      },
+      "analyst_notes": [
+        "Five systems in eight minutes. The spread is fast but not instantaneous - the gap between hosts is what a response has to fit inside.",
+        "The file server was reached over a mapped drive from the first workstation, not by the malware moving host to host. Segmentation between workstations would not have stopped that; restricting who can write to the whole share would have.",
+        "The nightly backup completed at 02:00 and lives on a separate VLAN with its own credentials, so it survived. That single design decision is the difference between a bad week and an existential one.",
+        "The backup has not been restore-tested since September 2024. A backup nobody has restored from is a hypothesis."
+      ]
+    }
+  },
+  {
+    "id": "doc-prior-incident",
+    "asset_type": "ticket",
+    "title": "Prior incident INC-2025-0311, closed 11 March",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "ticket_id": "INC-2025-0311",
+      "opened_at": "2025-03-11T09:05:00Z",
+      "opened_by": "soc@northwind.example",
+      "channel": "edr",
+      "subject": "Phishing attachment led to PowerShell execution on WKS-HR-014",
+      "body": "A spearphishing attachment was opened by p.raman on WKS-HR-014. Encoded PowerShell downloaded a second-stage implant which established Run-key persistence and began beaconing to update-cdn.paylo4d.example.\n\nActions taken:\n  - C2 domain blocked at the web proxy.\n  - Phishing awareness reminder issued to HR.\n  - Ticket closed 11 March 17:40.\n\nActions NOT taken:\n  - Host was not isolated (user needed the laptop for payroll week).\n  - Host was not reimaged.\n  - The Run key was not removed.\n  - p.raman's credentials were not reset.\n  - The C2 domain was not blocked at DNS or at the firewall.\n  - No sweep was run for the same indicators on other hosts."
+    }
+  },
+  {
+    "id": "doc-backup-status",
+    "asset_type": "auth_log",
+    "title": "Backup infrastructure status",
+    "reveal_phase": "recovery",
+    "is_decoy": false,
+    "content": {
+      "backup_server": "BKP-SRV-01",
+      "network": "Backup VLAN 10.20.9.0/24, no inbound SMB from user VLANs",
+      "authentication": "Local accounts only; not joined to the NORTHWIND domain",
+      "last_full_backup": "2025-03-18T02:00:14Z",
+      "last_incremental": "2025-03-18T06:00:09Z",
+      "integrity_check": "passed",
+      "encrypted_by_ransomware": false,
+      "restore_test_history": [
+        {
+          "date": "2024-09-02",
+          "scope": "single file",
+          "result": "success"
+        },
+        {
+          "date": "2024-03-14",
+          "scope": "single file",
+          "result": "success"
+        }
+      ],
+      "full_system_restore_tested": false,
+      "estimated_restore_time_full": "14-20 hours (untested estimate)",
+      "analyst_notes": [
+        "The backup survived because it is on a separate VLAN with credentials the domain does not know. This is the control that decides ransomware outcomes.",
+        "The 06:00 incremental ran ninety minutes before encryption began, so the recovery point is close.",
+        "Restore testing has only ever covered single files. Nobody has ever restored a whole system from this, and the 14-20 hour estimate is a guess.",
+        "Before reconnecting anything to a restored environment, the implant and its persistence have to be gone - otherwise the restore is re-encrypted by the same Run key."
+      ]
+    }
+  }
+]

@@ -1,0 +1,93 @@
+[
+  {
+    "id": "alert-mass-encryption",
+    "title": "Mass file rename in progress on WKS-HR-014",
+    "severity": "critical",
+    "source": "Northwind EDR",
+    "first_seen": "2025-03-18T07:41:12.000Z",
+    "description": "1,842 files renamed to a .nocturnelock extension in sixty seconds. The process doing it is onedrivesync.exe, running from AppData.",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 0,
+    "linked_document_ids": [
+      "doc-ransom-note"
+    ],
+    "linked_log_ids": [
+      "log-edr-mass-rename",
+      "log-edr-vssadmin"
+    ]
+  },
+  {
+    "id": "alert-shadow-delete",
+    "title": "Volume shadow copies deleted",
+    "severity": "critical",
+    "source": "Northwind EDR",
+    "first_seen": "2025-03-18T07:40:58.000Z",
+    "description": "vssadmin delete shadows /all /quiet executed on WKS-HR-014, fourteen seconds before encryption began. Local recovery points are gone.",
+    "host": "WKS-HR-014",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 0,
+    "linked_document_ids": [],
+    "linked_log_ids": [
+      "log-edr-vssadmin",
+      "log-edr-service-stop"
+    ]
+  },
+  {
+    "id": "alert-spread",
+    "title": "Mass file rename detections on four more hosts",
+    "severity": "critical",
+    "source": "Northwind EDR",
+    "first_seen": "2025-03-18T07:49:33.000Z",
+    "description": "The same detection has now fired on WKS-HR-015, WKS-FIN-003, WKS-ADM-021 and the shared file server FS-SHARED-01. 47,000 files affected across the estate.",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 60,
+    "linked_document_ids": [
+      "doc-impact-summary"
+    ],
+    "linked_log_ids": [
+      "log-ticket-summary",
+      "log-fs-mapped-drive"
+    ]
+  },
+  {
+    "id": "alert-av-scan",
+    "title": "Scheduled antivirus scan completed",
+    "severity": "info",
+    "source": "Northwind EDR",
+    "first_seen": "2025-03-18T07:15:00.000Z",
+    "description": "Routine scheduled scan on WKS-FIN-003 completed with no detections. Expected daily activity.",
+    "host": "WKS-FIN-003",
+    "is_decoy": true,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 0,
+    "linked_document_ids": [],
+    "linked_log_ids": [
+      "log-edr-n001"
+    ]
+  },
+  {
+    "id": "alert-c2-return",
+    "title": "Resolution of a previously blocked command-and-control domain",
+    "severity": "critical",
+    "source": "Network Detection",
+    "first_seen": "2025-03-18T07:38:09.000Z",
+    "description": "WKS-HR-014 resolved update-cdn.paylo4d.example and downloaded 1.8 MB from it at 07:39 - three minutes before encryption started. This domain was blocked at the proxy after incident INC-2025-0311 on 11 March, but never at DNS or the firewall.",
+    "host": "WKS-HR-014",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 200,
+    "linked_document_ids": [
+      "doc-prior-incident"
+    ],
+    "linked_log_ids": [
+      "log-dns-c2-return",
+      "log-proxy-payload-pull",
+      "log-edr-runkey-persist"
+    ]
+  }
+]

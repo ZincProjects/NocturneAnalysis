@@ -1,0 +1,111 @@
+[
+  {
+    "id": "alert-error-rate",
+    "title": "Error rate spike on the student portal search endpoint",
+    "severity": "high",
+    "source": "Application Monitoring",
+    "first_seen": "2025-06-17T14:22:10.000Z",
+    "description": "1,847 requests to /api/search from one address in 11 minutes, 94% returning HTTP 500. Normal error rate for this endpoint is under 0.2%.",
+    "host": "WEB-PORTAL-01",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 0,
+    "linked_document_ids": [
+      "doc-access-log"
+    ],
+    "linked_log_ids": [
+      "log-http-spike",
+      "log-http-probe-1"
+    ]
+  },
+  {
+    "id": "alert-waf-absent",
+    "title": "Anomalous request signatures on a public endpoint",
+    "severity": "medium",
+    "source": "Network Detection",
+    "first_seen": "2025-06-17T14:22:14.000Z",
+    "description": "Requests to /api/search contain SQL metacharacters and keywords. The portal has no web application firewall in front of it, so nothing is blocking them.",
+    "host": "WEB-PORTAL-01",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 0,
+    "linked_document_ids": [
+      "doc-access-log"
+    ],
+    "linked_log_ids": [
+      "log-http-sqli-001"
+    ]
+  },
+  {
+    "id": "alert-crawler",
+    "title": "Search engine crawler activity",
+    "severity": "info",
+    "source": "Application Monitoring",
+    "first_seen": "2025-06-17T14:30:00.000Z",
+    "description": "Googlebot indexing the public portal pages. Expected traffic, respecting robots.txt.",
+    "host": "WEB-PORTAL-01",
+    "is_decoy": true,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 0,
+    "linked_document_ids": [],
+    "linked_log_ids": [
+      "log-http-n004"
+    ]
+  },
+  {
+    "id": "alert-stacktrace",
+    "title": "Application returning stack traces to clients",
+    "severity": "high",
+    "source": "Application Monitoring",
+    "first_seen": "2025-06-17T14:24:19.000Z",
+    "description": "The /api/search error response included a database exception with the failing SQL statement, the ORM library and version. Debug output is enabled in production.",
+    "host": "WEB-PORTAL-01",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 140,
+    "linked_document_ids": [
+      "doc-error-page"
+    ],
+    "linked_log_ids": [
+      "log-app-error"
+    ]
+  },
+  {
+    "id": "alert-admin-login",
+    "title": "Portal administrator signed in from an external address",
+    "severity": "critical",
+    "source": "Identity Monitoring",
+    "first_seen": "2025-06-17T14:41:09.000Z",
+    "description": "The portal admin account authenticated successfully from 203.0.113.188 - the same address generating the malformed search requests. The account is not enrolled in MFA.",
+    "host": "WEB-PORTAL-01",
+    "user": "admin",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 280,
+    "linked_document_ids": [
+      "doc-login-request"
+    ],
+    "linked_log_ids": [
+      "log-http-login-bypass",
+      "log-auth-admin"
+    ]
+  },
+  {
+    "id": "alert-export",
+    "title": "Bulk student export downloaded",
+    "severity": "critical",
+    "source": "Application Monitoring",
+    "first_seen": "2025-06-17T14:43:30.000Z",
+    "description": "A 4.4 MB CSV export of the student register was downloaded through the admin interface by the session that authenticated from 203.0.113.188.",
+    "host": "WEB-PORTAL-01",
+    "user": "admin",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 400,
+    "linked_document_ids": [],
+    "linked_log_ids": [
+      "log-http-admin-actions",
+      "log-fw-portal-out"
+    ]
+  }
+]

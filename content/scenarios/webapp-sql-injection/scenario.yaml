@@ -1,0 +1,969 @@
+slug: webapp-sql-injection
+title: "Query Unfiltered: SQL Injection Against the Student Portal"
+category: web
+difficulty: intermediate
+estimated_minutes: 55
+organization: Northwind Polytechnic
+is_published: true
+
+summary: >-
+  The portal's search endpoint starts throwing errors. Twenty minutes later the
+  administrator account signs in from the same address and exports the student
+  register. Work the incident and map it to the OWASP Top 10.
+
+learning_objectives:
+  - Read a SQL injection attack in access logs and follow the attacker's reasoning step by step.
+  - Recognise why a verbose error page is a vulnerability and not a convenience.
+  - Understand how a comment character removes an authentication check entirely.
+  - Map an incident to OWASP Top 10 categories and tie each recommendation to the category it closes.
+  - Explain why parameterised queries fix injection and input escaping does not.
+  - Tell an injection probe apart from a student whose surname contains an apostrophe.
+
+mitre_techniques:
+  - T1190
+  - T1078
+
+owasp_categories:
+  - "A03:2021"
+  - "A05:2021"
+  - "A07:2021"
+
+root_cause: >-
+  The student portal builds SQL by concatenating user input directly into query
+  strings, in both the search handler and the login handler. The application
+  also runs with DEBUG enabled in production, so failed queries returned the
+  offending SQL statement, the ORM library and the framework version to the
+  attacker - turning a blind probe into a guided one. Once the login query was
+  understood, a comment character removed the password comparison, and the
+  portal's administrator account had no second factor to fall back on.
+
+model_recommendations:
+  - Replace string concatenation with parameterised queries in the search and login handlers, so user input is passed to the driver separately from the statement and can never be parsed as SQL (closes A03).
+  - Set DEBUG to false in the production configuration and return a generic error page, logging the detail server-side only (closes A05).
+  - Enrol the portal administrator account in phishing-resistant MFA, so a bypassed password check is not sufficient on its own (closes A07).
+  - Run the portal's database connection under an account with only the privileges the application needs, so a successful injection cannot read the users table.
+  - Add a web application firewall in front of the portal as a detection and delay layer, while being clear it is not a substitute for fixing the query.
+  - Add a pre-merge static analysis check that fails the build on string-concatenated SQL, so the class of bug cannot return silently.
+
+briefing_md: |
+  ## Your shift
+
+  You are on the afternoon shift. The student portal is one of the few systems
+  Northwind Polytechnic runs that is reachable from the public internet, which
+  makes it the most likely thing on your estate to be attacked and the most
+  consequential when it is.
+
+  ## What has happened so far
+
+  At 14:22 application monitoring flagged an error-rate spike on
+  **`/api/search`**. One source address had made 1,847 requests in eleven
+  minutes, and 94% of them returned HTTP 500. The endpoint's normal error rate
+  is under 0.2%.
+
+  ## What you need to do
+
+  Work out what those requests were doing, what they achieved, and which OWASP
+  Top 10 categories this incident belongs to. This scenario is the one built to
+  exercise the OWASP mapping, and your recommendations at the end should tie
+  each fix to the category it closes rather than listing good practice in
+  general.
+
+  One request in the logs looks like an injection probe and is a student called
+  O'Brien searching for their own name. Distinguishing the two is part of the
+  job, and getting it wrong in production means accusing a student of attacking
+  the school.
+
+  > All data in this scenario is synthetic. Addresses use RFC 5737
+  > documentation ranges and domains use RFC 2606 reserved TLDs; none of it
+  > resolves or routes anywhere.
+
+iocs:
+  - value: "203.0.113.188"
+    type: ip
+    is_malicious: true
+    description: "Source of the injection attempts, the authentication bypass and the student register download. One address for the whole incident."
+    discoverable_in_phase: triage
+    points: 10
+  - value: "python-requests/2.31.0"
+    type: process
+    is_malicious: true
+    description: "The attacker's user agent. No browser sends this; every request in the attack chain carries it, which makes it the cheapest possible filter for scoping."
+    discoverable_in_phase: triage
+    points: 8
+  - value: "sess_9f2b41"
+    type: user
+    is_malicious: true
+    description: "Session token issued to the attacker by the bypassed login. Anything done with this session was done as the portal administrator."
+    discoverable_in_phase: investigation
+    points: 10
+  - value: "admin' -- "
+    type: url
+    is_malicious: true
+    description: "The username submitted to bypass authentication. The trailing comment removes the password comparison from the SQL query."
+    discoverable_in_phase: investigation
+    points: 10
+  - value: "/admin/students/export"
+    type: url
+    is_malicious: true
+    description: "The endpoint used to download 4.4 MB of student records once administrative access was obtained."
+    discoverable_in_phase: investigation
+    points: 8
+
+  - value: "10.20.3.15"
+    type: ip
+    is_malicious: false
+    description: "The portal server's own internal address. It appears as the source of the outbound transfer because it is the compromised system, not the attacker's infrastructure."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "m.obrien"
+    type: user
+    is_malicious: false
+    description: "A student whose surname contains an apostrophe. Their perfectly ordinary search shows up in the logs looking like an injection probe."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "198.51.100.99"
+    type: ip
+    is_malicious: false
+    description: "An address probing for an exposed database port. Every attempt was denied - the database is not reachable from outside, and this is unrelated to the successful attack through the application."
+    discoverable_in_phase: investigation
+    points: 6
+
+phases:
+  # ------------------------------------------------------------ triage ----
+  - key: triage
+    title: Triage
+    instructions_md: |
+      Three alerts to start, and more will arrive as the attack progresses.
+
+      The first thing worth internalising: **a 94% error rate is not a broken
+      application, it is somebody learning how your application breaks**. Each
+      of those 500 responses told the attacker something.
+
+      Open the raw access log extract before deciding anything. The payloads
+      read in order tell you what the attacker was trying to work out.
+    objectives:
+      - Recognise the request pattern as injection probing rather than a fault.
+      - Assess severity for an internet-facing system holding student data.
+      - Escalate before the attacker finishes.
+    decisions:
+      - key: alert_severity
+        prompt: What severity do you assign?
+        type: select
+        help_md: |
+          At this moment you have probing against a public endpoint. Consider
+          what the portal holds and who can reach it, not only what you can
+          prove has happened so far.
+        options:
+          - value: critical
+            label: Critical
+            description: Active exploitation of an internet-facing system holding personal data.
+          - value: high
+            label: High
+            description: Determined probing of a public endpoint with signs of success.
+          - value: medium
+            label: Medium
+            description: Automated scanning noise against a public service.
+          - value: low
+            label: Low
+            description: Application errors requiring a developer, not a responder.
+        expected: high
+        points: 10
+        require_rationale: true
+        rationale_md: |
+          **High** at this point, and you should expect to raise it.
+
+          The probing is clearly deliberate and the error responses suggest it
+          is working, which rules out medium and low. But at 14:22 you do not
+          yet have evidence that anything was successfully extracted - the
+          large responses and the admin login come later.
+
+          Critical becomes correct the moment the export alert lands. Recording
+          High now and raising it as the evidence arrives is exactly right, and
+          it is worth noting in your write-up that your assessment changed and
+          why. An analyst who never revises a severity is not reassessing.
+      - key: request_pattern
+        prompt: What are these requests doing?
+        type: select
+        options:
+          - value: sql_injection_probing
+            label: Probing for SQL injection
+            description: Systematically testing how user input is handled in a database query.
+          - value: broken_search_feature
+            label: Exposing a bug in the search feature
+            description: A legitimate user hitting an application fault repeatedly.
+          - value: denial_of_service
+            label: Attempting denial of service
+            description: Generating load to exhaust the server.
+          - value: credential_stuffing
+            label: Credential stuffing
+            description: Testing stolen username and password pairs.
+        expected: sql_injection_probing
+        points: 10
+        rationale_md: |
+          Injection probing. The sequence is the tell: a single quote to see if
+          anything breaks, then a condition that is always true, then counting
+          columns upward until the errors stop.
+
+          Not denial of service - 1,847 requests over eleven minutes is nothing
+          for a web server, and a real attempt would not care about the
+          response content. Not credential stuffing, which targets the login
+          endpoint with password lists rather than the search endpoint with
+          syntax.
+
+          And not a broken feature, though it is worth noticing that a broken
+          feature and an attack look identical for the first few requests. What
+          separates them is the *progression*.
+    actions:
+      - key: escalate-appsec
+        event_type: ESCALATE
+        label: Escalate to the application owner and IR lead
+        target: "Portal development team / IR lead"
+        description: Escalate with the payloads attached - fixing this needs the people who own the code.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct, and escalating to the development team specifically matters
+          here. Unlike a malware incident, the remediation for this is a code
+          change, and the SOC cannot make it.
+      - key: restart-portal
+        event_type: CONTAIN_HOST
+        label: Restart the portal application
+        target: WEB-PORTAL-01
+        description: Clear the error condition and restore normal response times.
+        is_correct: false
+        points: 12
+        requires_confirmation: true
+        feedback_md: |
+          Restarting clears the symptom and changes nothing about the
+          vulnerability. Worse, it destroys in-memory state and application
+          logs that had not yet been flushed, and the attacker simply resumes
+          against the same endpoint.
+
+          "Have you tried turning it off and on again" is a reasonable first
+          move for a fault and an actively harmful one for an intrusion. The
+          difference is whether somebody is on the other end.
+    hints:
+      - key: triage-hint-payloads
+        cost: 3
+        text_md: |
+          Open the access log document and read the `q` parameter values in
+          order rather than individually. They are not random - each one
+          follows from what the previous response revealed.
+      - key: triage-hint-agent
+        cost: 3
+        text_md: |
+          Compare the user agent on the suspicious requests with the ones on
+          normal portal traffic. One of them is not a browser.
+    success_criteria:
+      required_decision_keys: [alert_severity, request_pattern]
+      required_action_keys: [escalate-appsec]
+      required_ioc_values: []
+      min_queries: 1
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ----------------------------------------------------- investigation ----
+  - key: investigation
+    title: Investigation
+    instructions_md: |
+      Follow the attack to its conclusion. Useful searches:
+
+      - `source:http` for the full request history.
+      - `ip:203.0.113.188` to scope everything that address did.
+      - `source:auth` for what happened at the login endpoint.
+
+      Two documents matter most. The **error response** shows what the
+      application handed the attacker for free. The **authentication bypass
+      request** shows how a two-character payload removed the password check.
+
+      When you reach the login bypass, work through the resulting query by
+      hand. Understanding why `--` is devastating is the single most
+      transferable thing in this scenario.
+    objectives:
+      - Establish that the injection succeeded and what it returned.
+      - Explain the authentication bypass in terms of the query it produced.
+      - Identify what data left and through which endpoint.
+      - Separate the genuine attacker from the student who looks like one.
+    decisions:
+      - key: attack_techniques
+        prompt: Which MITRE ATT&CK techniques does the evidence support?
+        type: multi_select
+        help_md: |
+          ATT&CK is coarser than OWASP for web attacks - that is expected, and
+          it is why this scenario carries both mappings. Select only what the
+          evidence supports.
+        options:
+          - value: T1190
+            label: "T1190 - Exploit Public-Facing Application"
+            description: Exploiting a weakness in an internet-facing service.
+          - value: T1078
+            label: "T1078 - Valid Accounts"
+            description: Operating as a legitimate account after obtaining access to it.
+          - value: T1110
+            label: "T1110 - Brute Force"
+            description: Repeated authentication attempts to guess credentials.
+          - value: T1566.001
+            label: "T1566.001 - Phishing: Spearphishing Attachment"
+            description: A targeted email carrying a malicious attachment.
+          - value: T1486
+            label: "T1486 - Data Encrypted for Impact"
+            description: Ransomware encryption of victim files.
+          - value: T1021.002
+            label: "T1021.002 - Remote Services: SMB/Windows Admin Shares"
+            description: Lateral movement over SMB.
+        expected: [T1190, T1078]
+        points: 20
+        rationale_md: |
+          Two techniques. The injection is T1190 - a genuine exploitation of an
+          internet-facing application, unlike the previous scenario where the
+          attacker merely authenticated. Once the bypass issued a session as
+          `admin`, everything afterwards is T1078: they were operating as a
+          legitimate account, and to the application they *were* the
+          administrator.
+
+          T1110 is the near-miss worth being careful about. There were many
+          requests to the login endpoint, but they were not password guesses -
+          the password was never checked at all. Brute force and authentication
+          bypass produce superficially similar log volume and have completely
+          different remediations.
+
+          Notice how little ATT&CK has to say here. Two techniques cover an
+          entire web attack, which is exactly why the OWASP Top 10 exists
+          alongside it.
+      - key: owasp_mapping
+        prompt: Which OWASP Top 10 (2021) categories does this incident demonstrate?
+        type: multi_select
+        help_md: |
+          Three distinct failures contributed. Map each one, not just the
+          headline.
+        options:
+          - value: "A03:2021"
+            label: "A03:2021 - Injection"
+            description: User input interpreted as part of a database command.
+          - value: "A05:2021"
+            label: "A05:2021 - Security Misconfiguration"
+            description: Debug mode enabled in production, returning stack traces to clients.
+          - value: "A07:2021"
+            label: "A07:2021 - Identification and Authentication Failures"
+            description: The administrator account had no second factor.
+          - value: "A01:2021"
+            label: "A01:2021 - Broken Access Control"
+            description: Authenticated users reaching data they should not.
+          - value: "A06:2021"
+            label: "A06:2021 - Vulnerable and Outdated Components"
+            description: A known vulnerability in a third-party library.
+          - value: "A10:2021"
+            label: "A10:2021 - Server-Side Request Forgery"
+            description: The server fetching an attacker-supplied URL.
+        expected: ["A03:2021", "A05:2021", "A07:2021"]
+        points: 20
+        rationale_md: |
+          Three categories, each a separate failure that had to be present:
+
+          **A03 Injection** is the vulnerability itself - the query is built by
+          concatenating input, so the input becomes part of the command.
+
+          **A05 Security Misconfiguration** is the accelerant. `DEBUG=True` in
+          production returned the failing SQL statement, the library and the
+          framework version. Without it the attacker would still have got
+          there, but blind, over far more requests, with far more chance of
+          being noticed.
+
+          **A07 Identification and Authentication Failures** is why the bypass
+          mattered. With MFA on the admin account, defeating the password check
+          would have produced nothing.
+
+          The three wrong options are instructive. A01 is tempting because
+          student data was accessed - but access control worked exactly as
+          designed; it was told the attacker was an administrator and believed
+          it correctly. No third-party component was exploited (A06), and the
+          server never fetched an attacker-supplied URL (A10).
+      - key: bypass_mechanism
+        prompt: How did the login bypass work?
+        type: select
+        help_md: "Open the authentication bypass request document and read the resulting query."
+        options:
+          - value: comment_truncates_password_check
+            label: A SQL comment removed the password comparison from the query
+            description: Everything after the comment marker, including the password check, was ignored by the database.
+          - value: password_was_guessed
+            label: The administrator password was guessed
+            description: Repeated attempts found the correct credential.
+          - value: session_token_stolen
+            label: A valid session token was stolen and replayed
+            description: An existing administrator session was hijacked.
+          - value: password_hash_reversed
+            label: The password hash was extracted and cracked
+            description: The hash from the users table was reversed offline.
+        expected: comment_truncates_password_check
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          The comment. The submitted username was `admin' -- `, which produced:
+
+          ```sql
+          SELECT id, role FROM users WHERE username = 'admin' -- ' AND password_hash = '...'
+          ```
+
+          Everything from `--` onwards is a comment. The database sees only
+          "find the user called admin", returns that row, and the application
+          treats a returned row as a successful authentication. **The password
+          was never compared to anything.** The attacker could have submitted
+          any password, or none.
+
+          "The hash was cracked" is the plausible wrong answer, and the logs
+          rule it out on timing: the users table was dumped at 14:31 and the
+          bypass happened at 14:41. Ten minutes is not enough to crack a
+          properly hashed password, and they did not need to.
+      - key: false_positive_check
+        prompt: One request looks like an injection probe but is not. Which?
+        type: select
+        options:
+          - value: obrien_search
+            label: "A search for O'Brien from an internal address"
+            description: A student searching for a surname that contains an apostrophe.
+          - value: robots_txt
+            label: "The robots.txt request from Googlebot"
+            description: A search engine crawler indexing the site.
+          - value: get_on_login
+            label: "A GET request to /api/login returning 405"
+            description: A method-not-allowed response on the login endpoint.
+          - value: denied_mysql_probe
+            label: "The denied inbound connection to port 3306"
+            description: Someone probing for an exposed database port.
+        expected: obrien_search
+        points: 15
+        rationale_md: |
+          `O'Brien`. An apostrophe in a name is indistinguishable from an
+          apostrophe in an injection payload if you are matching on characters
+          rather than reading context.
+
+          What separates them: it came from an internal campus address, the
+          user agent is a real browser, the response was a normal 1.9 KB search
+          result, and it happened once. Every one of those is the opposite of
+          the attacker's traffic.
+
+          This is not a contrived example. Input filtering that rejects
+          apostrophes is a classic bad fix for injection, and it breaks the
+          portal for every student named O'Brien, D'Souza or Sant'Anna. It is
+          also why the right fix is parameterised queries - they handle the
+          apostrophe correctly *and* handle the attack correctly, because they
+          never treat input as syntax at all.
+    actions: []
+    hints:
+      - key: inv-hint-sizes
+        cost: 5
+        text_md: |
+          Compare response sizes. A normal search returns about 1.9 KB. Find
+          the requests that returned two orders of magnitude more, and read
+          what they asked for.
+      - key: inv-hint-bypass
+        cost: 5
+        text_md: |
+          Write out the login query with `admin' -- ` substituted in, then
+          strike out everything after the two dashes. What is left is the whole
+          authentication check.
+      - key: inv-hint-session
+        cost: 5
+        text_md: |
+          After the bypass, search `source:http` for requests carrying
+          administrative paths. The attacker did not need any more injection
+          once they had a session.
+    success_criteria:
+      required_decision_keys:
+        [attack_techniques, owasp_mapping, bypass_mechanism, false_positive_check]
+      required_action_keys: []
+      required_ioc_values:
+        - "203.0.113.188"
+        - "admin' -- "
+        - "/admin/students/export"
+      min_queries: 3
+      min_notes: 1
+      require_reflection: false
+      reflection_min_words: 0
+
+  # -------------------------------------------------------- containment ----
+  - key: containment
+    title: Containment
+    instructions_md: |
+      Containment for a web application incident is awkward, because the
+      vulnerability is in code you cannot patch in the next five minutes and
+      the system is one students need.
+
+      You have a genuine trade-off: leave the portal up and the vulnerability
+      is reachable, take it down and 4,000 students lose access mid-semester.
+      Decide deliberately and be able to defend it.
+    objectives:
+      - Cut the attacker's access without necessarily taking the service down.
+      - Invalidate what they obtained, not only what they can still reach.
+      - Avoid a fix that breaks legitimate users.
+    decisions:
+      - key: containment_approach
+        prompt: How should the portal be contained?
+        type: select
+        help_md: |
+          The vulnerable code cannot be fixed today. Everything here is a
+          stopgap; choose the one that buys the most time for the least damage.
+        options:
+          - value: block_source_and_disable_endpoints
+            label: Block the source, disable the affected endpoints, keep the rest of the portal up
+            description: Take the vulnerable search and admin export offline; students keep timetables and results.
+          - value: take_portal_offline
+            label: Take the entire portal offline until the code is fixed
+            description: Complete containment, complete outage.
+          - value: block_source_only
+            label: Block the attacker's address and leave everything running
+            description: Minimal disruption, minimal containment.
+          - value: filter_apostrophes
+            label: Add an input filter rejecting apostrophes and SQL keywords
+            description: Block the payload patterns at the application edge.
+        expected: block_source_and_disable_endpoints
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          Block the source, disable the two vulnerable endpoints, keep the rest
+          of the portal running. Students keep the functions they need today;
+          the reachable vulnerability goes away until the code is fixed.
+
+          Blocking the address alone is too little - the attacker changes
+          address in thirty seconds and nothing has been fixed. Taking the
+          whole portal down is defensible but disproportionate when you know
+          precisely which two handlers are affected.
+
+          The input filter is the genuinely tempting wrong answer and it is
+          worth being clear about. It breaks every student named O'Brien, it is
+          routinely bypassed by encoding the payload, and worst of all it
+          creates the belief that the problem is solved, which is how the real
+          fix gets deprioritised. Escaping and filtering are not substitutes
+          for parameterisation.
+    actions:
+      - key: block-attacker-ip
+        event_type: BLOCK_INDICATOR
+        label: Block 203.0.113.188 at the perimeter
+        target: "203.0.113.188"
+        description: Deny traffic from the attacking address.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct as a first move, while being realistic about its value - this
+          buys minutes, not safety. Do it anyway; minutes matter.
+      - key: disable-search-endpoint
+        event_type: BLOCK_INDICATOR
+        label: Disable /api/search and /admin/students/export
+        target: "/api/search, /admin/students/export"
+        description: Return 503 for the two vulnerable endpoints while the code is fixed.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct. This is the action that actually removes the reachable
+          vulnerability, and it is far less disruptive than taking the portal
+          down entirely.
+      - key: revoke-admin-session
+        event_type: ISOLATE_ACCOUNT
+        label: Revoke session sess_9f2b41 and reset the admin credential
+        target: "admin (sess_9f2b41)"
+        description: Invalidate the attacker's session and rotate the administrator password.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct. Blocking the address does nothing about a session already
+          issued - a session token is a bearer credential and works from
+          anywhere until it is revoked.
+      - key: take-portal-offline
+        event_type: CONTAIN_HOST
+        label: Take the entire student portal offline
+        target: WEB-PORTAL-01
+        description: Shut down the portal until the vulnerability is fixed.
+        is_correct: false
+        points: 10
+        requires_confirmation: true
+        feedback_md: |
+          Effective, and disproportionate. You know which two endpoints are
+          affected. Four thousand students have lost their timetables,
+          submissions and results to contain a vulnerability in two handlers.
+
+          There are incidents where this is the right call. This is not one,
+          and the difference is that here you have the precision to do better.
+      - key: block-internal-student
+        event_type: ISOLATE_ACCOUNT
+        label: Disable the m.obrien account
+        target: "m.obrien"
+        description: This account submitted a search containing an apostrophe during the attack window.
+        is_correct: false
+        points: 15
+        requires_confirmation: true
+        feedback_md: |
+          You have suspended a student for searching for their own surname.
+
+          Beyond being wrong, consider the consequence: in a real institution
+          this becomes a disciplinary matter, a distressed student, and a
+          conversation with a parent. False positives in security work are not
+          only inefficient, they land on people.
+    hints:
+      - key: contain-hint-session
+        cost: 5
+        text_md: |
+          The attacker has a session token. Ask yourself what blocking their IP
+          address does to a token that is already issued.
+      - key: contain-hint-proportion
+        cost: 5
+        text_md: |
+          You know exactly which endpoints are vulnerable. Is there a
+          containment that removes those and leaves the rest of the portal
+          working?
+    success_criteria:
+      required_decision_keys: [containment_approach]
+      required_action_keys:
+        - block-attacker-ip
+        - disable-search-endpoint
+        - revoke-admin-session
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # -------------------------------------------------------- eradication ----
+  - key: eradication
+    title: Eradication
+    instructions_md: |
+      Eradication here is a code change, not a cleanup. There is no malware to
+      remove and no persistence mechanism to delete - the attacker used the
+      application exactly as it was written to work.
+
+      The developer ticket is open in your documents. Read the proposed fix
+      before answering.
+    objectives:
+      - Identify the correct fix for the injection and say why alternatives fail.
+      - Close the misconfiguration that accelerated the attack.
+      - Address the authentication weakness that made the bypass pay off.
+    decisions:
+      - key: injection_fix
+        prompt: What is the correct fix for the injection vulnerability?
+        type: select
+        help_md: "There is one right answer here and the wrong ones are all real practices people defend."
+        options:
+          - value: parameterised_queries
+            label: Parameterised queries (prepared statements)
+            description: The statement and the values are sent to the database separately.
+          - value: escape_input
+            label: Escape special characters in user input before building the query
+            description: Neutralise quotes and other metacharacters.
+          - value: blocklist_keywords
+            label: Reject requests containing SQL keywords
+            description: Filter out UNION, SELECT and similar terms at the edge.
+          - value: waf_only
+            label: Put a web application firewall in front of the portal
+            description: Detect and block injection payloads before they reach the application.
+        expected: parameterised_queries
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          **Parameterised queries.** The statement goes to the database with
+          placeholders, and the values travel separately. The database parses
+          the statement *first*, then binds the values, so input can never
+          become syntax no matter what it contains. That is a structural
+          guarantee, not a filter that has to anticipate every payload.
+
+          Why the others fail:
+
+          - **Escaping** relies on getting every character, every encoding and
+            every database dialect right, forever. It is a blocklist wearing a
+            disguise, and it breaks on the next unusual character set.
+          - **Keyword blocklists** break legitimate content - a student
+            searching for "union representation" - and are trivially bypassed
+            by case, comments or encoding.
+          - **A WAF** is worth having as a detection and delay layer. It is not
+            a fix, and treating it as one means the vulnerability is still
+            there the day the WAF is misconfigured or bypassed.
+
+          Parameterisation also handles O'Brien correctly, which none of the
+          others do. That is not a coincidence: a fix that distinguishes data
+          from code correctly gets both cases right.
+      - key: eradication_steps
+        prompt: Which steps are required to eradicate this vulnerability class?
+        type: multi_select
+        options:
+          - value: parameterise_both_handlers
+            label: Parameterise the queries in both the search and login handlers
+            description: Fix the vulnerability in both places it exists.
+          - value: disable_debug_production
+            label: Set DEBUG to false in production and return a generic error page
+            description: Stop handing attackers the query, library and framework version.
+          - value: enrol_admin_mfa
+            label: Enrol the portal administrator account in MFA
+            description: Make a bypassed password check insufficient on its own.
+          - value: least_privilege_db_user
+            label: Run the application's database connection with least privilege
+            description: The portal does not need to read the users table from the search handler.
+          - value: rotate_all_portal_credentials
+            label: Rotate all portal account credentials, since the users table was dumped
+            description: Every password hash in that table is now in the attacker's hands.
+          - value: static_analysis_gate
+            label: Add a pre-merge static analysis check that fails on concatenated SQL
+            description: Prevent the bug class from returning silently.
+          - value: rewrite_portal
+            label: Rewrite the portal in a different framework
+            description: Replace the application entirely.
+          - value: remove_search
+            label: Remove the search feature permanently
+            description: Delete the functionality that was exploited.
+        expected:
+          - parameterise_both_handlers
+          - disable_debug_production
+          - enrol_admin_mfa
+          - least_privilege_db_user
+          - rotate_all_portal_credentials
+          - static_analysis_gate
+        points: 20
+        rationale_md: |
+          Six steps: fix both handlers, close the debug configuration, add the
+          second factor, reduce the database account's privilege, rotate the
+          credentials that were dumped, and add a check so the bug class cannot
+          come back unnoticed.
+
+          Rotating credentials is the one students most often miss. The users
+          table was read at 14:31 - every password hash in the portal is now in
+          the attacker's possession and can be attacked offline at their
+          leisure. Fixing the injection does nothing about that.
+
+          The two wrong options are both "solve it by deleting it". Rewriting
+          the portal is a multi-year programme that leaves the vulnerability
+          live in the meantime; removing search removes a function students
+          use, when the fix is one line per query.
+    actions:
+      - key: request-portal-image
+        event_type: DOWNLOAD_ARTIFACT
+        label: Preserve portal and database logs for the incident window
+        target: WEB-PORTAL-01
+        description: Capture application, access and database logs covering 14:00 to 15:00 before any rotation or redeploy.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct, and time-critical in a way disk imaging is not: web server
+          logs rotate. Capture them before a redeploy or a log rotation removes
+          the only record of exactly which rows were returned.
+    hints:
+      - key: erad-hint-dump
+        cost: 5
+        text_md: |
+          One of the successful injections returned 918 KB from the users
+          table. Ask what is now true about every credential in that table, and
+          whether fixing the query changes it.
+    success_criteria:
+      required_decision_keys: [injection_fix, eradication_steps]
+      required_action_keys: [request-portal-image]
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ----------------------------------------------------------- recovery ----
+  - key: recovery
+    title: Recovery
+    instructions_md: |
+      Bring the portal back, and be able to show it is safe rather than assert
+      it. This scenario also has a notification dimension: student records were
+      exported and the users table was read.
+    objectives:
+      - Define evidence that the fix works before restoring the endpoints.
+      - Handle the consequences of a dumped credential store.
+      - Recognise the disclosure obligation.
+    decisions:
+      - key: recovery_steps
+        prompt: What is required before the affected endpoints return to service?
+        type: multi_select
+        options:
+          - value: verify_fix_with_payloads
+            label: Re-test the original payloads against the fixed code in staging
+            description: Confirm the exact requests that worked now fail safely.
+          - value: confirm_generic_errors
+            label: Confirm the application returns generic errors with no stack traces
+            description: Verify the misconfiguration is closed in the production build.
+          - value: force_password_reset
+            label: Force a password reset for every portal account
+            description: The users table was dumped, so every credential is compromised.
+          - value: review_admin_actions
+            label: Review everything done with the attacker's admin session
+            description: Establish the full extent of what was accessed or changed.
+          - value: monitor_endpoint_30_days
+            label: Monitor the affected endpoints with raised sensitivity for 30 days
+            description: Heightened alerting for a defined period.
+          - value: restore_from_backup
+            label: Restore the portal database from last night's backup
+            description: Roll the database back to before the attack.
+          - value: reenable_debug_for_monitoring
+            label: Keep DEBUG enabled temporarily so errors are easier to diagnose
+            description: Retain the detailed error output while watching for problems.
+        expected:
+          - verify_fix_with_payloads
+          - confirm_generic_errors
+          - force_password_reset
+          - review_admin_actions
+          - monitor_endpoint_30_days
+        points: 20
+        rationale_md: |
+          Five steps. Re-testing with the *original* payloads is the important
+          one: a fix that has not been tested against the exact requests that
+          worked is a hypothesis.
+
+          Restoring from backup is wrong here for an instructive reason.
+          Nothing was destroyed or modified - the attacker read data and
+          exported it. A restore would roll back a day of legitimate student
+          submissions to undo damage that was never done. Read carefully enough
+          to know whether an incident is a confidentiality problem or an
+          integrity one, because the responses are opposite.
+
+          Keeping DEBUG on is the option that reopens the door you just closed.
+      - key: disclosure
+        prompt: What does the institution have to disclose?
+        type: select
+        options:
+          - value: notify_students_and_dpo
+            label: Notify the data protection officer, who decides on notifying affected students
+            description: Personal data was exported and credential hashes were taken.
+          - value: internal_only
+            label: Record it internally; no external notification is needed
+            description: Handle it as an operational security incident.
+          - value: notify_only_if_passwords_cracked
+            label: Notify only if evidence emerges that passwords were cracked
+            description: Wait for confirmed downstream harm before disclosing.
+          - value: notify_regulator_not_students
+            label: Notify the regulator but not the students
+            description: Meet the legal obligation without alarming users.
+        expected: notify_students_and_dpo
+        points: 10
+        rationale_md: |
+          The DPO decides, and they need to be told today. A 4.4 MB student
+          register was exported and the entire credential store was read.
+
+          "Wait until we see harm" is the wrong instinct for a specific reason:
+          offline password cracking leaves no trace in your logs. You will
+          never observe the event you are waiting for. The obligation attaches
+          to the disclosure of the data, not to evidence of its misuse.
+
+          As in the network intrusion scenario, the SOC's job is to hand over
+          precise facts - what was in the export, how many records, which
+          hashing algorithm protected the passwords - and let the people
+          accountable for the obligation decide.
+    actions: []
+    hints:
+      - key: rec-hint-test
+        cost: 5
+        text_md: |
+          You have the exact payloads that worked, in the access log. What is
+          the most direct way to demonstrate the fix is real?
+    success_criteria:
+      required_decision_keys: [recovery_steps, disclosure]
+      required_action_keys: []
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ---------------------------------------------------- lessons learned ----
+  - key: lessons_learned
+    title: Lessons Learned
+    instructions_md: |
+      Write the post-incident review.
+
+      Because this is the OWASP scenario, do one thing specifically: **tie each
+      recommendation to the category it closes**. "Use parameterised queries"
+      is a good recommendation; "use parameterised queries, which closes the
+      A03 Injection vector that made this possible" is one a developer and a
+      manager can both act on, and it is how a security team makes a framework
+      useful rather than decorative.
+
+      Note also that none of the three failures here was exotic. Concatenated
+      SQL, debug mode left on, and a privileged account without MFA are the
+      three most ordinary findings in web application security. That is worth
+      saying out loud in a review.
+    objectives:
+      - Explain the incident so a developer and a vice-principal both understand it.
+      - Map every recommendation to the OWASP category it addresses.
+      - Identify the process gap that let the vulnerability ship.
+    decisions:
+      - key: primary_control_gap
+        prompt: Which single control failure most enabled this incident?
+        type: select
+        options:
+          - value: concatenated_sql
+            label: SQL built by string concatenation in the application code
+            description: The vulnerability itself, present in two handlers.
+          - value: debug_in_production
+            label: Debug mode enabled in production
+            description: Error responses handed the attacker the query structure.
+          - value: no_admin_mfa
+            label: No MFA on the portal administrator account
+            description: A bypassed password check was sufficient to gain admin access.
+          - value: no_waf
+            label: No web application firewall in front of the portal
+            description: Nothing inspected requests before they reached the application.
+        expected: concatenated_sql
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          The concatenated SQL. Everything else made the attack faster, easier
+          or more damaging; this is the one without which there is no attack at
+          all.
+
+          The reasoning matters more than the answer. Debug mode was an
+          accelerant - remove it and a competent attacker still gets there,
+          blind, over more requests. Missing MFA raised the impact - with it,
+          the bypass yields nothing useful. No WAF removed a chance to detect -
+          but a WAF in front of vulnerable code is a mitigation, not a fix.
+
+          Ranking contributing factors honestly is a skill in itself. A review
+          that lists four failures as equally important gives whoever has to
+          prioritise the work no help at all.
+      - key: process_gap
+        prompt: What process change would most reduce the chance of this recurring?
+        type: select
+        options:
+          - value: automated_sast_in_ci
+            label: Automated static analysis in the build, failing on concatenated SQL
+            description: Catch the bug class mechanically before merge.
+          - value: annual_pentest
+            label: An annual penetration test
+            description: Have the portal tested by specialists once a year.
+          - value: developer_training
+            label: Secure coding training for the development team
+            description: Teach developers to avoid the pattern.
+          - value: code_review_policy
+            label: Require a second reviewer on all pull requests
+            description: Add human review before merge.
+        expected: automated_sast_in_ci
+        points: 15
+        rationale_md: |
+          Automated static analysis in the build. Concatenated SQL is exactly
+          the kind of defect a machine finds reliably and a tired human reviewer
+          misses on a Friday afternoon.
+
+          The other three all help and none of them scales the same way. An
+          annual test finds this bug up to twelve months after it ships.
+          Training raises the floor but decays, and the person who wrote this
+          handler may well have known better and been in a hurry. A second
+          reviewer catches it only if that reviewer is looking for it.
+
+          The principle generalises: when a defect class is mechanically
+          detectable, detect it mechanically, and spend the human attention on
+          the problems that need judgement.
+    actions: []
+    hints:
+      - key: ll-hint-owasp
+        cost: 3
+        text_md: |
+          Write each recommendation in the form "do X, which closes Y". If you
+          cannot name the category a recommendation closes, it may be general
+          good practice rather than a finding from this incident.
+    success_criteria:
+      required_decision_keys: [primary_control_gap, process_gap]
+      required_action_keys: []
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: true
+      reflection_min_words: 140

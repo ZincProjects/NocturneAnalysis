@@ -1,0 +1,884 @@
+slug: brute-force-lateral-movement
+title: "The Night Shift: Brute Force to Data Exfiltration"
+category: network
+difficulty: intermediate
+estimated_minutes: 60
+organization: Northwind Polytechnic
+is_published: true
+
+summary: >-
+  Overnight, someone sprayed passwords at an internet-facing jump host, got in
+  on a service account, moved sideways to a file server, and left with 2.1 GB
+  of student records. You are picking this up at 06:00.
+
+learning_objectives:
+  - Recognise password spraying by its shape rather than its volume.
+  - Understand why a service account logging in interactively is a finding on its own.
+  - Trace lateral movement through authentication logon types.
+  - Distinguish collection from exfiltration, and see why the gap between them is your only warning.
+  - Scope containment to the whole blast radius rather than the first host you noticed.
+  - Recognise when a security incident has become a data breach with reporting obligations.
+
+mitre_techniques:
+  - T1110
+  - T1078
+  - T1021.002
+  - T1560
+  - T1041
+
+owasp_categories: []
+
+root_cause: >-
+  A firewall rule created as a temporary measure in March 2021 left RDP exposed
+  to the entire internet and was never reviewed or removed. An attacker sprayed
+  passwords against it and succeeded on svc_helpdesk - a service account with a
+  password unchanged since 2019, no MFA, membership of Server Operators, and an
+  explicit exemption from the account lockout policy. From there they used
+  built-in Windows tooling to move to a file server, archived the academic
+  records share, and uploaded it over HTTPS.
+
+model_recommendations:
+  - Remove the Remote-Access-Legacy firewall rule and place all remote access behind the VPN with MFA; no service should be reachable from the whole internet.
+  - Introduce a scheduled review of perimeter rules with a mandatory expiry date on anything created as temporary.
+  - Deny interactive and RemoteInteractive logon to service accounts through group policy, so a stolen service credential cannot be used at a keyboard.
+  - Remove the lockout exemption on service accounts and replace it with alerting on repeated failures, which achieves the availability goal without removing the control.
+  - Rotate service account passwords on a schedule and move to group-managed service accounts where the platform supports it.
+  - Alert on outbound transfers above a size threshold from servers that have no business uploading anything, which would have caught the exfiltration during the twenty-six minutes it was still only staged.
+
+briefing_md: |
+  ## Your shift
+
+  You are the Tier 2 analyst opening the queue at 06:00. Nothing was escalated
+  to a human overnight - the alerts fired, and they sat.
+
+  ## What has happened so far
+
+  Between 01:12 and 01:47, a single internet address made 43 failed remote
+  logon attempts against **JMP-RDP-01**, the jump host, spread across nine
+  different staff and service accounts. At 01:48:22 one of them succeeded.
+
+  Activity continued on the internal network until just before 03:00.
+
+  ## What you need to do
+
+  Work out what they got, how far they reached, and what the institution now
+  has to do about it. Be careful with scope: the first thing you notice is
+  rarely the whole of what happened, and containment that only addresses the
+  first host leaves the attacker their access.
+
+  One of the alerts in your queue is genuine background noise that ran all
+  night and matters not at all. Part of the exercise is not chasing it.
+
+  > All data in this scenario is synthetic. Addresses use RFC 5737
+  > documentation ranges and domains use RFC 2606 reserved TLDs; none of it
+  > resolves or routes anywhere.
+
+iocs:
+  - value: "198.51.100.23"
+    type: ip
+    is_malicious: true
+    description: "Source of the password spray, the successful RDP logon, and the destination of the 2.1 GB upload. The same address at both ends of the incident."
+    discoverable_in_phase: triage
+    points: 10
+  - value: "svc_helpdesk"
+    type: user
+    is_malicious: true
+    description: "Compromised service account. Password unchanged since 2019, exempt from lockout, member of Server Operators, and not intended for interactive logon at all."
+    discoverable_in_phase: triage
+    points: 10
+  - value: "psexesvc.exe"
+    type: process
+    is_malicious: true
+    description: "Unsigned service binary dropped on the file server to execute commands remotely. The name imitates a legitimate administration tool."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "7b8e41a09c2d5f36e8a1b47d90c5e2f8134a6b7c9d0e2f4a5b6c7d8e9f012345"
+    type: hash
+    is_malicious: true
+    description: "SHA-256 of the remote execution service binary written to C:\\Windows on FS-ACAD-02."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "acad_records.zip"
+    type: file
+    is_malicious: true
+    description: "The 2.1 GB archive of the academic records share, staged in a hidden administrative share before being uploaded."
+    discoverable_in_phase: investigation
+    points: 10
+
+  - value: "10.20.2.40"
+    type: ip
+    is_malicious: false
+    description: "The file server's own internal address. It is the victim of this incident, not attacker infrastructure - blocking it would take the academic records share offline for everyone."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "svc_backup"
+    type: user
+    is_malicious: false
+    description: "The nightly backup service account. It appears in the logs reading the same share the attacker archived, at 00:30, exactly as it does every night."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "198.51.100.140"
+    type: ip
+    is_malicious: false
+    description: "Internet background scanning. Present all night, denied every time, and unrelated to the successful intrusion. Adjacent in the logs, not adjacent in the incident."
+    discoverable_in_phase: investigation
+    points: 6
+
+phases:
+  # ------------------------------------------------------------ triage ----
+  - key: triage
+    title: Triage
+    instructions_md: |
+      Four alerts. Two describe the same intrusion, one describes the condition
+      that allowed it, and one is noise.
+
+      You are arriving hours after the fact. That changes your job: this is no
+      longer "is something happening" but "what happened, and is it still
+      happening." Both questions matter, and the second one is the reason to
+      move quickly even though the events are old.
+    objectives:
+      - Separate the intrusion from the background noise in the queue.
+      - Assess severity given that the activity is hours old.
+      - Escalate with an accurate initial scope.
+    decisions:
+      - key: alert_severity
+        prompt: What severity do you assign to this incident?
+        type: select
+        help_md: |
+          A confirmed interactive logon from the internet, on a privileged
+          service account, followed by activity on a second host. Consider what
+          the account could reach, not only what you have proof it touched.
+        options:
+          - value: critical
+            label: Critical
+            description: Confirmed unauthorised access with privileged credentials and evidence of activity beyond the entry point.
+          - value: high
+            label: High
+            description: Confirmed compromise of one host with limited onward movement.
+          - value: medium
+            label: Medium
+            description: Suspicious authentication activity requiring investigation.
+          - value: low
+            label: Low
+            description: Routine internet noise against an exposed service.
+        expected: critical
+        points: 10
+        require_rationale: true
+        rationale_md: |
+          **Critical.**
+
+          This is the case the phishing scenario deliberately was not. There,
+          one workstation was affected and calling it critical would have been
+          crying wolf. Here you have a successful authentication from the
+          internet, on an account in **Server Operators**, followed by process
+          execution on a second host. The account's reach - not the hosts you
+          have already confirmed - sets the blast radius.
+
+          The activity being hours old does not reduce the severity. It
+          increases the urgency, because the attacker has had four unobserved
+          hours and you do not yet know where they went.
+      - key: exposure_assessment
+        prompt: Which condition made this incident possible?
+        type: select
+        options:
+          - value: rdp_exposed_to_internet
+            label: RDP published to the internet with no source restriction
+            description: The perimeter allowed anyone to attempt authentication.
+          - value: weak_user_passwords
+            label: Staff chose weak passwords
+            description: The accounts targeted had guessable credentials.
+          - value: missing_antivirus
+            label: The jump host had no endpoint protection
+            description: Malware was able to run unimpeded.
+          - value: unpatched_rdp
+            label: An unpatched RDP vulnerability was exploited
+            description: A known flaw in the remote desktop service was used.
+        expected: rdp_exposed_to_internet
+        points: 10
+        rationale_md: |
+          The exposed rule. Nothing was exploited here - no vulnerability, no
+          malware on the way in. The attacker simply logged in, because the
+          front door was reachable and one key fitted.
+
+          Note what this rules out. There is no evidence of an unpatched
+          service; authentication succeeded normally. And while the service
+          account's password was certainly weak, framing this as "staff chose
+          weak passwords" would send the institution into another password
+          awareness campaign when the actual fix is a firewall rule and an
+          MFA policy.
+    actions:
+      - key: escalate-ir-lead
+        event_type: ESCALATE
+        label: Escalate to the incident response lead
+        target: "IR Lead (out of hours)"
+        description: Wake the IR lead. Confirmed intrusion with privileged credentials and evidence of lateral movement.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct. An incident of this severity is not a Tier 2 analyst's to
+          run alone, and the institution will need decisions - about
+          notification, about taking systems offline - that sit above the SOC.
+      - key: monitor-only
+        event_type: ESCALATE
+        label: Log it for the morning handover
+        target: "Day shift handover"
+        description: Record the findings and let the day shift pick it up after the standup.
+        is_correct: false
+        points: 12
+        requires_confirmation: true
+        feedback_md: |
+          The attacker still holds working credentials for a privileged account
+          and an open path into the network. Every hour that passes is another
+          hour of unobserved access.
+
+          "It happened overnight so it can wait until morning" is how a
+          contained incident becomes an estate-wide one. The events are old;
+          the access is current.
+    hints:
+      - key: triage-hint-noise
+        cost: 3
+        text_md: |
+          One source address appears all night and never succeeds at anything.
+          Another appears for ninety minutes and succeeds immediately. Only one
+          of them is your incident.
+      - key: triage-hint-account
+        cost: 3
+        text_md: |
+          Look at *which* account succeeded, and open the authentication
+          summary document to see what kind of account it is. The answer
+          changes how bad this is.
+    success_criteria:
+      required_decision_keys: [alert_severity, exposure_assessment]
+      required_action_keys: [escalate-ir-lead]
+      required_ioc_values: []
+      min_queries: 1
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ----------------------------------------------------- investigation ----
+  - key: investigation
+    title: Investigation
+    instructions_md: |
+      Reconstruct the night. Useful starting points:
+
+      - `source:auth` to see the authentication story end to end.
+      - `user:svc_helpdesk` to follow the compromised account.
+      - `source:firewall` for what crossed the perimeter, in both directions.
+
+      Pay attention to **logon types**. They are the clearest signal of
+      movement in a Windows environment:
+
+      - Type 2 &mdash; interactive, someone at the keyboard.
+      - Type 3 &mdash; network, typically a file share or remote execution.
+      - Type 5 &mdash; service, an automated process.
+      - Type 10 &mdash; RemoteInteractive, an RDP session.
+
+      A service account producing a type 10 is not an anomaly to note. It is
+      the finding.
+    objectives:
+      - Follow the account from the internet to the jump host to the file server.
+      - Identify the collection step and distinguish it from the exfiltration.
+      - Establish what data left and therefore what obligations follow.
+    decisions:
+      - key: attack_techniques
+        prompt: Which MITRE ATT&CK techniques does the evidence support?
+        type: multi_select
+        help_md: |
+          Select only what the logs show. Choosing techniques you cannot point
+          at a log line for is guessing, and the instructor sees both.
+        options:
+          - value: T1110
+            label: "T1110 - Brute Force"
+            description: Repeated authentication attempts to guess credentials.
+          - value: T1078
+            label: "T1078 - Valid Accounts"
+            description: Using legitimate credentials rather than exploiting a flaw.
+          - value: T1021.002
+            label: "T1021.002 - Remote Services: SMB/Windows Admin Shares"
+            description: Moving to another host over SMB or admin shares.
+          - value: T1560
+            label: "T1560 - Archive Collected Data"
+            description: Compressing gathered data before taking it.
+          - value: T1041
+            label: "T1041 - Exfiltration Over C2 Channel"
+            description: Sending data out over the attacker's existing channel.
+          - value: T1566.001
+            label: "T1566.001 - Phishing: Spearphishing Attachment"
+            description: A targeted email carrying a malicious attachment.
+          - value: T1486
+            label: "T1486 - Data Encrypted for Impact"
+            description: Ransomware encryption of victim files.
+          - value: T1190
+            label: "T1190 - Exploit Public-Facing Application"
+            description: Exploitation of an internet-facing service.
+          - value: T1547.001
+            label: "T1547.001 - Registry Run Keys / Startup Folder"
+            description: Persistence via a Run key.
+        expected: [T1110, T1078, T1021.002, T1560, T1041]
+        points: 20
+        rationale_md: |
+          Five techniques, in the order they happened: they sprayed passwords
+          (T1110), used the one that worked as a legitimate credential
+          (T1078), moved to the file server over admin shares (T1021.002),
+          archived the data (T1560), and uploaded it to the same address they
+          had been operating from (T1041).
+
+          T1190 is the tempting wrong answer, and worth being clear about. An
+          internet-facing service was involved, but it was not *exploited* -
+          there was no vulnerability, no payload, no crash. The attacker
+          authenticated. That distinction decides whether the remediation is
+          "patch something" or "stop publishing RDP", which are very different
+          pieces of work.
+
+          There is no phishing, no encryption and no Run key here. Those belong
+          to other incidents in this library.
+      - key: initial_access_vector
+        prompt: How did the attacker first obtain access?
+        type: select
+        options:
+          - value: sprayed_credentials_over_rdp
+            label: Password spraying against internet-facing RDP
+            description: Repeated low-volume attempts across many accounts until one succeeded.
+          - value: phishing_email
+            label: A phishing email harvested the credential
+            description: The account holder gave the password to an attacker-controlled page.
+          - value: vpn_vulnerability
+            label: Exploitation of a VPN appliance
+            description: A known flaw in a perimeter device was used.
+          - value: insider_shared_credential
+            label: An insider shared the credential
+            description: Somebody with legitimate access passed it on.
+        expected: sprayed_credentials_over_rdp
+        points: 15
+        rationale_md: |
+          Password spraying. The pattern is distinctive and worth learning to
+          recognise: **many accounts, few attempts each, spread over time**.
+          Classic brute forcing hammers one account until it locks out. Spraying
+          tries one common password across the whole directory, then waits, and
+          stays under every lockout threshold by design.
+
+          Forty-three attempts across nine accounts in thirty-six minutes is a
+          spray. It is also small enough that a volume-based alert would very
+          likely never fire - which is precisely why it works.
+      - key: data_impact
+        prompt: What is the data impact of this incident?
+        type: select
+        help_md: "Open the archive listing document before answering."
+        options:
+          - value: student_pii_exfiltrated
+            label: Student personal data was exfiltrated and this is a notifiable breach
+            description: Records left the institution's control and the transfer completed.
+          - value: staged_but_not_exfiltrated
+            label: Data was staged but the transfer did not complete
+            description: An archive was built but never left the network.
+          - value: no_data_accessed
+            label: No data was accessed
+            description: The attacker had access but did not reach anything sensitive.
+          - value: cannot_determine
+            label: Cannot be determined from the available evidence
+            description: The logs do not answer the question either way.
+        expected: student_pii_exfiltrated
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          It completed. The firewall summary shows 2,214,604,800 bytes leaving
+          for 198.51.100.23 over twenty-seven minutes, which matches the staged
+          archive almost exactly. The archive listing shows transcripts,
+          admissions records and appeals case notes.
+
+          This is the moment the incident stops being a SOC matter. Student
+          personal data has left the institution's control, which brings
+          notification obligations and a data protection officer into the room.
+          The technical work continues, but so does a conversation the SOC does
+          not own.
+
+          Being able to say "the transfer completed, here is the byte count and
+          here is what was in it" - rather than "we think they might have taken
+          something" - is what makes that conversation possible.
+    actions: []
+    hints:
+      - key: inv-hint-logon-types
+        cost: 5
+        text_md: |
+          Search `source:auth` and read the logon types. The account appears
+          with type 10 on the jump host and type 3 on the file server. Those two
+          numbers are the whole lateral movement story.
+      - key: inv-hint-exfil
+        cost: 5
+        text_md: |
+          Compare the size of the archive in the file share log with the total
+          bytes in the firewall summary. If they match, the data is gone, not
+          merely staged.
+      - key: inv-hint-decoys
+        cost: 5
+        text_md: |
+          Two things in these logs look suspicious and are not: an account
+          reading the academic records share at 00:30, and an address probing
+          the perimeter all night. Check what time the backup job runs, and
+          check whether the probing ever succeeded.
+    success_criteria:
+      required_decision_keys: [attack_techniques, initial_access_vector, data_impact]
+      required_action_keys: []
+      required_ioc_values:
+        - "198.51.100.23"
+        - "svc_helpdesk"
+        - "acad_records.zip"
+      min_queries: 4
+      min_notes: 1
+      require_reflection: false
+      reflection_min_words: 0
+
+  # -------------------------------------------------------- containment ----
+  - key: containment
+    title: Containment
+    instructions_md: |
+      The blast radius here is larger than the alert that started it. Two hosts
+      are involved, one account, and one perimeter rule that will let the
+      attacker straight back in if you leave it.
+
+      Containing only the first host you noticed is the specific mistake this
+      phase is built around. Work out everything the attacker touched or could
+      still reach, and close all of it.
+    objectives:
+      - Cut the attacker's route back in at the perimeter.
+      - Disable the compromised credential everywhere it is valid.
+      - Isolate both affected hosts, not only the entry point.
+      - Avoid taking down systems that are not part of the incident.
+    decisions:
+      - key: containment_scope
+        prompt: What is the correct containment scope?
+        type: select
+        options:
+          - value: both_hosts_account_and_perimeter
+            label: Both affected hosts, the compromised account, and the firewall rule
+            description: Everything the attacker touched, plus the route they came in by.
+          - value: jump_host_only
+            label: The jump host only
+            description: Isolate the entry point where the intrusion began.
+          - value: file_server_only
+            label: The file server only
+            description: Protect the system holding the data.
+          - value: entire_network_offline
+            label: Disconnect the campus network
+            description: Take everything offline until the investigation is complete.
+        expected: both_hosts_account_and_perimeter
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          All four elements. Isolating the jump host alone leaves the attacker
+          a valid credential and an open port; isolating the file server alone
+          leaves them inside the network.
+
+          Disconnecting the campus is the interesting wrong answer. It would
+          certainly contain the incident, and it would also stop every lecture,
+          every assessment and every clinical placement system at once. That
+          trade is occasionally right - it is close to the right answer in the
+          ransomware scenario - but here you know exactly which two hosts and
+          which one account are involved. Proportionality is part of the skill.
+    actions:
+      - key: block-attacker-ip
+        event_type: BLOCK_INDICATOR
+        label: Block 198.51.100.23 at the perimeter
+        target: "198.51.100.23"
+        description: Deny all traffic to and from the attacker's address in both directions.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct, and note this stops the exfiltration channel as well as the
+          access path - the same address is at both ends of this incident.
+      - key: disable-rdp-rule
+        event_type: BLOCK_INDICATOR
+        label: Disable the Remote-Access-Legacy firewall rule
+        target: "Remote-Access-Legacy (TCP/3389 from any)"
+        description: Withdraw the rule publishing RDP to the internet.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct, and more important than blocking the single address.
+          Blocking one IP stops this attacker; closing the rule stops the next
+          one. The address is disposable to them; the exposure was not.
+      - key: disable-svc-helpdesk
+        event_type: ISOLATE_ACCOUNT
+        label: Disable svc_helpdesk and revoke its sessions
+        target: "NORTHWIND\\svc_helpdesk"
+        description: Disable the account, terminate active sessions, and flag it for credential rotation.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct. Expect this to break something - it is a service account
+          doing real work, and disabling it is a deliberate acceptance of that
+          cost. Say so in the ticket rather than letting somebody re-enable it
+          quietly at 09:00.
+      - key: isolate-jump-host
+        event_type: CONTAIN_HOST
+        label: Network-isolate JMP-RDP-01
+        target: JMP-RDP-01
+        description: Cut the jump host off from the network, leaving it powered on for forensics.
+        is_correct: true
+        points: 10
+        feedback_md: "Correct. The entry point, preserved for analysis."
+      - key: isolate-file-server
+        event_type: CONTAIN_HOST
+        label: Network-isolate FS-ACAD-02
+        target: FS-ACAD-02
+        description: Cut the file server off from the network, leaving it powered on for forensics.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct, and this is the one students most often miss. The alert was
+          about the jump host; the data loss happened here.
+      - key: isolate-noc-workstation
+        event_type: CONTAIN_HOST
+        label: Network-isolate NOC-WS-01
+        target: NOC-WS-01
+        description: The night operator's workstation shows a failed logon during the incident window.
+        is_correct: false
+        points: 10
+        feedback_md: |
+          One failed logon followed sixteen seconds later by a success, from a
+          workstation on the internal network, by the operator who was on shift.
+          That is somebody mistyping their own password.
+
+          You have taken the night-shift operator offline in the middle of an
+          incident they are helping you respond to.
+      - key: disable-svc-backup
+        event_type: ISOLATE_ACCOUNT
+        label: Disable svc_backup
+        target: "NORTHWIND\\svc_backup"
+        description: This account also accessed the academic records share during the night.
+        is_correct: false
+        points: 12
+        requires_confirmation: true
+        feedback_md: |
+          svc_backup read that share at 00:30, as it does every night, using a
+          type 5 service logon from the host itself. It is the backup job.
+
+          You have just disabled backups during a live data breach - at the
+          exact moment the institution is most likely to need a restore point.
+    hints:
+      - key: contain-hint-scope
+        cost: 5
+        text_md: |
+          Walk the attack chain and list every host and account that appears in
+          it. Then ask, for each one: if I leave this alone, can the attacker
+          still use it? The answer decides your containment list.
+      - key: contain-hint-rule
+        cost: 5
+        text_md: |
+          Blocking the attacker's address stops this attacker. Ask yourself what
+          stops the next one who finds the same open port.
+    success_criteria:
+      required_decision_keys: [containment_scope]
+      required_action_keys:
+        - block-attacker-ip
+        - disable-rdp-rule
+        - disable-svc-helpdesk
+        - isolate-jump-host
+        - isolate-file-server
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # -------------------------------------------------------- eradication ----
+  - key: eradication
+    title: Eradication
+    instructions_md: |
+      Remove what the attacker left and close the conditions that let them in.
+      Eradication here is as much about configuration as about artefacts: the
+      binary on the file server is trivial to delete, and the account policy
+      that made the intrusion possible is the part that actually takes work.
+    objectives:
+      - Remove attacker tooling and staged data.
+      - Close the account weaknesses that made the credential usable.
+      - Preserve evidence before rebuilding anything.
+    decisions:
+      - key: eradication_steps
+        prompt: Which steps are required to eradicate this compromise?
+        type: multi_select
+        options:
+          - value: remove_psexesvc
+            label: Remove psexesvc.exe from the file server
+            description: Delete the unsigned remote execution service binary.
+          - value: delete_staged_archive
+            label: Delete the staged archive from temp$
+            description: Remove acad_records.zip, after imaging it as evidence.
+          - value: rotate_service_credentials
+            label: Rotate credentials for every service account
+            description: Not only the compromised one - assume the spray list was broader than it succeeded.
+          - value: remove_lockout_exemption
+            label: Remove the lockout exemption on service accounts
+            description: Replace it with alerting on repeated failures.
+          - value: deny_interactive_logon_services
+            label: Deny interactive and RemoteInteractive logon to service accounts
+            description: A group policy change so a stolen service credential cannot be used at a keyboard.
+          - value: rebuild_both_hosts
+            label: Rebuild JMP-RDP-01 and FS-ACAD-02 from known-good images
+            description: Flatten both affected hosts rather than cleaning in place.
+          - value: reset_all_student_passwords
+            label: Reset every student account password
+            description: Force a credential change across the whole student body.
+          - value: decommission_file_sharing
+            label: Decommission network file shares entirely
+            description: Remove the capability that was abused.
+        expected:
+          - remove_psexesvc
+          - delete_staged_archive
+          - rotate_service_credentials
+          - remove_lockout_exemption
+          - deny_interactive_logon_services
+          - rebuild_both_hosts
+        points: 20
+        rationale_md: |
+          Six steps: the binary, the staged data, the credentials, the two
+          policy weaknesses, and both hosts.
+
+          Note that half the list is configuration rather than cleanup. That is
+          normal for an intrusion that used valid credentials - there is very
+          little malware to remove and a great deal of policy to fix.
+
+          The two wrong options are both over-reach. Student accounts were never
+          targeted by the spray and resetting 4,000 passwords would consume the
+          service desk for a fortnight to no security benefit. Decommissioning
+          file sharing removes a capability the institution runs on because it
+          was the thing that got stolen from - which is like removing the filing
+          cabinet after a burglary.
+      - key: evidence_handling
+        prompt: What should happen to the staged archive before it is deleted?
+        type: select
+        options:
+          - value: image_and_hash_first
+            label: Image it, hash it, and record the hash in the incident ticket
+            description: Preserve it as evidence with an integrity record before removal.
+          - value: delete_immediately
+            label: Delete it immediately to limit further exposure
+            description: Remove the sensitive data from the compromised host at once.
+          - value: leave_in_place
+            label: Leave it in place until the investigation closes
+            description: Do not touch anything until forensics is complete.
+        expected: image_and_hash_first
+        points: 10
+        rationale_md: |
+          Image and hash it first. That archive is the single best evidence of
+          exactly what left the institution, and the notification the data
+          protection officer has to write depends on knowing precisely which
+          records were in it.
+
+          Deleting it immediately feels protective and destroys the answer to
+          the only question that matters to the people whose data it was.
+          Leaving it in place on a compromised host is not preservation, it is
+          just risk.
+
+          This is the same chain-of-custody principle your own event log
+          demonstrates: the value of evidence is inseparable from being able to
+          prove it was not altered.
+    actions:
+      - key: request-forensic-images
+        event_type: DOWNLOAD_ARTIFACT
+        label: Request forensic images of both hosts
+        target: "JMP-RDP-01, FS-ACAD-02"
+        description: Raise a forensic acquisition request for disk and memory on both affected systems before rebuild.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct, and requested for both. An image of the jump host alone would
+          leave you unable to answer what happened on the server where the data
+          actually was.
+    hints:
+      - key: erad-hint-config
+        cost: 5
+        text_md: |
+          Ask what would have to be true for this exact attack to fail next
+          week. Deleting a binary does not change that answer; the account
+          policy does.
+    success_criteria:
+      required_decision_keys: [eradication_steps, evidence_handling]
+      required_action_keys: [request-forensic-images]
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ----------------------------------------------------------- recovery ----
+  - key: recovery
+    title: Recovery
+    instructions_md: |
+      Restore service and prove it is safe. This incident has an extra
+      dimension the others do not: data about real people left the building, so
+      recovery includes obligations to those people, not only to the systems.
+    objectives:
+      - Define what evidence would show the environment is clean.
+      - Restore remote access in a form that does not recreate the exposure.
+      - Recognise the notification duty and who owns it.
+    decisions:
+      - key: recovery_steps
+        prompt: What is required before these systems return to normal service?
+        type: multi_select
+        options:
+          - value: rebuild_and_patch
+            label: Rebuild both hosts from known-good images and patch fully before reconnecting
+            description: Clean build, current patch level, then network.
+          - value: remote_access_behind_vpn_mfa
+            label: Reinstate remote access only behind the VPN with MFA
+            description: Restore the capability without restoring the exposure.
+          - value: hunt_for_other_access
+            label: Sweep authentication logs for other successful logons from the attacker's ranges
+            description: Confirm this was the only account and the only entry.
+          - value: verify_no_outbound
+            label: Confirm no further outbound traffic to the attacker's infrastructure
+            description: Verify from firewall and proxy telemetry that the channel is closed.
+          - value: monitor_30_days
+            label: Monitor both hosts and all service accounts with raised sensitivity for 30 days
+            description: Heightened alerting for a defined period before standing down.
+          - value: reenable_legacy_rule
+            label: Re-enable the Remote-Access-Legacy rule once the hosts are rebuilt
+            description: Restore the remote access staff were using.
+          - value: restore_from_last_night_backup
+            label: Restore the file server from the 00:30 backup
+            description: The backup completed before the intrusion began.
+        expected:
+          - rebuild_and_patch
+          - remote_access_behind_vpn_mfa
+          - hunt_for_other_access
+          - verify_no_outbound
+          - monitor_30_days
+        points: 20
+        rationale_md: |
+          Five steps. Note that restoring from the 00:30 backup is not wrong on
+          timing - it genuinely predates the 01:12 spray - but it is
+          unnecessary here, because nothing was encrypted or destroyed. The
+          attacker copied data; they did not damage it. Restoring would achieve
+          nothing except downtime.
+
+          Compare that with the ransomware scenario, where the backup timing
+          question is the whole problem. Getting into the habit of asking "is my
+          restore point before patient zero, and do I even need it?" is the
+          transferable skill.
+
+          Re-enabling the legacy rule is the one option that would undo the
+          entire response.
+      - key: notification_owner
+        prompt: Who owns the decision to notify affected individuals?
+        type: select
+        help_md: |
+          Student personal data has left the institution's control. Somebody has
+          to decide what is said, to whom, and when.
+        options:
+          - value: dpo_with_leadership
+            label: The data protection officer, with institutional leadership
+            description: The people accountable for the institution's obligations to data subjects.
+          - value: soc_team
+            label: The SOC team that investigated it
+            description: The people who know the technical facts best.
+          - value: it_manager
+            label: The IT manager
+            description: The owner of the affected systems.
+          - value: no_notification_needed
+            label: Nobody - this is an internal security matter
+            description: Handle it as an operational incident.
+        expected: dpo_with_leadership
+        points: 10
+        rationale_md: |
+          The data protection officer, with leadership. The SOC's job is to
+          establish the facts - what was taken, when, whose - and hand them over
+          clearly. The SOC does not decide what gets disclosed.
+
+          This matters for how you write your report. A DPO reading it needs to
+          know the categories of data, the number of records, the time window
+          and the confidence level. Writing the report as though only other
+          analysts will read it makes their job harder at the worst moment.
+
+          "Nobody" is worth naming as wrong explicitly: a security incident
+          involving personal data is not only an internal matter, and treating
+          it as one is how institutions turn a breach into a scandal.
+    actions: []
+    hints:
+      - key: rec-hint-access
+        cost: 5
+        text_md: |
+          The staff who used that RDP rule still need remote access on Monday.
+          A recovery plan that only removes things will be quietly reversed by
+          somebody under pressure - what do you replace it with?
+    success_criteria:
+      required_decision_keys: [recovery_steps, notification_owner]
+      required_action_keys: []
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ---------------------------------------------------- lessons learned ----
+  - key: lessons_learned
+    title: Lessons Learned
+    instructions_md: |
+      Two things went wrong here and only one of them is technical.
+
+      The firewall rule was created as a temporary measure in 2021 and never
+      reviewed. The service account had a six-year-old password and an
+      exemption from the lockout policy, granted so that a service would not be
+      interrupted. Both were reasonable decisions by competent people under
+      normal pressure. Neither was ever revisited.
+
+      Write the review. The most useful thing you can produce is a
+      recommendation that changes how those decisions get made, not just a list
+      of what to switch off this week.
+    objectives:
+      - Explain the incident in terms a non-technical reader can act on.
+      - Identify the process failure as well as the technical one.
+      - Recommend changes with a named owner and a mechanism.
+    decisions:
+      - key: primary_control_gap
+        prompt: Which single control failure most enabled this incident?
+        type: select
+        options:
+          - value: unreviewed_perimeter_rule
+            label: A temporary firewall rule was never reviewed or expired
+            description: RDP stayed published to the internet for four years after its justification ended.
+          - value: service_account_hygiene
+            label: Service account password age, privilege and lockout exemption
+            description: The credential was guessable, over-privileged and exempt from lockout.
+          - value: no_mfa
+            label: No multi-factor authentication on remote access
+            description: A correct password was sufficient to get in.
+          - value: alerting_not_actioned
+            label: Alerts fired overnight and nobody acted on them
+            description: The detection worked; the response did not.
+        expected: unreviewed_perimeter_rule
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          The unreviewed rule, because it is the condition every other failure
+          needed in order to matter.
+
+          This is a genuinely arguable call and a good one to defend either
+          way - MFA would also have stopped it, and so would service account
+          hygiene. What makes the firewall rule the primary answer is that it
+          turned an internal weakness into an internet-facing one. A stale
+          service account password on a network the internet cannot reach is a
+          finding for the next audit; the same password on a port open to the
+          world is this incident.
+
+          The fourth option deserves its own attention in your write-up even
+          though it is not the primary gap. The alerts fired at 01:48 and
+          nobody saw them until 06:00. Detection without a path to a human is
+          not detection.
+    actions: []
+    hints:
+      - key: ll-hint-process
+        cost: 3
+        text_md: |
+          Ask why the rule survived four years. "Remove the rule" fixes today.
+          "Temporary rules get an expiry date and a review that fails closed"
+          fixes the class of problem.
+    success_criteria:
+      required_decision_keys: [primary_control_gap]
+      required_action_keys: []
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: true
+      reflection_min_words: 140

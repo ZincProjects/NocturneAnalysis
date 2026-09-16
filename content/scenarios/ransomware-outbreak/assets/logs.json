@@ -1,0 +1,372 @@
+[
+  {
+    "id": "log-fs-n001",
+    "ts": "2025-03-18T02:00:14.000Z",
+    "source": "backup",
+    "message": "BACKUP_JOB host=BKP-SRV-01 target=FS-SHARED-01 status=success files=402118 size=1284807168 type=full",
+    "host": "BKP-SRV-01",
+    "action": "backup",
+    "severity": "info",
+    "fields": {
+      "status": "success",
+      "files": 402118,
+      "type": "full",
+      "note": "The nightly backup completed at 02:00, five and a half hours before encryption began."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-n002",
+    "ts": "2025-03-18T06:50:33.000Z",
+    "source": "edr",
+    "message": "PROCESS host=WKS-ADM-021 user=NORTHWIND\\s.menon parent=explorer.exe image=OUTLOOK.EXE args=\"\"",
+    "host": "WKS-ADM-021",
+    "user": "s.menon",
+    "action": "process_create",
+    "severity": "info",
+    "fields": {
+      "note": "Somebody opening Outlook. Unremarkable, and it is what makes the March 11 detection remarkable."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-n001",
+    "ts": "2025-03-18T07:12:40.000Z",
+    "source": "auth",
+    "message": "EventID=4624 Logon Type=2 (Interactive) Account=NORTHWIND\\j.tan Workstation=WKS-LIB-008 Status=Success",
+    "host": "WKS-LIB-008",
+    "user": "j.tan",
+    "action": "logon_success",
+    "fields": {
+      "event_id": 4624
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-n001",
+    "ts": "2025-03-18T07:15:00.000Z",
+    "source": "edr",
+    "message": "PROCESS host=WKS-FIN-003 user=NORTHWIND\\k.lim parent=services.exe image=MsMpEng.exe args=\"scheduled scan\"",
+    "host": "WKS-FIN-003",
+    "action": "process_create",
+    "severity": "info",
+    "fields": {
+      "note": "Scheduled antivirus scan."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-n001",
+    "ts": "2025-03-18T07:20:11.000Z",
+    "source": "firewall",
+    "message": "DENY proto=TCP src=198.51.100.140 dst=203.0.113.5 dport=445 policy=Default-Deny-Inbound",
+    "src_ip": "198.51.100.140",
+    "dst_ip": "203.0.113.5",
+    "action": "deny",
+    "fields": {
+      "policy": "Default-Deny-Inbound",
+      "note": "Internet background noise. Denied."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fs-n002",
+    "ts": "2025-03-18T07:30:02.000Z",
+    "source": "fileshare",
+    "message": "ACCESS host=FS-SHARED-01 user=NORTHWIND\\j.tan share=\\\\FS-SHARED-01\\Departments operation=open files=4",
+    "host": "FS-SHARED-01",
+    "user": "j.tan",
+    "action": "read",
+    "fields": {
+      "note": "Someone opening four documents before the working day starts."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-praman-logon",
+    "ts": "2025-03-18T07:37:55.000Z",
+    "source": "auth",
+    "message": "EventID=4624 Logon Type=2 (Interactive) Account=NORTHWIND\\p.raman Workstation=WKS-HR-014 Status=Success",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "action": "logon_success",
+    "fields": {
+      "event_id": 4624,
+      "note": "The user logs in at 07:37. Seven seconds later the Run key fires."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-runkey-persist",
+    "ts": "2025-03-18T07:38:02.000Z",
+    "source": "edr",
+    "message": "PROCESS host=WKS-HR-014 user=NORTHWIND\\p.raman parent=explorer.exe image=C:\\Users\\p.raman\\AppData\\Roaming\\OneDriveSync\\onedrivesync.exe args=\"\" trigger=run_key",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "severity": "high",
+    "action": "process_create",
+    "fields": {
+      "trigger": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync",
+      "sha256": "4c1d9e73f5a2680bb31c47e0a9d85f62103e7b4c8a6d2f9015e3b7c4d8a1f620",
+      "note": "The implant from the March 11 phishing incident, launched by its Run key at logon. It never left."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-c2-return",
+    "ts": "2025-03-18T07:38:09.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "critical",
+    "fields": {
+      "note": "The same command-and-control domain as the March 11 incident. It was blocked at the proxy but never at DNS or the firewall."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-payload-pull",
+    "ts": "2025-03-18T07:39:21.000Z",
+    "source": "proxy",
+    "message": "GET https://update-cdn.paylo4d.example/r3 status=200 bytes=1841204 content-type=application/octet-stream user-agent=\"WindowsPowerShell/5.1\"",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "allowed",
+    "severity": "critical",
+    "fields": {
+      "bytes": 1841204,
+      "note": "The ransomware payload, pulled down seven days after the original compromise."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-service-stop",
+    "ts": "2025-03-18T07:40:44.000Z",
+    "source": "edr",
+    "message": "SERVICE_CONTROL host=WKS-HR-014 action=stop services=\"SQLWriter,VeeamAgent,MSSQL$NORTHWIND,VSS\"",
+    "host": "WKS-HR-014",
+    "severity": "high",
+    "action": "service_stop",
+    "fields": {
+      "services": "SQLWriter, VeeamAgent, MSSQL$NORTHWIND, VSS",
+      "note": "Stopping backup and database services so their files are unlocked and can be encrypted too."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-vssadmin",
+    "ts": "2025-03-18T07:40:58.000Z",
+    "source": "edr",
+    "message": "PROCESS host=WKS-HR-014 user=NORTHWIND\\p.raman parent=onedrivesync.exe image=vssadmin.exe args=\"delete shadows /all /quiet\"",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "severity": "critical",
+    "action": "process_create",
+    "fields": {
+      "image": "vssadmin.exe",
+      "signed": true,
+      "note": "Deleting volume shadow copies, quietly, fourteen seconds before encryption began. This is the step that removes local recovery."
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-edr-encrypt-001",
+    "ts": "2025-03-18T07:41:12.000Z",
+    "source": "edr",
+    "message": "DETECTION NWD-EDR-0301 host=WKS-HR-014 user=NORTHWIND\\p.raman rule=\"Mass file rename\" files_modified=1842 extension=.nocturnelock",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "severity": "critical",
+    "action": "detected",
+    "fields": {
+      "files_modified": 1842,
+      "extension": ".nocturnelock"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-mass-rename",
+    "ts": "2025-03-18T07:41:12.000Z",
+    "source": "edr",
+    "message": "DETECTION NWD-EDR-0301 host=WKS-HR-014 user=NORTHWIND\\p.raman rule=\"Mass file rename\" files_modified=1842 extension=.nocturnelock window=60s",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "severity": "critical",
+    "action": "detected",
+    "fields": {
+      "rule": "Mass file rename",
+      "files_modified": 1842,
+      "extension": ".nocturnelock",
+      "note": "1,842 files renamed in sixty seconds. No human and no legitimate process does this."
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-edr-ransom-note",
+    "ts": "2025-03-18T07:42:03.000Z",
+    "source": "edr",
+    "message": "FILE_CREATE host=WKS-HR-014 path=C:\\Users\\p.raman\\Desktop\\_HOW_TO_RESTORE_FILES.txt size=2841",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "severity": "high",
+    "action": "file_create",
+    "fields": {
+      "path": "_HOW_TO_RESTORE_FILES.txt",
+      "size_bytes": 2841
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-encrypt-002",
+    "ts": "2025-03-18T07:43:27.000Z",
+    "source": "edr",
+    "message": "DETECTION NWD-EDR-0301 host=WKS-HR-015 user=NORTHWIND\\a.wong rule=\"Mass file rename\" files_modified=964 extension=.nocturnelock",
+    "host": "WKS-HR-015",
+    "user": "a.wong",
+    "severity": "critical",
+    "action": "detected",
+    "fields": {
+      "files_modified": 964,
+      "extension": ".nocturnelock"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-n001",
+    "ts": "2025-03-18T07:44:02.000Z",
+    "source": "dns",
+    "message": "query=cdn.northwind.example type=A response=10.20.1.40 rcode=NOERROR client=10.20.4.91",
+    "host": "WKS-HR-015",
+    "domain": "cdn.northwind.example",
+    "src_ip": "10.20.4.91",
+    "dst_ip": "10.20.1.40",
+    "action": "resolved",
+    "fields": {
+      "note": "The institution's own content host. Busy all day, every day."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-encrypt-003",
+    "ts": "2025-03-18T07:45:05.000Z",
+    "source": "edr",
+    "message": "DETECTION NWD-EDR-0301 host=WKS-FIN-003 user=NORTHWIND\\k.lim rule=\"Mass file rename\" files_modified=2211 extension=.nocturnelock",
+    "host": "WKS-FIN-003",
+    "user": "k.lim",
+    "severity": "critical",
+    "action": "detected",
+    "fields": {
+      "files_modified": 2211,
+      "extension": ".nocturnelock"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-encrypt-004",
+    "ts": "2025-03-18T07:47:19.000Z",
+    "source": "edr",
+    "message": "DETECTION NWD-EDR-0301 host=WKS-ADM-021 user=NORTHWIND\\s.menon rule=\"Mass file rename\" files_modified=1408 extension=.nocturnelock",
+    "host": "WKS-ADM-021",
+    "user": "s.menon",
+    "severity": "critical",
+    "action": "detected",
+    "fields": {
+      "files_modified": 1408,
+      "extension": ".nocturnelock"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fs-mapped-drive",
+    "ts": "2025-03-18T07:49:30.000Z",
+    "source": "fileshare",
+    "message": "ACCESS host=FS-SHARED-01 user=NORTHWIND\\p.raman share=\\\\FS-SHARED-01\\Departments operation=write files=41882 source_host=WKS-HR-014",
+    "host": "FS-SHARED-01",
+    "user": "p.raman",
+    "action": "write",
+    "severity": "critical",
+    "fields": {
+      "share": "Departments",
+      "file_count": 41882,
+      "source_host": "WKS-HR-014",
+      "note": "The file server was encrypted over a mapped drive from the first workstation. The malware did not need to move host at all - it just followed the drive letter."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-encrypt-005",
+    "ts": "2025-03-18T07:49:33.000Z",
+    "source": "edr",
+    "message": "DETECTION NWD-EDR-0301 host=FS-SHARED-01 user=NORTHWIND\\p.raman rule=\"Mass file rename\" files_modified=41882 extension=.nocturnelock",
+    "host": "FS-SHARED-01",
+    "user": "p.raman",
+    "severity": "critical",
+    "action": "detected",
+    "fields": {
+      "files_modified": 41882,
+      "extension": ".nocturnelock"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-ticket-summary",
+    "ts": "2025-03-18T07:52:00.000Z",
+    "source": "edr",
+    "message": "SUMMARY mass file rename detections on 5 hosts between 07:41 and 07:49: WKS-HR-014, WKS-HR-015, WKS-FIN-003, WKS-ADM-021, FS-SHARED-01",
+    "severity": "critical",
+    "action": "summary",
+    "fields": {
+      "affected_hosts": 5,
+      "first_seen": "07:41:12",
+      "last_seen": "07:49:33",
+      "note": "Eight minutes from the first host to the fifth."
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-ticket-march11",
+    "ts": "2025-03-18T07:55:00.000Z",
+    "source": "edr",
+    "message": "REFERENCE prior incident INC-2025-0311 host=WKS-HR-014 status=closed resolution=\"C2 domain blocked at proxy; user awareness reminder issued\" reimaged=false credentials_reset=false",
+    "host": "WKS-HR-014",
+    "severity": "high",
+    "action": "reference",
+    "fields": {
+      "prior_incident": "INC-2025-0311",
+      "closed_on": "2025-03-11",
+      "reimaged": false,
+      "credentials_reset": false,
+      "note": "The earlier incident was closed without rebuilding the host or removing the persistence."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  }
+]

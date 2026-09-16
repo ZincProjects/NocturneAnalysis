@@ -1,0 +1,1039 @@
+slug: ransomware-outbreak
+title: "Seven Days Later: Ransomware Across the Estate"
+category: ransomware
+difficulty: advanced
+estimated_minutes: 75
+organization: Northwind Polytechnic
+is_published: true
+continues_from: phishing-initial-access
+
+summary: >-
+  At 07:41 five systems begin encrypting themselves within eight minutes of
+  each other. The trail leads back to an incident this SOC closed a week ago
+  without rebuilding the host.
+
+learning_objectives:
+  - Respond under time pressure when the damage is already occurring.
+  - Recognise pre-encryption behaviour - shadow copy deletion, service stops - as the last warning before impact.
+  - Understand how a mapped drive spreads encryption without the malware moving host.
+  - Judge whether a backup is genuinely usable, not merely present.
+  - Sequence recovery so that restored systems are not immediately re-encrypted.
+  - Confront the cost of closing an incident without eradicating it.
+
+mitre_techniques:
+  - T1486
+  - T1490
+  - T1489
+  - T1566.001
+
+owasp_categories: []
+
+root_cause: >-
+  Incident INC-2025-0311 was closed on 11 March after blocking the
+  command-and-control domain at the web proxy, but the affected workstation was
+  never isolated or rebuilt, the Run-key persistence was never removed, the
+  user's credentials were never reset, and the domain was never blocked at DNS
+  or the firewall. The implant remained on WKS-HR-014 for seven days. On 18
+  March it launched at logon, resolved the same C2 domain through a path that
+  had not been blocked, downloaded a ransomware payload, deleted shadow copies,
+  stopped backup and database services, and encrypted the workstation and every
+  share it had a mapped drive to.
+
+model_recommendations:
+  - Require that any host with confirmed code execution is rebuilt from a known-good image before it returns to service, with an explicit named exception process rather than an informal one.
+  - Block confirmed C2 indicators at every layer - DNS, proxy and firewall - and verify the block from the affected host rather than assuming it applied.
+  - Define closure criteria for incidents that include eradication of persistence and credential rotation, so a ticket cannot be closed while the implant is still resident.
+  - Restrict write access to departmental shares so a single compromised workstation cannot encrypt 42,000 files over a mapped drive.
+  - Keep backups on a separate network with separate credentials, and restore-test a full system at least twice a year rather than testing single files.
+  - Run a threat hunt for the original indicators across the whole estate after any confirmed compromise, rather than treating the detected host as the whole incident.
+
+briefing_md: |
+  ## Your shift
+
+  You are the on-call analyst. It is 07:52 on a Tuesday and your phone has been
+  going for eleven minutes.
+
+  ## What is happening right now
+
+  At **07:41:12** the endpoint agent on `WKS-HR-014` reported 1,842 files
+  renamed to a `.nocturnelock` extension in sixty seconds. By the time you open
+  the console, the same detection has fired on four more systems, including
+  **FS-SHARED-01**, the departmental file server.
+
+  This is not an investigation into something that happened. It is happening.
+
+  ## What you need to do
+
+  Contain it first and understand it second &mdash; the opposite order to every
+  other scenario in this library, and a genuinely different discipline. Then
+  work out how it started, because the answer is uncomfortable and it is the
+  reason this scenario exists.
+
+  You will find that this SOC has seen the first stage of this attack before.
+
+  > This scenario continues *Payroll Pressure: Phishing to Endpoint
+  > Compromise*. You can work it alone, but running them back to back shows how
+  > one incomplete remediation becomes an estate-wide event.
+
+  > All data in this scenario is synthetic. Addresses use RFC 5737
+  > documentation ranges and domains use RFC 2606 reserved TLDs; none of it
+  > resolves or routes anywhere.
+
+iocs:
+  - value: "onedrivesync.exe"
+    type: file
+    is_malicious: true
+    description: "The implant left behind by the 11 March incident. It launched from its Run key at logon and pulled down the ransomware payload."
+    discoverable_in_phase: triage
+    points: 10
+  - value: "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync"
+    type: registry
+    is_malicious: true
+    description: "The persistence that survived the previous incident. Removing this on 11 March would have prevented everything here."
+    discoverable_in_phase: investigation
+    points: 12
+  - value: "update-cdn.paylo4d.example"
+    type: domain
+    is_malicious: true
+    description: "The same command-and-control domain as the 11 March incident. Blocked at the web proxy at the time, but never at DNS or the firewall - so it still resolved."
+    discoverable_in_phase: investigation
+    points: 12
+  - value: "203.0.113.47"
+    type: ip
+    is_malicious: true
+    description: "Address the C2 domain resolves to. Blocking the domain without blocking the address leaves the channel open to anything that skips DNS."
+    discoverable_in_phase: investigation
+    points: 10
+  - value: ".nocturnelock"
+    type: file
+    is_malicious: true
+    description: "Extension appended to every encrypted file. The cheapest way to scope which systems are affected across the estate."
+    discoverable_in_phase: triage
+    points: 8
+  - value: "recovery-desk.paylo4d.example"
+    type: domain
+    is_malicious: true
+    description: "Contact address in the ransom note, on the same parent domain as the C2 infrastructure - which ties this ransomware to the March intrusion independently of the endpoint evidence."
+    discoverable_in_phase: investigation
+    points: 10
+
+  - value: "BKP-SRV-01"
+    type: host
+    is_malicious: false
+    description: "The backup server. It appears in the logs during the incident window because it completed a backup at 02:00 - it is the thing that saves this institution, not part of the attack."
+    discoverable_in_phase: investigation
+    points: 10
+  - value: "10.20.1.40"
+    type: ip
+    is_malicious: false
+    description: "The institution's internal content delivery host. Busy throughout the incident because it is busy every day."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "j.tan"
+    type: user
+    is_malicious: false
+    description: "A staff member who opened four documents on the shared drive shortly before encryption began. Coincidence of timing, not involvement."
+    discoverable_in_phase: investigation
+    points: 8
+
+phases:
+  # ------------------------------------------------------------ triage ----
+  - key: triage
+    title: Triage
+    instructions_md: |
+      Triage under active impact is a different job. You are not deciding
+      whether this is real - it is - you are deciding how much of the
+      institution is still savable and in what order.
+
+      The most useful number on your screen is the gap between hosts: roughly
+      two minutes. That is your budget.
+
+      Do not spend this phase understanding how it started. That matters
+      enormously and it matters second.
+    objectives:
+      - Establish the scope of active encryption.
+      - Assess severity and declare a major incident.
+      - Escalate to the people who can authorise estate-wide action.
+    decisions:
+      - key: alert_severity
+        prompt: What severity do you assign?
+        type: select
+        help_md: |
+          Five systems including a departmental file server, actively
+          encrypting, with shadow copies already deleted.
+        options:
+          - value: critical
+            label: Critical
+            description: Active, spreading destruction of data across multiple systems including shared infrastructure.
+          - value: high
+            label: High
+            description: Serious compromise of several endpoints.
+          - value: medium
+            label: Medium
+            description: Suspicious file activity requiring investigation.
+          - value: low
+            label: Low
+            description: Isolated endpoint issue.
+        expected: critical
+        points: 10
+        rationale_md: |
+          Critical, without hesitation, and this is the scenario that earns the
+          word. Compare it with the phishing incident, where calling a single
+          workstation critical would have been an overreaction.
+
+          Here: multiple systems, shared infrastructure, active destruction,
+          local recovery already removed, and a spread rate of about one host
+          every two minutes. The severity scale exists so that this looks
+          different from that, and if everything is critical then nothing is.
+      - key: immediate_priority
+        prompt: What is your first priority in the next five minutes?
+        type: select
+        help_md: |
+          You cannot do everything at once and the spread is ongoing. Choose
+          what you do first.
+        options:
+          - value: stop_the_spread
+            label: Stop the spread - isolate affected hosts and cut shared drive access
+            description: Limit how many more systems are reached.
+          - value: identify_patient_zero
+            label: Identify patient zero and the entry vector
+            description: Understand the attack before acting on it.
+          - value: check_backups
+            label: Verify the backups are intact
+            description: Establish whether recovery is possible.
+          - value: contact_attacker
+            label: Make contact using the address in the ransom note
+            description: Open a channel to understand the demand.
+        expected: stop_the_spread
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          **Stop the spread.** Every other scenario in this library rewards
+          understanding before acting. This one inverts it, because the damage
+          is accruing while you think and each host is roughly two minutes of
+          delay away from being encrypted.
+
+          Verifying backups is essential and it is not more urgent than
+          preventing more systems needing to be restored from them. Identifying
+          patient zero is the whole second half of this exercise and none of it
+          changes what you do in the next five minutes.
+
+          Contacting the attacker is never the SOC's call. It is a decision for
+          leadership with legal advice, and making contact yourself forfeits
+          options the institution may need.
+    actions:
+      - key: declare-major-incident
+        event_type: ESCALATE
+        label: Declare a major incident and escalate to leadership
+        target: "Incident Management / Senior Leadership Team"
+        description: Invoke the major incident process. This needs decisions above the SOC, immediately.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct, and early. A ransomware outbreak requires decisions - about
+          disconnecting services, about communications, about whether to pay -
+          that no analyst should make alone or be left holding at 08:00.
+      - key: wait-and-observe
+        event_type: ESCALATE
+        label: Continue monitoring before escalating
+        target: "SOC queue"
+        description: Gather more information before waking senior staff.
+        is_correct: false
+        points: 15
+        requires_confirmation: true
+        feedback_md: |
+          You have spent your two-minute budget. Another host is encrypting.
+
+          The instinct to have complete information before escalating is a good
+          one in almost every other situation and actively harmful here.
+          Escalate with what you have, and update as you learn.
+    hints:
+      - key: triage-hint-clock
+        cost: 3
+        text_md: |
+          Look at the first-seen timestamps across the five hosts. Work out the
+          interval between them. That number tells you how much time analysis
+          costs you.
+      - key: triage-hint-vss
+        cost: 3
+        text_md: |
+          Two things happened in the minute *before* encryption began. Both are
+          in the queue. They are the last warning any environment gets.
+    success_criteria:
+      required_decision_keys: [alert_severity, immediate_priority]
+      required_action_keys: [declare-major-incident]
+      required_ioc_values: []
+      min_queries: 1
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ----------------------------------------------------- investigation ----
+  - key: investigation
+    title: Investigation
+    instructions_md: |
+      Now work out how this started. Useful searches:
+
+      - `host:WKS-HR-014` for the first system affected.
+      - `before:07:41` to see what preceded the encryption.
+      - `source:dns` and `source:proxy` for what the host talked to.
+
+      Work backwards from 07:41 and keep going past the point where it looks
+      like you have the answer. The interesting part of this incident is
+      earlier than the ransomware.
+
+      Read the prior-incident ticket in your documents. Read what it says was
+      done, and then read what it says was not.
+    objectives:
+      - Identify the pre-encryption behaviour and what it was for.
+      - Explain how the file server was encrypted without the malware moving host.
+      - Trace the payload back to the 11 March incident.
+      - Establish why a blocked domain still resolved.
+    decisions:
+      - key: attack_techniques
+        prompt: Which MITRE ATT&CK techniques does the evidence support?
+        type: multi_select
+        options:
+          - value: T1486
+            label: "T1486 - Data Encrypted for Impact"
+            description: Encrypting data to disrupt access to it.
+          - value: T1490
+            label: "T1490 - Inhibit System Recovery"
+            description: Deleting shadow copies and backups to prevent restoration.
+          - value: T1489
+            label: "T1489 - Service Stop"
+            description: Stopping services so their locked files can be encrypted.
+          - value: T1566.001
+            label: "T1566.001 - Phishing: Spearphishing Attachment"
+            description: The original access, seven days earlier.
+          - value: T1110
+            label: "T1110 - Brute Force"
+            description: Repeated authentication attempts to guess credentials.
+          - value: T1190
+            label: "T1190 - Exploit Public-Facing Application"
+            description: Exploitation of an internet-facing service.
+          - value: T1021.002
+            label: "T1021.002 - Remote Services: SMB/Windows Admin Shares"
+            description: Lateral movement over SMB or admin shares.
+        expected: [T1486, T1490, T1489, T1566.001]
+        points: 20
+        rationale_md: |
+          Four techniques, and the fourth is the point of this scenario.
+
+          T1486, T1490 and T1489 are the ransomware itself: encrypt, remove
+          recovery, stop the services holding files open. Including T1566.001
+          says something important - **the initial access was not today**. It
+          was the phishing attachment on 11 March, and this incident is its
+          continuation.
+
+          T1021.002 is the tempting wrong answer. The file server was
+          encrypted, so it feels like lateral movement. But there was no SMB
+          session from an attacker tool and no remote execution: the malware
+          walked a mapped drive letter that was already mounted in the user's
+          session. That distinction changes the remediation from "segment the
+          network" to "restrict who can write to the share".
+      - key: spread_mechanism
+        prompt: How was FS-SHARED-01 encrypted?
+        type: select
+        options:
+          - value: mapped_drive_from_workstation
+            label: Over a mapped drive already mounted on WKS-HR-014
+            description: The malware wrote through a drive letter in the user's session.
+          - value: lateral_movement_smb
+            label: The malware moved to the file server and ran there
+            description: A remote execution technique placed the payload on the server.
+          - value: separate_infection
+            label: The file server was infected independently
+            description: It received its own copy of the payload.
+          - value: backup_agent_propagation
+            label: The backup agent propagated the encrypted files
+            description: Replication carried the damage across.
+        expected: mapped_drive_from_workstation
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          A mapped drive. The file share log records the write operation with
+          `source_host=WKS-HR-014` - the malware never ran on the server at
+          all. It wrote 41,882 files through a drive letter that was mounted in
+          p.raman's session because she uses it every day.
+
+          This matters because the two explanations lead to different fixes.
+          "Lateral movement" suggests network segmentation and credential
+          hardening. Mapped-drive encryption is not stopped by either: the
+          traffic is a legitimate user writing to a share they are permitted to
+          write to. What stops it is restricting *what* that permission covers,
+          so one HR workstation cannot rewrite every department's folder.
+      - key: initial_access
+        prompt: When and how did the attacker first gain access?
+        type: select
+        help_md: "Search before:07:41 on WKS-HR-014, and read the prior incident ticket."
+        options:
+          - value: march_11_phishing_never_eradicated
+            label: 11 March, via a phishing attachment - and the implant was never removed
+            description: The persistence from the earlier incident survived and launched again.
+          - value: today_via_email
+            label: This morning, via a new phishing email
+            description: A fresh delivery preceded the encryption.
+          - value: rdp_brute_force
+            label: Through brute-forced remote access
+            description: An attacker authenticated from outside.
+          - value: compromised_update
+            label: A compromised software update
+            description: A trusted update channel delivered the payload.
+        expected: march_11_phishing_never_eradicated
+        points: 20
+        require_rationale: true
+        rationale_md: |
+          Seven days ago, and the implant never left.
+
+          The evidence chain is unambiguous: at 07:37:55 p.raman logs in. At
+          07:38:02 `onedrivesync.exe` starts from the Run key - the same file
+          hash as the 11 March incident. At 07:38:09 it resolves
+          `update-cdn.paylo4d.example`, the same C2 domain. At 07:39:21 it
+          downloads 1.8 MB. At 07:40:44 services stop, at 07:40:58 shadow
+          copies are deleted, at 07:41:12 encryption starts.
+
+          The whole outbreak took three minutes and seventeen seconds from a
+          user logging in.
+
+          The ticket tells you why. The domain was blocked at the proxy. The
+          host was not isolated, because the user needed her laptop during
+          payroll week. It was not reimaged. The Run key was not removed. Her
+          credentials were not reset. And nobody swept the estate for the same
+          indicators.
+
+          Every one of those was a defensible small decision under time
+          pressure. Together they are this Tuesday.
+      - key: proxy_block_failure
+        prompt: The C2 domain was blocked on 11 March. Why did it still work?
+        type: select
+        options:
+          - value: blocked_at_proxy_only
+            label: It was blocked only at the web proxy, not at DNS or the firewall
+            description: The implant reached it by a path the block did not cover.
+          - value: attacker_changed_domain
+            label: The attacker registered a new domain
+            description: The block was correct but no longer relevant.
+          - value: block_expired
+            label: The block had a time limit that expired
+            description: The rule was temporary.
+          - value: dns_cache_poisoning
+            label: DNS cache poisoning circumvented the block
+            description: Resolution was manipulated.
+        expected: blocked_at_proxy_only
+        points: 15
+        rationale_md: |
+          One layer, not all of them. The DNS log shows the domain resolving
+          normally at 07:38:09 and the firewall permitting the outbound
+          connection. The proxy block was real and the traffic simply did not
+          go through the proxy.
+
+          This is one of the most common gaps in practice. A block gets applied
+          where it is easiest to apply, the ticket is closed, and nobody checks
+          it from the affected host. Verifying a block **from the place it is
+          supposed to protect** takes two minutes and would have caught this.
+    actions: []
+    hints:
+      - key: inv-hint-backwards
+        cost: 5
+        text_md: |
+          Set your search to `before:07:41` on WKS-HR-014 and read forwards
+          from 07:37. The three minutes before encryption contain the whole
+          story.
+      - key: inv-hint-hash
+        cost: 5
+        text_md: |
+          Compare the SHA-256 of the process that started the encryption with
+          the one in the 11 March incident ticket. They are the same file.
+      - key: inv-hint-mapped
+        cost: 5
+        text_md: |
+          Look at the `source_host` field on the file server's write event.
+          It tells you which machine was doing the writing.
+    success_criteria:
+      required_decision_keys:
+        [attack_techniques, spread_mechanism, initial_access, proxy_block_failure]
+      required_action_keys: []
+      required_ioc_values:
+        - "onedrivesync.exe"
+        - "update-cdn.paylo4d.example"
+        - "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync"
+      min_queries: 4
+      min_notes: 1
+      require_reflection: false
+      reflection_min_words: 0
+
+  # -------------------------------------------------------- containment ----
+  - key: containment
+    title: Containment
+    instructions_md: |
+      Containment here is broader than anything else in this library, and the
+      proportionality judgement runs the opposite way to the web application
+      scenario.
+
+      There, you knew exactly which two endpoints were vulnerable and taking
+      the whole portal down was disproportionate. Here you do not know which
+      hosts are compromised but not yet encrypting, and the cost of being wrong
+      is measured in departments.
+    objectives:
+      - Isolate every affected host, not only the first.
+      - Cut shared drive access to stop server-side encryption.
+      - Protect the backup infrastructure above all else.
+      - Close the C2 channel at every layer this time.
+    decisions:
+      - key: containment_scope
+        prompt: What containment do you authorise?
+        type: select
+        options:
+          - value: isolate_all_affected_plus_shares_and_backup
+            label: Isolate all five hosts, disable shared drive access estate-wide, and network-isolate the backup server
+            description: Stop the spread and protect the only route to recovery.
+          - value: isolate_affected_only
+            label: Isolate the five affected hosts
+            description: Contain the systems known to be encrypting.
+          - value: isolate_patient_zero
+            label: Isolate WKS-HR-014
+            description: Contain the origin of the outbreak.
+          - value: shut_down_everything
+            label: Power off every system on the campus network
+            description: Total containment by disconnection.
+        expected: isolate_all_affected_plus_shares_and_backup
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          All three elements, and the backup server is the one that decides
+          whether this institution recovers.
+
+          Isolating the five known hosts is necessary and insufficient - you do
+          not know which others hold the same implant, and shared drives are
+          the spread mechanism. Disabling share access is disruptive and
+          proportionate when 42,000 files have already gone that way.
+
+          Powering everything off is worth taking seriously rather than
+          dismissing: it is occasionally the right call, and in some outbreaks
+          it is the only one. Here it is not, because it also loses the
+          volatile evidence needed to confirm eradication, and you have a
+          targeted option that addresses the actual spread mechanism.
+
+          Note how the backup server is protected: by isolating it, not by
+          using it. Ransomware operators target backups deliberately, and this
+          one already tried locally with `vssadmin`.
+    actions:
+      - key: isolate-affected-hosts
+        event_type: CONTAIN_HOST
+        label: Network-isolate all five affected hosts
+        target: "WKS-HR-014, WKS-HR-015, WKS-FIN-003, WKS-ADM-021, FS-SHARED-01"
+        description: Cut all five from the network via the EDR console, leaving them powered on.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct, and powered on. The temptation to pull power during
+          encryption is strong and usually wrong: memory may hold the
+          encryption key, and it certainly holds evidence that a hard shutdown
+          destroys.
+      - key: isolate-backup-server
+        event_type: CONTAIN_HOST
+        label: Network-isolate BKP-SRV-01
+        target: BKP-SRV-01
+        description: Cut the backup server off from the production network to protect the only clean copy.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct, and the single most valuable action in this incident.
+          Ransomware operators go for backups deliberately. An intact backup is
+          the difference between a difficult week and a catastrophe.
+      - key: disable-share-access
+        event_type: BLOCK_INDICATOR
+        label: Disable write access to all departmental shares
+        target: "\\\\FS-SHARED-01\\Departments and all mapped shares"
+        description: Revoke write permissions estate-wide until affected hosts are identified.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct. This is what actually stops the spread mechanism - the
+          malware reached the file server through a drive letter, not through
+          the network in a way isolation alone would have caught.
+      - key: block-c2-all-layers
+        event_type: BLOCK_INDICATOR
+        label: Block the C2 domain and address at DNS, proxy and firewall
+        target: "update-cdn.paylo4d.example, 203.0.113.47"
+        description: Block at every layer this time, and verify the block from an affected host.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct, and note the lesson it encodes. This exact block was applied
+          at one layer on 11 March and closed as done. Verify it from the host
+          it is meant to protect.
+      - key: disable-praman
+        event_type: ISOLATE_ACCOUNT
+        label: Disable p.raman and reset her credentials
+        target: "NORTHWIND\\p.raman"
+        description: Disable the account whose session the malware ran in - and whose credentials were harvested in March and never reset.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct, and overdue by seven days. Her credentials were submitted to
+          a harvesting page on 11 March and never rotated.
+      - key: restore-immediately
+        event_type: DOWNLOAD_ARTIFACT
+        label: Begin restoring FS-SHARED-01 from backup now
+        target: "BKP-SRV-01 -> FS-SHARED-01"
+        description: Start the restore immediately to get departments working again.
+        is_correct: false
+        points: 20
+        requires_confirmation: true
+        feedback_md: |
+          You have restored clean data onto a network where the implant is
+          still resident and shares are still writable. It will be encrypted
+          again, and you will have consumed your recovery window and possibly
+          your restore point.
+
+          Restoring before eradicating is the single most expensive mistake in
+          ransomware response. Recovery comes after eradication for a reason,
+          and the pressure to skip that ordering will be enormous and will come
+          from people senior to you.
+      - key: power-off-everything
+        event_type: CONTAIN_HOST
+        label: Power off all campus systems
+        target: "All campus endpoints and servers"
+        description: Hard shutdown of everything to guarantee the spread stops.
+        is_correct: false
+        points: 12
+        requires_confirmation: true
+        feedback_md: |
+          This stops the spread and destroys the volatile evidence you need to
+          confirm eradication, takes down systems that were never at risk, and
+          may corrupt files mid-write on machines that were fine.
+
+          It is not an unthinkable action - in some outbreaks it is the right
+          one. It is the wrong one when you have a targeted containment that
+          addresses the actual mechanism, which you do.
+    hints:
+      - key: contain-hint-backup
+        cost: 5
+        text_md: |
+          Ask what this incident looks like if the backup server is encrypted
+          too. Then ask what you are doing to make sure that does not happen in
+          the next ten minutes.
+      - key: contain-hint-shares
+        cost: 5
+        text_md: |
+          Isolating hosts stops those hosts. What stopped the file server being
+          encrypted was never about the file server's own network connection.
+    success_criteria:
+      required_decision_keys: [containment_scope]
+      required_action_keys:
+        - isolate-affected-hosts
+        - isolate-backup-server
+        - disable-share-access
+        - block-c2-all-layers
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # -------------------------------------------------------- eradication ----
+  - key: eradication
+    title: Eradication
+    instructions_md: |
+      This is the phase the 11 March incident skipped, which is why you are
+      here. Do it properly.
+
+      The question to keep asking: if this host rejoins the network tomorrow,
+      is there anything on it that could start this again?
+    objectives:
+      - Remove the implant and its persistence wherever it exists.
+      - Establish how many hosts carry the same persistence, not just the encrypted ones.
+      - Rotate credentials compromised seven days ago and never reset.
+    decisions:
+      - key: eradication_scope
+        prompt: Which hosts need to be checked for the implant?
+        type: select
+        help_md: |
+          The five encrypted hosts are the ones you know about. Think about what
+          the 11 March response did not do.
+        options:
+          - value: entire_estate_hunt
+            label: Every host in the estate, by hunting for the Run key and file hash
+            description: The March incident was never swept, so the true footprint is unknown.
+          - value: five_affected_hosts
+            label: The five hosts that were encrypted
+            description: Clean the systems showing impact.
+          - value: hr_department_only
+            label: The HR department, where it started
+            description: Focus on the affected business unit.
+          - value: patient_zero_only
+            label: WKS-HR-014 only
+            description: Remove it from the origin.
+        expected: entire_estate_hunt
+        points: 20
+        require_rationale: true
+        rationale_md: |
+          The whole estate. This is the direct lesson of the previous incident:
+          nobody swept then, so nobody knows how many machines received the
+          same phishing email, opened it, and are sitting quietly with a Run
+          key waiting for a payload.
+
+          The five encrypted hosts are the ones where the payload arrived. They
+          are not necessarily the ones where the implant is.
+
+          Hunting for two indicators - the Run key path and the file hash -
+          across the estate is a few hours of work. Not doing it is how this
+          recurs in another seven days, and a second recurrence is no longer a
+          technical failure but an institutional one.
+      - key: eradication_steps
+        prompt: Which steps are required?
+        type: multi_select
+        options:
+          - value: rebuild_all_affected
+            label: Rebuild all five affected hosts from known-good images
+            description: Do not clean encrypted, compromised systems in place.
+          - value: hunt_run_key_estate_wide
+            label: Hunt for the Run key and implant hash across every host
+            description: Find the machines carrying the persistence but not yet triggered.
+          - value: reset_praman_credentials
+            label: Reset p.raman's credentials and revoke her tokens
+            description: Harvested on 11 March and never rotated.
+          - value: block_all_layers_verified
+            label: Confirm the C2 block is effective at DNS, proxy and firewall from an affected host
+            description: Verify, rather than assume, that the block applies.
+          - value: purge_original_phish
+            label: Search the mail estate for the original 11 March phishing email and purge remaining copies
+            description: Other mailboxes may still hold it.
+          - value: pay_ransom
+            label: Pay the ransom to obtain the decryption key
+            description: Recover the encrypted files directly.
+          - value: delete_encrypted_files
+            label: Delete all encrypted files to free up space
+            description: Clear the .nocturnelock files from affected systems.
+        expected:
+          - rebuild_all_affected
+          - hunt_run_key_estate_wide
+          - reset_praman_credentials
+          - block_all_layers_verified
+          - purge_original_phish
+        points: 20
+        rationale_md: |
+          Five steps, and note that two of them are finishing work that should
+          have happened on 11 March.
+
+          Paying the ransom is not the SOC's decision and is not eradication -
+          it is a recovery option with legal, ethical and practical problems,
+          and it does nothing about the implant. If the institution pays and
+          restores without eradicating, they are encrypted again with a
+          decryption key they have already bought once.
+
+          Deleting the encrypted files is the quietly destructive option. Those
+          files are evidence, they may be partially recoverable, and in some
+          ransomware families flawed implementations have been broken later.
+          Deleting them forecloses that permanently to reclaim disk space.
+      - key: verification_of_eradication
+        prompt: What would demonstrate that eradication succeeded?
+        type: select
+        options:
+          - value: no_indicators_and_no_c2_for_period
+            label: Estate-wide sweep returns no indicators, and no host resolves or connects to the C2 across a monitored period
+            description: Absence confirmed by active searching plus time.
+          - value: antivirus_clean
+            label: Antivirus reports clean on the rebuilt hosts
+            description: Endpoint protection finds nothing.
+          - value: users_report_normal
+            label: Users report their systems are working normally
+            description: No further disruption reported.
+          - value: no_new_encryption
+            label: No new encryption events for 24 hours
+            description: The immediate impact has stopped.
+        expected: no_indicators_and_no_c2_for_period
+        points: 15
+        rationale_md: |
+          An active sweep that finds nothing, plus a monitored period with no
+          contact to the C2 infrastructure. Absence of evidence only counts as
+          evidence of absence when you actually went looking.
+
+          The other three are what the 11 March response effectively relied on.
+          Antivirus was clean then too - it never detected this implant. Users
+          reported normal, because a beacon is invisible to the person using
+          the laptop. And there was no new encryption for seven days, right up
+          until there was.
+    actions:
+      - key: request-forensic-images-ransom
+        event_type: DOWNLOAD_ARTIFACT
+        label: Capture forensic images of the affected hosts
+        target: "WKS-HR-014 and the four other affected systems"
+        description: Image disk and memory on all affected hosts before rebuilding.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct, and memory matters unusually much here: some ransomware
+          families leave key material in memory, and a host that is isolated
+          but still running is the only chance to capture it.
+    hints:
+      - key: erad-hint-sweep
+        cost: 5
+        text_md: |
+          Read what the 11 March ticket says was *not* done. One of those
+          omissions is the reason you cannot currently answer how many hosts
+          are affected.
+    success_criteria:
+      required_decision_keys:
+        [eradication_scope, eradication_steps, verification_of_eradication]
+      required_action_keys: [request-forensic-images-ransom]
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ----------------------------------------------------------- recovery ----
+  - key: recovery
+    title: Recovery
+    instructions_md: |
+      Read the backup status document before answering anything in this phase.
+
+      The institution has a usable backup, which puts it in a far better
+      position than most. But "a backup exists" and "we can restore from it"
+      are different claims, and the document tells you which one is actually
+      supported.
+
+      Sequence matters more here than anywhere else in this library.
+    objectives:
+      - Judge whether the backup is genuinely usable.
+      - Order recovery so restored data is not immediately re-encrypted.
+      - Set realistic expectations about time to restore.
+    decisions:
+      - key: backup_assessment
+        prompt: Is the backup usable, and what is the risk?
+        type: select
+        help_md: "Check the recovery point, where the backup lives, and what has actually been tested."
+        options:
+          - value: usable_but_never_fully_tested
+            label: Usable - it survived and the recovery point is good - but a full system restore has never been tested
+            description: The backup is intact; the restore process is unproven.
+          - value: fully_reliable
+            label: Fully reliable - it is isolated, intact and regularly tested
+            description: Recovery can proceed with confidence.
+          - value: unusable_encrypted
+            label: Unusable - the ransomware reached it
+            description: The backup was encrypted along with everything else.
+          - value: unusable_too_old
+            label: Unusable - the recovery point is too old to be useful
+            description: Too much would be lost.
+        expected: usable_but_never_fully_tested
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          Usable, and unproven.
+
+          What is good: it is on a separate VLAN with local credentials the
+          domain does not know, which is exactly why it survived. The 06:00
+          incremental ran ninety minutes before encryption, so the recovery
+          point costs about ninety minutes of work.
+
+          What is not: restore testing has only ever covered **single files**,
+          most recently in September 2024. Nobody has restored a whole system
+          from this infrastructure, and the 14-20 hour estimate is a guess by
+          someone who has never done it.
+
+          That distinction belongs in your report, because leadership will be
+          asking "when will we be back" and the honest answer is "we have a
+          good copy and an untested process." A restore that fails at hour
+          twelve is a very different Tuesday from one that succeeds.
+      - key: recovery_sequence
+        prompt: In what order should recovery proceed?
+        type: select
+        options:
+          - value: eradicate_then_rebuild_then_restore_then_reconnect
+            label: Eradicate, rebuild hosts, restore data to clean systems, verify, then reconnect
+            description: Nothing clean touches the network until the network is clean.
+          - value: restore_then_eradicate
+            label: Restore the file server first to get departments working, then eradicate
+            description: Prioritise getting the institution operating again.
+          - value: reconnect_then_monitor
+            label: Reconnect the isolated hosts and watch for renewed activity
+            description: Return to service and monitor closely.
+          - value: restore_in_parallel
+            label: Restore and eradicate in parallel to save time
+            description: Run both workstreams simultaneously under pressure.
+        expected: eradicate_then_rebuild_then_restore_then_reconnect
+        points: 20
+        require_rationale: true
+        rationale_md: |
+          Eradicate, rebuild, restore, verify, reconnect &mdash; in that order,
+          and the order is the whole answer.
+
+          Restoring first is the option leadership will push for, because it is
+          the one that gets people working. It restores clean data onto a
+          network where the implant is still present, and you lose the data and
+          the window.
+
+          Restoring in parallel is the subtle version of the same mistake. It
+          sounds efficient and it means clean data arrives before the
+          environment is confirmed clean.
+
+          Being able to explain *why* the sequence cannot be compressed - to
+          someone who is under real pressure and not being unreasonable - is
+          the most valuable thing an analyst can do in the hours after an
+          outbreak.
+      - key: ransom_decision
+        prompt: Who decides whether to pay, and what is your input?
+        type: select
+        options:
+          - value: leadership_with_legal_soc_advises
+            label: Leadership with legal advice; the SOC advises that a usable backup exists
+            description: The SOC supplies facts; the decision sits above it.
+          - value: soc_decides_not_to_pay
+            label: The SOC declines to pay on principle
+            description: Refuse as a matter of policy.
+          - value: pay_to_restore_quickly
+            label: Pay, because it is faster than restoring
+            description: Buy the decryption key to reduce downtime.
+          - value: negotiate_for_time
+            label: Open negotiations to extend the deadline
+            description: Engage to buy time for recovery.
+        expected: leadership_with_legal_soc_advises
+        points: 10
+        rationale_md: |
+          Leadership, with legal advice. The SOC's contribution is factual and
+          it is decisive: **an intact backup exists with a ninety-minute
+          recovery point**. That single fact changes the conversation more than
+          any argument about principle.
+
+          Paying does not undo the breach, does not remove the implant, does
+          not guarantee a working decryptor, and may carry legal exposure
+          depending on who the operators are. Those are real considerations
+          that the SOC surfaces and does not decide.
+
+          Negotiating and making contact are not neutral acts, and doing either
+          without legal input forecloses options the institution may need.
+    actions: []
+    hints:
+      - key: rec-hint-tested
+        cost: 5
+        text_md: |
+          Look at the restore test history in the backup document. Check what
+          scope was tested, not just whether tests happened.
+      - key: rec-hint-order
+        cost: 5
+        text_md: |
+          Ask what happens to restored files if the implant is still live on
+          any host with write access to the share.
+    success_criteria:
+      required_decision_keys: [backup_assessment, recovery_sequence, ransom_decision]
+      required_action_keys: []
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ---------------------------------------------------- lessons learned ----
+  - key: lessons_learned
+    title: Lessons Learned
+    instructions_md: |
+      This is the hardest review in the library to write honestly, because the
+      most important finding is about the SOC itself.
+
+      Seven days ago this team detected the intrusion correctly, blocked the C2
+      domain, and closed the ticket. Every individual decision was reasonable.
+      The host was not isolated because a colleague needed it during payroll
+      week. The block was applied where it was easiest to apply. Nobody swept
+      the estate because nothing suggested a second host.
+
+      Reviews that turn into blame produce teams that stop reporting things.
+      Reviews that avoid the finding entirely produce the same Tuesday again.
+      Write one that does neither: name what went wrong at the level of
+      *process*, and propose changes that would hold even when the next person
+      is under the same pressure.
+    objectives:
+      - Identify the incomplete eradication as the proximate cause without blaming individuals.
+      - Recommend process changes that survive time pressure.
+      - Address backup assurance as well as prevention.
+    decisions:
+      - key: primary_control_gap
+        prompt: Which single failure most enabled this incident?
+        type: select
+        options:
+          - value: incomplete_eradication_march
+            label: The 11 March incident was closed without eradicating the persistence
+            description: The implant remained resident for seven days.
+          - value: no_network_segmentation
+            label: Insufficient network segmentation
+            description: Shared drives allowed the encryption to reach the file server.
+          - value: mail_gateway_policy
+            label: The mail gateway policy that let the original attachment through
+            description: The initial access on 11 March.
+          - value: no_edr_blocking
+            label: The endpoint agent detected but did not block
+            description: Detection without prevention.
+        expected: incomplete_eradication_march
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          The incomplete eradication. The mail gateway failure was real and it
+          was the previous incident's finding, already recorded. What turned a
+          contained compromise into an estate-wide outbreak was closing the
+          ticket while the implant was still resident.
+
+          Be precise in the write-up about what "incomplete" means here, because
+          it is a checklist, not an attitude: the host was not isolated, not
+          reimaged, the Run key stayed, credentials were not rotated, the block
+          was applied at one layer, and no sweep ran.
+
+          Segmentation is a genuine finding and belongs in the report as a
+          contributing factor - it determined the blast radius once the payload
+          ran. It did not determine whether the payload ran.
+      - key: process_change
+        prompt: Which process change would most reliably prevent a repeat?
+        type: select
+        options:
+          - value: eradication_closure_criteria
+            label: Incidents cannot be closed until documented eradication criteria are met, with exceptions signed off by name
+            description: Make incomplete closure visible and accountable rather than silent.
+          - value: more_training
+            label: Additional ransomware response training for the SOC
+            description: Improve the team's knowledge.
+          - value: buy_better_edr
+            label: Procure an endpoint product with blocking enabled
+            description: Replace detection with prevention.
+          - value: increase_soc_headcount
+            label: Increase SOC staffing
+            description: Add capacity so incidents get more attention.
+        expected: eradication_closure_criteria
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          Closure criteria with named exceptions.
+
+          The team already knew the host should be rebuilt. They did not do it
+          because somebody needed the laptop during payroll week, and no
+          mechanism made that trade-off visible to anyone who could weigh it.
+          That is a process gap, not a knowledge gap, and training does not fix
+          process gaps.
+
+          The key design detail is the **named exception**. The point is not to
+          make rebuilding mandatory regardless of circumstance - sometimes the
+          laptop genuinely is needed. It is to make skipping it a decision
+          somebody owns in writing, rather than something that quietly does not
+          happen.
+
+          More headcount and better tooling both help and neither addresses the
+          specific failure, which is that an incident was allowed to close in a
+          state everyone would have recognised as incomplete if anyone had been
+          asked.
+    actions: []
+    hints:
+      - key: ll-hint-blame
+        cost: 3
+        text_md: |
+          Test each recommendation by asking: would this have held on 11 March,
+          with the same people, the same pressure and the same deadline? If it
+          relies on somebody being more careful, it would not have.
+    success_criteria:
+      required_decision_keys: [primary_control_gap, process_change]
+      required_action_keys: []
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: true
+      reflection_min_words: 160

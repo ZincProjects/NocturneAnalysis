@@ -1,0 +1,112 @@
+[
+  {
+    "id": "alert-bruteforce",
+    "title": "Burst of failed remote logons followed by a success",
+    "severity": "high",
+    "source": "Identity Monitoring",
+    "first_seen": "2025-04-22T01:48:30.000Z",
+    "description": "43 failed RemoteInteractive logons against JMP-RDP-01 from a single internet address over 36 minutes, spread across nine accounts, then one success. The successful account is svc_helpdesk.",
+    "host": "JMP-RDP-01",
+    "user": "svc_helpdesk",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 0,
+    "linked_document_ids": [
+      "doc-auth-report"
+    ],
+    "linked_log_ids": [
+      "log-auth-spike",
+      "log-auth-success"
+    ]
+  },
+  {
+    "id": "alert-exposed-rdp",
+    "title": "RDP reachable from the public internet",
+    "severity": "medium",
+    "source": "Configuration Monitoring",
+    "first_seen": "2025-04-22T01:12:03.000Z",
+    "description": "The perimeter firewall policy Remote-Access-Legacy permits inbound 3389 from any source address to the jump host. The rule has been in place since March 2021.",
+    "host": "JMP-RDP-01",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 0,
+    "linked_document_ids": [
+      "doc-firewall-rule"
+    ],
+    "linked_log_ids": [
+      "log-fw-rdp-allow"
+    ]
+  },
+  {
+    "id": "alert-scanner",
+    "title": "Inbound scanning denied at perimeter",
+    "severity": "info",
+    "source": "Perimeter Firewall",
+    "first_seen": "2025-04-22T00:55:41.000Z",
+    "description": "Routine internet background scanning from 198.51.100.140. Every attempt denied by the default-deny inbound policy. No action required.",
+    "is_decoy": true,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 0,
+    "linked_document_ids": [],
+    "linked_log_ids": [
+      "log-fw-n001",
+      "log-fw-n002"
+    ]
+  },
+  {
+    "id": "alert-lateral",
+    "title": "Remote process creation on a file server",
+    "severity": "critical",
+    "source": "Northwind EDR",
+    "first_seen": "2025-04-22T01:52:41.000Z",
+    "description": "wmic.exe on JMP-RDP-01 created a process on FS-ACAD-02 using the svc_helpdesk account. An unsigned service binary appeared on the file server thirty seconds later.",
+    "host": "FS-ACAD-02",
+    "user": "svc_helpdesk",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 120,
+    "linked_document_ids": [],
+    "linked_log_ids": [
+      "log-edr-wmic",
+      "log-edr-psexec",
+      "log-auth-smb"
+    ]
+  },
+  {
+    "id": "alert-staging",
+    "title": "Large archive written to a hidden share",
+    "severity": "critical",
+    "source": "File Activity Monitoring",
+    "first_seen": "2025-04-22T02:05:47.000Z",
+    "description": "A 2.1 GB zip archive of the AcademicRecords share was written to \\\\FS-ACAD-02\\temp$ by svc_helpdesk. Nothing schedules this.",
+    "host": "FS-ACAD-02",
+    "user": "svc_helpdesk",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 260,
+    "linked_document_ids": [
+      "doc-share-listing"
+    ],
+    "linked_log_ids": [
+      "log-fs-archive",
+      "log-edr-7z"
+    ]
+  },
+  {
+    "id": "alert-exfil",
+    "title": "Sustained outbound transfer from a file server",
+    "severity": "critical",
+    "source": "Network Detection",
+    "first_seen": "2025-04-22T02:31:04.000Z",
+    "description": "FS-ACAD-02 uploaded 2.1 GB over HTTPS to 198.51.100.23 across 27 minutes - the same address that brute-forced the jump host. This matches the size of the staged archive exactly.",
+    "host": "FS-ACAD-02",
+    "is_decoy": false,
+    "reveal_phase": "triage",
+    "reveal_after_seconds": 400,
+    "linked_document_ids": [],
+    "linked_log_ids": [
+      "log-fw-exfil-001",
+      "log-fw-exfil-total"
+    ]
+  }
+]

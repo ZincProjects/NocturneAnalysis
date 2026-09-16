@@ -1,0 +1,717 @@
+{
+  "scenario_slug": "brute-force-lateral-movement",
+  "analyst_handle": "sample.analyst",
+  "organization_name": "Northwind Polytechnic (Demo)",
+  "events": [
+    {
+      "id": "sample-brute-force-lateral-movement-0001",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SESSION_START",
+      "phase": "triage",
+      "payload": {
+        "scenario_slug": "brute-force-lateral-movement",
+        "resumed": false
+      },
+      "created_at": "2025-05-07T10:00:03.000Z",
+      "prev_hash": "",
+      "hash": "62dd498756831b861f758fbad7ee9793160ae945efb70a7f726b2da5a1bed396",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0002",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "VIEW_ALERT",
+      "phase": "triage",
+      "payload": {
+        "alert_id": "alert-exposed-rdp",
+        "severity": "medium"
+      },
+      "created_at": "2025-05-07T10:00:36.000Z",
+      "prev_hash": "62dd498756831b861f758fbad7ee9793160ae945efb70a7f726b2da5a1bed396",
+      "hash": "d577536a6de7cc0071217acbcd5e749378a07b34dd99cd7aefd905bdfd331ab6",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0003",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "VIEW_ALERT",
+      "phase": "triage",
+      "payload": {
+        "alert_id": "alert-bruteforce",
+        "severity": "high"
+      },
+      "created_at": "2025-05-07T10:01:00.000Z",
+      "prev_hash": "d577536a6de7cc0071217acbcd5e749378a07b34dd99cd7aefd905bdfd331ab6",
+      "hash": "a3d0c951feddaef83a8093fc8f4c59dac23851ac2a4d7f3fa417a555d5b305e0",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0004",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "RUN_QUERY",
+      "phase": "triage",
+      "payload": {
+        "query": "source:edr",
+        "result_count": 4,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:01:48.000Z",
+      "prev_hash": "a3d0c951feddaef83a8093fc8f4c59dac23851ac2a4d7f3fa417a555d5b305e0",
+      "hash": "ac5393e623254634bfc45895d7900536c3cd473b8a3f64830438ca4d34543017",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0005",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "triage",
+      "payload": {
+        "decision_key": "alert_severity",
+        "decision_value": "critical",
+        "rationale": "One staff endpoint with near-certain code execution, but no evidence yet of a second host or of anything touching student records. High rather than critical - I would raise it the moment the blast radius grows."
+      },
+      "created_at": "2025-05-07T10:03:07.000Z",
+      "prev_hash": "ac5393e623254634bfc45895d7900536c3cd473b8a3f64830438ca4d34543017",
+      "hash": "b01c2457ff135db2d0c14b01f92e4d47e7fb071ddfef80353334bbf231e8a092",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0006",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "triage",
+      "payload": {
+        "decision_key": "exposure_assessment",
+        "decision_value": "rdp_exposed_to_internet"
+      },
+      "created_at": "2025-05-07T10:04:17.000Z",
+      "prev_hash": "b01c2457ff135db2d0c14b01f92e4d47e7fb071ddfef80353334bbf231e8a092",
+      "hash": "8a4d75853e64cc923e01be5ec12edb1e1de2063491305fafe2e1c6d95e9216cb",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0007",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "ESCALATE",
+      "phase": "triage",
+      "payload": {
+        "action_key": "escalate-ir-lead",
+        "target": "IR Lead (out of hours)"
+      },
+      "created_at": "2025-05-07T10:05:16.000Z",
+      "prev_hash": "8a4d75853e64cc923e01be5ec12edb1e1de2063491305fafe2e1c6d95e9216cb",
+      "hash": "880dc199b39def6a94a7ce4c332c444bfd9dce4ab17dc5211adda8d5276c8ec7",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0008",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "investigation",
+      "payload": {
+        "from": "triage",
+        "to": "investigation"
+      },
+      "created_at": "2025-05-07T10:05:36.000Z",
+      "prev_hash": "880dc199b39def6a94a7ce4c332c444bfd9dce4ab17dc5211adda8d5276c8ec7",
+      "hash": "89c190bb2f18e8f6695307443c84099dd11b271b922fcc42a177d7f5506fb9e8",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0009",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "host:FS-ACAD-02",
+        "result_count": 10,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:06:25.000Z",
+      "prev_hash": "89c190bb2f18e8f6695307443c84099dd11b271b922fcc42a177d7f5506fb9e8",
+      "hash": "7c05946451dfbad7d13ab70f5b8a0b05847d9e5fb311562ad98d78781bab11ed",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0010",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:dns",
+        "result_count": 0,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:07:05.000Z",
+      "prev_hash": "7c05946451dfbad7d13ab70f5b8a0b05847d9e5fb311562ad98d78781bab11ed",
+      "hash": "07c800eb27a3442fc9be448af29104c8b02f49d0bc28bad4cd8ad3846b5ab8cf",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0011",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:proxy",
+        "result_count": 0,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:07:36.000Z",
+      "prev_hash": "07c800eb27a3442fc9be448af29104c8b02f49d0bc28bad4cd8ad3846b5ab8cf",
+      "hash": "a61f63736b34dc591b4a7c24c74b9108a1c7db42b7d9308900fcc8f0069e94c8",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0012",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:edr",
+        "result_count": 4,
+        "filters": {}
+      },
+      "created_at": "2025-05-07T10:08:21.000Z",
+      "prev_hash": "a61f63736b34dc591b4a7c24c74b9108a1c7db42b7d9308900fcc8f0069e94c8",
+      "hash": "3f9b1e568bec80e838b9ab59df7c827775034a1cbbc488a0fc8332b05e68db09",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0013",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-fw-rdp-allow",
+        "source": "firewall"
+      },
+      "created_at": "2025-05-07T10:08:37.000Z",
+      "prev_hash": "3f9b1e568bec80e838b9ab59df7c827775034a1cbbc488a0fc8332b05e68db09",
+      "hash": "b8c0bb128be13665b1013a083e91269a72b291f81643291950c3cebce485de0b",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0014",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-auth-fail-001",
+        "source": "auth"
+      },
+      "created_at": "2025-05-07T10:09:07.000Z",
+      "prev_hash": "b8c0bb128be13665b1013a083e91269a72b291f81643291950c3cebce485de0b",
+      "hash": "2fd3c3b5739766542a5a64484a703cf442d3f7e150dcc8f9fa043656b7ca1597",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0015",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-auth-fail-002",
+        "source": "auth"
+      },
+      "created_at": "2025-05-07T10:09:28.000Z",
+      "prev_hash": "2fd3c3b5739766542a5a64484a703cf442d3f7e150dcc8f9fa043656b7ca1597",
+      "hash": "d8a9bd0b9b7d9e26be3ccf6ecd146cf36d15b12687615289cb8cd36a56b69c96",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0016",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-auth-fail-003",
+        "source": "auth"
+      },
+      "created_at": "2025-05-07T10:09:40.000Z",
+      "prev_hash": "d8a9bd0b9b7d9e26be3ccf6ecd146cf36d15b12687615289cb8cd36a56b69c96",
+      "hash": "9549d965a11713d7f0bb7a95022fb521437194436c43bf0c01e8f0b4b78ce2b6",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0017",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-auth-fail-004",
+        "source": "auth"
+      },
+      "created_at": "2025-05-07T10:10:06.000Z",
+      "prev_hash": "9549d965a11713d7f0bb7a95022fb521437194436c43bf0c01e8f0b4b78ce2b6",
+      "hash": "76c954d9a4667ced6747c6cf4fa24277be2979685b74f4d0f93d272d6b40592e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0018",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-auth-fail-005",
+        "source": "auth"
+      },
+      "created_at": "2025-05-07T10:10:23.000Z",
+      "prev_hash": "76c954d9a4667ced6747c6cf4fa24277be2979685b74f4d0f93d272d6b40592e",
+      "hash": "30b3030e7545518253cbfc9e32f976b688f7c04fae0d50fae8f178001446dce2",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0019",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "198.51.100.23",
+        "ioc_type": "ip"
+      },
+      "created_at": "2025-05-07T10:11:09.000Z",
+      "prev_hash": "30b3030e7545518253cbfc9e32f976b688f7c04fae0d50fae8f178001446dce2",
+      "hash": "8e971599804a5b8c1eeb226b81f54ae9b4813dbfe246dd53faadcf9e60f5256a",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0020",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "svc_helpdesk",
+        "ioc_type": "user"
+      },
+      "created_at": "2025-05-07T10:11:46.000Z",
+      "prev_hash": "8e971599804a5b8c1eeb226b81f54ae9b4813dbfe246dd53faadcf9e60f5256a",
+      "hash": "4f54f798320ef871ca0a10170deb7912b8ba02ca3fc9d94145b6ca013d7e6edd",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0021",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "psexesvc.exe",
+        "ioc_type": "process"
+      },
+      "created_at": "2025-05-07T10:12:14.000Z",
+      "prev_hash": "4f54f798320ef871ca0a10170deb7912b8ba02ca3fc9d94145b6ca013d7e6edd",
+      "hash": "2b9624fc6378f65cc9e8cb272558f7ffc011f9bd5d37ff6b4241ad711db55f9e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0022",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "7b8e41a09c2d5f36e8a1b47d90c5e2f8134a6b7c9d0e2f4a5b6c7d8e9f012345",
+        "ioc_type": "hash"
+      },
+      "created_at": "2025-05-07T10:12:56.000Z",
+      "prev_hash": "2b9624fc6378f65cc9e8cb272558f7ffc011f9bd5d37ff6b4241ad711db55f9e",
+      "hash": "f259e8f8bd91ade2404992bc940170cf3c6ee96b41d375c5d6dccfec472ab9b6",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0023",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "10.20.2.40",
+        "ioc_type": "ip"
+      },
+      "created_at": "2025-05-07T10:13:29.000Z",
+      "prev_hash": "f259e8f8bd91ade2404992bc940170cf3c6ee96b41d375c5d6dccfec472ab9b6",
+      "hash": "ece8ebfbf2de298e980c6c8efdb7c4584abde92c187bfbd35de9fd2332943cf9",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0024",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "ADD_NOTE",
+      "phase": "investigation",
+      "payload": {
+        "text": "Investigation: working through the evidence and recording what it supports before moving on."
+      },
+      "created_at": "2025-05-07T10:14:18.000Z",
+      "prev_hash": "ece8ebfbf2de298e980c6c8efdb7c4584abde92c187bfbd35de9fd2332943cf9",
+      "hash": "75d040ada5439b21308872495e206129bbc8f663b486bdbe8303f0d5b660f9b7",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0025",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "attack_techniques",
+        "decision_value": [
+          "T1110",
+          "T1078",
+          "T1021.002",
+          "T1560",
+          "T1041"
+        ]
+      },
+      "created_at": "2025-05-07T10:15:41.000Z",
+      "prev_hash": "75d040ada5439b21308872495e206129bbc8f663b486bdbe8303f0d5b660f9b7",
+      "hash": "c4bde31c9c27f45e44b3ceeb43249303ba6bcf071d88c125d5f124f29cdf568e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0026",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "initial_access_vector",
+        "decision_value": "sprayed_credentials_over_rdp"
+      },
+      "created_at": "2025-05-07T10:16:55.000Z",
+      "prev_hash": "c4bde31c9c27f45e44b3ceeb43249303ba6bcf071d88c125d5f124f29cdf568e",
+      "hash": "da5d32507205d45b07f848b0014c4c0ca8139fb7973d5a8189df2223f45dc712",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0027",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "data_impact",
+        "decision_value": "student_pii_exfiltrated",
+        "rationale": "Recorded during the network incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:18:23.000Z",
+      "prev_hash": "da5d32507205d45b07f848b0014c4c0ca8139fb7973d5a8189df2223f45dc712",
+      "hash": "cc0292334177ac7846d4569eab2edba893500008fbdf5a94293e14a7e6f4350b",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0028",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "containment",
+      "payload": {
+        "from": "investigation",
+        "to": "containment"
+      },
+      "created_at": "2025-05-07T10:18:47.000Z",
+      "prev_hash": "cc0292334177ac7846d4569eab2edba893500008fbdf5a94293e14a7e6f4350b",
+      "hash": "e6e0aca30f6dcd99cc22fd1c033e2610c63a3c4209faf65ddb7b70cf7566f3e6",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0029",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "containment",
+      "payload": {
+        "decision_key": "containment_scope",
+        "decision_value": "both_hosts_account_and_perimeter",
+        "rationale": "Recorded during the network incident based on the evidence available at this point in the investigation."
+      },
+      "created_at": "2025-05-07T10:19:57.000Z",
+      "prev_hash": "e6e0aca30f6dcd99cc22fd1c033e2610c63a3c4209faf65ddb7b70cf7566f3e6",
+      "hash": "d11394974761c9cffad834f9a76f5b0ad94c15303849e94561ef1938751a6006",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0030",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "BLOCK_INDICATOR",
+      "phase": "containment",
+      "payload": {
+        "action_key": "block-attacker-ip",
+        "target": "198.51.100.23"
+      },
+      "created_at": "2025-05-07T10:20:56.000Z",
+      "prev_hash": "d11394974761c9cffad834f9a76f5b0ad94c15303849e94561ef1938751a6006",
+      "hash": "8a8320f7261c0e3ac82a442a1b4e48c6c44c9993823f2524bd0b5f3f5d60e660",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0031",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "BLOCK_INDICATOR",
+      "phase": "containment",
+      "payload": {
+        "action_key": "disable-rdp-rule",
+        "target": "Remote-Access-Legacy (TCP/3389 from any)"
+      },
+      "created_at": "2025-05-07T10:21:46.000Z",
+      "prev_hash": "8a8320f7261c0e3ac82a442a1b4e48c6c44c9993823f2524bd0b5f3f5d60e660",
+      "hash": "417e95913c26435dc9e3b8d5f03fd92ebd9f0d7b59b6c6ec0b36e1677ea8c525",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0032",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "ISOLATE_ACCOUNT",
+      "phase": "containment",
+      "payload": {
+        "action_key": "disable-svc-helpdesk",
+        "target": "NORTHWIND\\svc_helpdesk"
+      },
+      "created_at": "2025-05-07T10:22:50.000Z",
+      "prev_hash": "417e95913c26435dc9e3b8d5f03fd92ebd9f0d7b59b6c6ec0b36e1677ea8c525",
+      "hash": "0e2a1d19edb52e0b9e37c135ff693b06e75dc87ea94f017d9f978f0cbb4ab527",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0033",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "CONTAIN_HOST",
+      "phase": "containment",
+      "payload": {
+        "action_key": "isolate-jump-host",
+        "target": "JMP-RDP-01"
+      },
+      "created_at": "2025-05-07T10:23:45.000Z",
+      "prev_hash": "0e2a1d19edb52e0b9e37c135ff693b06e75dc87ea94f017d9f978f0cbb4ab527",
+      "hash": "8cae909e70d593a810abe87a709878a66c0a52f97f5079438153de3ab93ddbfa",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0034",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "CONTAIN_HOST",
+      "phase": "containment",
+      "payload": {
+        "action_key": "isolate-file-server",
+        "target": "FS-ACAD-02"
+      },
+      "created_at": "2025-05-07T10:24:31.000Z",
+      "prev_hash": "8cae909e70d593a810abe87a709878a66c0a52f97f5079438153de3ab93ddbfa",
+      "hash": "44baad55d0e823542f0b0fa8afb7ecffb696733f53c3737914ec19ffa289e72e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0035",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "eradication",
+      "payload": {
+        "from": "containment",
+        "to": "eradication"
+      },
+      "created_at": "2025-05-07T10:25:01.000Z",
+      "prev_hash": "44baad55d0e823542f0b0fa8afb7ecffb696733f53c3737914ec19ffa289e72e",
+      "hash": "afd78fac837076bf5568bcd70752c489b6a1441df9e2e74b51e1c81982acf214",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0036",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "eradication",
+      "payload": {
+        "decision_key": "eradication_steps",
+        "decision_value": [
+          "remove_psexesvc",
+          "delete_staged_archive",
+          "rotate_service_credentials",
+          "remove_lockout_exemption",
+          "deny_interactive_logon_services",
+          "rebuild_both_hosts"
+        ]
+      },
+      "created_at": "2025-05-07T10:26:17.000Z",
+      "prev_hash": "afd78fac837076bf5568bcd70752c489b6a1441df9e2e74b51e1c81982acf214",
+      "hash": "94f5cadf03be01cea43c3659f60378fa8b65a93d15a93c7116b9dc5e6b4f20c1",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0037",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "eradication",
+      "payload": {
+        "decision_key": "evidence_handling",
+        "decision_value": "image_and_hash_first"
+      },
+      "created_at": "2025-05-07T10:27:47.000Z",
+      "prev_hash": "94f5cadf03be01cea43c3659f60378fa8b65a93d15a93c7116b9dc5e6b4f20c1",
+      "hash": "310c072beb71b245783583b0d9d8930845915ee4eb8d93f6646a6acab9810448",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0038",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "DOWNLOAD_ARTIFACT",
+      "phase": "eradication",
+      "payload": {
+        "action_key": "request-forensic-images",
+        "target": "JMP-RDP-01, FS-ACAD-02"
+      },
+      "created_at": "2025-05-07T10:28:43.000Z",
+      "prev_hash": "310c072beb71b245783583b0d9d8930845915ee4eb8d93f6646a6acab9810448",
+      "hash": "88cc00d50e0bd3fdc4f46afc759fe73c93e871e47975104149913f2b3d387375",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0039",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "recovery",
+      "payload": {
+        "from": "eradication",
+        "to": "recovery"
+      },
+      "created_at": "2025-05-07T10:29:00.000Z",
+      "prev_hash": "88cc00d50e0bd3fdc4f46afc759fe73c93e871e47975104149913f2b3d387375",
+      "hash": "e076055b1c0d15c434ca80bad2920e79370c2f3c0f7e94b91274412f2ffcda7c",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0040",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "recovery",
+      "payload": {
+        "decision_key": "recovery_steps",
+        "decision_value": [
+          "rebuild_and_patch",
+          "remote_access_behind_vpn_mfa",
+          "hunt_for_other_access",
+          "verify_no_outbound",
+          "monitor_30_days"
+        ]
+      },
+      "created_at": "2025-05-07T10:30:26.000Z",
+      "prev_hash": "e076055b1c0d15c434ca80bad2920e79370c2f3c0f7e94b91274412f2ffcda7c",
+      "hash": "4887f0b8f25a6ce6665a273769db0077023c3e5bfeddcd603f226559e66cb8e8",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0041",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "recovery",
+      "payload": {
+        "decision_key": "notification_owner",
+        "decision_value": "dpo_with_leadership"
+      },
+      "created_at": "2025-05-07T10:31:43.000Z",
+      "prev_hash": "4887f0b8f25a6ce6665a273769db0077023c3e5bfeddcd603f226559e66cb8e8",
+      "hash": "eef74c33370fc0bc693b5d1942bd74c93c0464bda66c7b854f876986bcb85557",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0042",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "lessons_learned",
+      "payload": {
+        "from": "recovery",
+        "to": "lessons_learned"
+      },
+      "created_at": "2025-05-07T10:32:19.000Z",
+      "prev_hash": "eef74c33370fc0bc693b5d1942bd74c93c0464bda66c7b854f876986bcb85557",
+      "hash": "1934c09ff3f4b6eb87ffb8c214a11177ec31f4ebf1b6d831586440d538e2c127",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0043",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "lessons_learned",
+      "payload": {
+        "decision_key": "primary_control_gap",
+        "decision_value": "unreviewed_perimeter_rule",
+        "rationale": "The gateway is the earliest point where one configuration change stops the whole chain. The other gaps are real but further down and harder to close without breaking legitimate work."
+      },
+      "created_at": "2025-05-07T10:33:41.000Z",
+      "prev_hash": "1934c09ff3f4b6eb87ffb8c214a11177ec31f4ebf1b6d831586440d538e2c127",
+      "hash": "4b38d4748648d64f4de0fddb2a707c53383d6b442e7d5b24ed999059d3f1af36",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0044",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SUBMIT_REPORT",
+      "phase": "lessons_learned",
+      "payload": {
+        "reflection": {
+          "what_happened": "A network incident affecting Northwind Polytechnic. A firewall rule created as a temporary measure in March 2021 left RDP exposed to the entire internet and was never reviewed or removed. An attacker sprayed passwords against it and succeeded on svc_helpdesk - a service account with a password unchanged since 2019, no MFA, membership of Server Operators, and an explicit exemption from the account lockout policy. From there they used built-in Windows tooling to move to a file server, archived the academic records share, and uploaded it over HTTPS.",
+          "what_worked": "Detection telemetry gave us the incident early enough to contain it before the attacker achieved their objective, and the evidence available was sufficient to establish the root cause without guesswork.",
+          "what_to_change": "The controls that failed are the ones closest to the initial access, and fixing those is worth more than adding another layer of detection further down the chain.",
+          "recommended_controls": [
+            "Remove the Remote-Access-Legacy firewall rule and place all remote access behind the VPN with MFA; no service should be reachable from the whole internet.",
+            "Introduce a scheduled review of perimeter rules with a mandatory expiry date on anything created as temporary.",
+            "Deny interactive and RemoteInteractive logon to service accounts through group policy, so a stolen service credential cannot be used at a keyboard."
+          ]
+        },
+        "executive_summary": "A network incident affecting Northwind Polytechnic. A firewall rule created as a temporary measure in March 2021 left RDP exposed to the entire internet and was never reviewed or removed. An attacker sprayed passwords against it and succeeded on svc_helpdesk - a service account with a password unchanged since 2019, no MFA, membership of Server Operators, and an explicit exemption from the account lockout policy. From there they used built-in Windows tooling to move to a file server, archived the academic records share, and uploaded it over HTTPS."
+      },
+      "created_at": "2025-05-07T10:35:14.000Z",
+      "prev_hash": "4b38d4748648d64f4de0fddb2a707c53383d6b442e7d5b24ed999059d3f1af36",
+      "hash": "9b45cf7d620cc468ab55092cc3bc4a6866ad6a780792ddfd09a8437f97a36b4d",
+      "client_meta": null
+    },
+    {
+      "id": "sample-brute-force-lateral-movement-0045",
+      "session_id": "sample-brute-force-lateral-movement",
+      "user_id": "sample-user-brute-force-lateral-movement",
+      "event_type": "SESSION_COMPLETE",
+      "phase": "lessons_learned",
+      "payload": {
+        "total_phases": 6
+      },
+      "created_at": "2025-05-07T10:35:31.000Z",
+      "prev_hash": "9b45cf7d620cc468ab55092cc3bc4a6866ad6a780792ddfd09a8437f97a36b4d",
+      "hash": "a6d80f758932d64e5e54645ec1b0b8ef640bc5e57991deb073cf3356b76588ce",
+      "client_meta": null
+    }
+  ]
+}

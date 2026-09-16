@@ -1,0 +1,402 @@
+[
+  {
+    "id": "log-fw-n001",
+    "ts": "2025-06-17T14:10:05.000Z",
+    "source": "firewall",
+    "message": "DENY proto=TCP src=198.51.100.99 dst=203.0.113.20 dport=3306 policy=Default-Deny-Inbound",
+    "src_ip": "198.51.100.99",
+    "dst_ip": "203.0.113.20",
+    "action": "deny",
+    "fields": {
+      "policy": "Default-Deny-Inbound",
+      "note": "Someone probing for an exposed database port. Denied - the database is not reachable from outside."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-n001",
+    "ts": "2025-06-17T14:15:40.000Z",
+    "source": "auth",
+    "message": "PORTAL_LOGIN user=j.tan source=10.20.4.61 result=success mfa=passed session=sess_44a1c2",
+    "host": "WEB-PORTAL-01",
+    "user": "j.tan",
+    "src_ip": "10.20.4.61",
+    "action": "logon_success",
+    "fields": {
+      "mfa": "passed",
+      "note": "A normal staff login with MFA. This is the control the admin account is missing."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-n001",
+    "ts": "2025-06-17T14:20:02.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=timetable HTTP/1.1 200 1876 \"-\" \"Mozilla/5.0 (Windows NT 10.0) Chrome/126\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "10.20.4.61",
+    "action": "allowed",
+    "fields": {
+      "status": 200,
+      "note": "A student searching the portal. This is what normal looks like - note the size."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-spike",
+    "ts": "2025-06-17T14:22:10.000Z",
+    "source": "http",
+    "message": "SUMMARY 1,847 requests to /api/search from 203.0.113.188 in 11 minutes, 94% returning HTTP 500",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "severity": "high",
+    "action": "summary",
+    "fields": {
+      "request_count": 1847,
+      "error_rate": "94%",
+      "window_minutes": 11,
+      "user_agent": "python-requests/2.31.0",
+      "note": "A very high error rate is the signature of someone probing, not browsing."
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-http-probe-1",
+    "ts": "2025-06-17T14:22:14.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=' HTTP/1.1 500 1204 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "error",
+    "severity": "medium",
+    "fields": {
+      "status": 500,
+      "path": "/api/search",
+      "param_q": "'",
+      "note": "A single quote. The most basic injection probe there is - and it produced a server error."
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-http-n002",
+    "ts": "2025-06-17T14:23:45.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=exam%20timetable HTTP/1.1 200 2104 \"-\" \"Mozilla/5.0 (Macintosh) Safari/17\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "10.20.4.88",
+    "action": "allowed",
+    "fields": {
+      "status": 200
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-app-error",
+    "ts": "2025-06-17T14:24:19.000Z",
+    "source": "http",
+    "message": "APPLICATION ERROR /api/search - psycopg2.errors.SyntaxError: unterminated quoted string at or near \"'\" LINE 1: SELECT id, title, body FROM articles WHERE title LIKE '%'%'",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "error",
+    "severity": "high",
+    "fields": {
+      "exception": "psycopg2.errors.SyntaxError",
+      "leaked_query": "SELECT id, title, body FROM articles WHERE title LIKE '%<input>%'",
+      "framework": "Flask 2.0.1 / psycopg2 2.9.3",
+      "note": "The error page returned the failing SQL statement to the attacker. This is how they learned the query shape in one request instead of fifty."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-sqli-001",
+    "ts": "2025-06-17T14:25:07.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=' OR '1'='1 HTTP/1.1 200 184402 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "allowed",
+    "severity": "critical",
+    "fields": {
+      "status": 200,
+      "bytes": 184402,
+      "path": "/api/search",
+      "param_q": "' OR '1'='1",
+      "note": "Boolean-based: a condition that is always true. The response is 150x larger than a normal search."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-n003",
+    "ts": "2025-06-17T14:26:11.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=O%27Brien HTTP/1.1 200 1952 \"-\" \"Mozilla/5.0 (Windows NT 10.0) Chrome/126\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "10.20.4.102",
+    "user": "m.obrien",
+    "action": "allowed",
+    "fields": {
+      "status": 200,
+      "note": "A student searching for their own surname, which contains an apostrophe. Looks like an injection probe and is a person named O'Brien."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-sqli-002",
+    "ts": "2025-06-17T14:26:14.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=' OR '1'='1' -- HTTP/1.1 200 184402 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "allowed",
+    "severity": "critical",
+    "fields": {
+      "status": 200,
+      "bytes": 184402,
+      "path": "/api/search",
+      "param_q": "' OR '1'='1' --",
+      "note": "Same payload with a comment to swallow the rest of the query."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-sqli-003",
+    "ts": "2025-06-17T14:27:21.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=' UNION SELECT NULL-- HTTP/1.1 500 1204 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "error",
+    "severity": "high",
+    "fields": {
+      "status": 500,
+      "bytes": 1204,
+      "path": "/api/search",
+      "param_q": "' UNION SELECT NULL--",
+      "note": "Column-count probing. The error tells them the number was wrong."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-sqli-004",
+    "ts": "2025-06-17T14:28:28.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=' UNION SELECT NULL,NULL-- HTTP/1.1 500 1204 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "error",
+    "severity": "high",
+    "fields": {
+      "status": 500,
+      "bytes": 1204,
+      "path": "/api/search",
+      "param_q": "' UNION SELECT NULL,NULL--",
+      "note": "Still wrong. They are counting upwards."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-sqli-005",
+    "ts": "2025-06-17T14:29:35.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=' UNION SELECT NULL,NULL,NULL-- HTTP/1.1 200 1876 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 200,
+      "bytes": 1876,
+      "path": "/api/search",
+      "param_q": "' UNION SELECT NULL,NULL,NULL--",
+      "note": "Three columns. No error means they have found the shape of the query."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-n004",
+    "ts": "2025-06-17T14:30:00.000Z",
+    "source": "http",
+    "message": "GET /robots.txt HTTP/1.1 200 118 \"-\" \"Googlebot/2.1\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.200",
+    "action": "allowed",
+    "fields": {
+      "status": 200,
+      "note": "Search engine crawler."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-sqli-006",
+    "ts": "2025-06-17T14:30:42.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=' UNION SELECT table_name,NULL,NULL FROM information_schema.tables-- HTTP/1.1 200 24918 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 200,
+      "bytes": 24918,
+      "path": "/api/search",
+      "param_q": "' UNION SELECT table_name,NULL,NULL FROM information_schema.tables--",
+      "note": "Enumerating the schema. information_schema is the database describing itself."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-sqli-007",
+    "ts": "2025-06-17T14:31:49.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=' UNION SELECT column_name,NULL,NULL FROM information_schema.columns WHERE table_name='users'-- HTTP/1.1 200 3402 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 200,
+      "bytes": 3402,
+      "path": "/api/search",
+      "param_q": "' UNION SELECT column_name,NULL,NULL FROM information_schema.columns WHERE table_name='users'--",
+      "note": "Now they know the users table has a password column."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-sqli-008",
+    "ts": "2025-06-17T14:32:56.000Z",
+    "source": "http",
+    "message": "GET /api/search?q=' UNION SELECT username,password,NULL FROM users-- HTTP/1.1 200 918447 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "allowed",
+    "severity": "critical",
+    "fields": {
+      "status": 200,
+      "bytes": 918447,
+      "path": "/api/search",
+      "param_q": "' UNION SELECT username,password,NULL FROM users--",
+      "note": "The payload this was all building towards. 918 KB of response."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-n005",
+    "ts": "2025-06-17T14:35:22.000Z",
+    "source": "http",
+    "message": "GET /api/login HTTP/1.1 405 312 \"-\" \"Mozilla/5.0 (Windows NT 10.0) Chrome/126\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "10.20.4.61",
+    "action": "error",
+    "fields": {
+      "status": 405,
+      "note": "A GET on a POST-only endpoint. Somebody refreshed a page."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-login-bypass",
+    "ts": "2025-06-17T14:41:08.000Z",
+    "source": "http",
+    "message": "POST /api/login HTTP/1.1 302 512 \"-\" \"python-requests/2.31.0\" user=admin' -- ",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "action": "allowed",
+    "severity": "critical",
+    "fields": {
+      "status": 302,
+      "path": "/api/login",
+      "param_username": "admin' -- ",
+      "note": "Authentication bypass: the comment removes the password check from the query entirely."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-admin",
+    "ts": "2025-06-17T14:41:09.000Z",
+    "source": "auth",
+    "message": "PORTAL_LOGIN user=admin source=203.0.113.188 result=success mfa=not_enrolled session=sess_9f2b41",
+    "host": "WEB-PORTAL-01",
+    "user": "admin",
+    "src_ip": "203.0.113.188",
+    "action": "logon_success",
+    "severity": "critical",
+    "fields": {
+      "mfa": "not_enrolled",
+      "session": "sess_9f2b41",
+      "note": "The portal's administrative account has no second factor. A bypassed password was all that stood in the way."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-http-admin-actions",
+    "ts": "2025-06-17T14:43:30.000Z",
+    "source": "http",
+    "message": "GET /admin/students/export?format=csv HTTP/1.1 200 4418203 \"-\" \"python-requests/2.31.0\"",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "203.0.113.188",
+    "user": "admin",
+    "action": "allowed",
+    "severity": "critical",
+    "fields": {
+      "status": 200,
+      "bytes": 4418203,
+      "path": "/admin/students/export",
+      "note": "4.4 MB student export, downloaded through the admin interface as a logged-in administrator."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-portal-out",
+    "ts": "2025-06-17T14:43:31.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=10.20.3.15 dst=203.0.113.188 dport=443 policy=Web-Outbound bytes=4418203",
+    "host": "WEB-PORTAL-01",
+    "src_ip": "10.20.3.15",
+    "dst_ip": "203.0.113.188",
+    "action": "allow",
+    "severity": "high",
+    "fields": {
+      "policy": "Web-Outbound",
+      "bytes": 4418203
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-n002",
+    "ts": "2025-06-17T14:52:17.000Z",
+    "source": "auth",
+    "message": "PORTAL_LOGIN user=k.lim source=10.20.4.77 result=failure reason=bad_password",
+    "host": "WEB-PORTAL-01",
+    "user": "k.lim",
+    "src_ip": "10.20.4.77",
+    "action": "logon_failure",
+    "fields": {
+      "note": "One failed login from inside the campus network."
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  }
+]
