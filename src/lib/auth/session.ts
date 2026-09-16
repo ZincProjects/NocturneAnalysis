@@ -1,8 +1,10 @@
 import "server-only";
 
 import { cache } from "react";
+import { cookies } from "next/headers";
 
 import { createClient } from "@/lib/supabase/server";
+import { readSupabaseEnv } from "@/lib/supabase/env";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export type Profile = Tables<"profiles">;
@@ -22,8 +24,21 @@ export interface Viewer {
  * Wrapped in React's `cache` so that a page rendering a header, a sidebar and
  * a body all asking "who is this?" costs one round trip per request rather
  * than three.
+ *
+ * Returns null rather than throwing when Supabase is not configured. The site
+ * header calls this on every page, and the public pages - samples, scenarios,
+ * the ATT&CK and OWASP references - are built from bundled content and must
+ * keep rendering for a signed-out visitor even if the database is unreachable
+ * or a deployment is missing its environment variables.
  */
 export const getViewer = cache(async (): Promise<Viewer | null> => {
+  // Who is viewing is a per-request fact. Reading cookies first marks every
+  // page that asks as dynamic, so a signed-in page is never prerendered at
+  // build time - which would otherwise happen whenever credentials are absent.
+  await cookies();
+
+  if (!readSupabaseEnv()) return null;
+
   const supabase = await createClient();
 
   const {
