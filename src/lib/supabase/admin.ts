@@ -3,6 +3,7 @@ import "server-only";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "./database.types";
+import { readSupabaseEnv } from "./env";
 
 /**
  * Service-role client. Bypasses Row Level Security entirely.
@@ -33,7 +34,7 @@ const MISSING =
   "set it in the Vercel project settings. Never prefix it with NEXT_PUBLIC_ and never commit it.";
 
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = readSupabaseEnv()?.url;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !serviceKey) throw new Error(MISSING);

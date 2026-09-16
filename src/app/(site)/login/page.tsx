@@ -37,8 +37,9 @@ export default async function LoginPage({
           <CardHeader>
             <CardTitle className="text-xl">Sign-in is not configured</CardTitle>
             <CardDescription>
-              This deployment has no Supabase credentials. Set NEXT_PUBLIC_SUPABASE_URL and
-              NEXT_PUBLIC_SUPABASE_ANON_KEY, then redeploy - both are read at build time.
+              This deployment cannot see its Supabase credentials. In Vercel, open Project
+              Settings, then Environment Variables, and add NEXT_PUBLIC_SUPABASE_URL and
+              NEXT_PUBLIC_SUPABASE_ANON_KEY for the Production environment. Then redeploy.
             </CardDescription>
           </CardHeader>
         </Card>

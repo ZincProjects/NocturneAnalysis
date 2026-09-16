@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PublicEnvScript } from "@/components/layout/public-env-script";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const sans = Inter({
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     // theme class on <html> before React hydrates to avoid a flash.
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`${sans.variable} ${mono.variable} min-h-dvh antialiased`}>
+        <PublicEnvScript />
         <ThemeProvider>
           <TooltipProvider delayDuration={200}>
             <a href="#main" className="skip-link">
