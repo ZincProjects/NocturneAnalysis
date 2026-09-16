@@ -47,7 +47,8 @@ begin
   end if;
 
   new.created_at := coalesce(new.created_at, now());
-  skew := abs(new.created_at - now());
+  -- Postgres has no abs(interval); take the larger of the two differences.
+  skew := greatest(new.created_at - now(), now() - new.created_at);
 
   if skew > interval '2 minutes' then
     raise exception
