@@ -1,0 +1,142 @@
+[
+  {
+    "code": "A01:2021",
+    "short_name": "Broken Access Control",
+    "name": "A01:2021 - Broken Access Control",
+    "description": "Restrictions on what an authenticated user is allowed to do are not correctly enforced, letting attackers reach other users' data or admin-only functions.",
+    "plain_language": "The application checks who you are but not what you are allowed to see. If changing a number in the URL from /orders/41 to /orders/42 shows you someone else's order, that is broken access control.",
+    "example": "A student portal loads a transcript from /api/transcript?student_id=. Nothing verifies the ID belongs to the logged-in student, so any student can read any transcript by editing the number.",
+    "prevention": [
+      "Deny by default; grant access explicitly rather than blocking known-bad paths.",
+      "Enforce ownership checks server-side on every request, never in the browser.",
+      "Log access-control failures and alert on repeated denials from one account."
+    ],
+    "url": "https://owasp.org/Top10/A01_2021-Broken_Access_Control/"
+  },
+  {
+    "code": "A02:2021",
+    "short_name": "Cryptographic Failures",
+    "name": "A02:2021 - Cryptographic Failures",
+    "description": "Sensitive data is exposed because it is not encrypted, is encrypted weakly, or the keys and protocols protecting it are mishandled.",
+    "plain_language": "Data that should have been scrambled either was not, or was scrambled badly. Passwords stored as plain text, traffic sent over HTTP, or an old algorithm nobody has reviewed since 2005.",
+    "example": "A login endpoint stores passwords using unsalted MD5. One database leak turns into every reused password on the internet being compromised for those users.",
+    "prevention": [
+      "Classify the data first; you cannot protect what you have not identified as sensitive.",
+      "Use TLS everywhere and modern password hashing (argon2id, scrypt, bcrypt) with per-user salts.",
+      "Do not store what you do not need - unstored data cannot leak."
+    ],
+    "url": "https://owasp.org/Top10/A02_2021-Cryptographic_Failures/"
+  },
+  {
+    "code": "A03:2021",
+    "short_name": "Injection",
+    "name": "A03:2021 - Injection",
+    "description": "Untrusted input is interpreted as part of a command or query, letting an attacker change what that command does. Includes SQL, NoSQL, OS command, LDAP and expression-language injection.",
+    "plain_language": "The application glues user input straight into an instruction it is about to run. The attacker writes input that is really an instruction, and the database or shell obeys it.",
+    "example": "A search box builds SELECT * FROM users WHERE name = '<input>'. Entering ' OR '1'='1 makes the condition always true and dumps the whole table.",
+    "prevention": [
+      "Use parameterised queries or prepared statements so input can never be parsed as code.",
+      "Validate and allow-list input server-side; escaping alone is fragile.",
+      "Apply least privilege to the database account the application connects with."
+    ],
+    "url": "https://owasp.org/Top10/A03_2021-Injection/"
+  },
+  {
+    "code": "A04:2021",
+    "short_name": "Insecure Design",
+    "name": "A04:2021 - Insecure Design",
+    "description": "Flaws that come from missing or ineffective security design rather than from an implementation bug. No amount of careful coding fixes a design that never considered the threat.",
+    "plain_language": "The bug is in the plan, not the code. If a password reset flow was designed to trust an email address the user supplies, implementing it perfectly still leaves it broken.",
+    "example": "A course enrolment system has no rate limit by design, so a script can enrol one account into every class in seconds.",
+    "prevention": [
+      "Threat model features before building them.",
+      "Write abuse cases alongside user stories: what would a malicious user do here?",
+      "Use reference architectures and secure design patterns rather than inventing flows."
+    ],
+    "url": "https://owasp.org/Top10/A04_2021-Insecure_Design/"
+  },
+  {
+    "code": "A05:2021",
+    "short_name": "Security Misconfiguration",
+    "name": "A05:2021 - Security Misconfiguration",
+    "description": "Insecure default settings, incomplete configuration, open cloud storage, unnecessary features enabled, or error messages that reveal internal detail.",
+    "plain_language": "The software could have been secure, but it was set up carelessly. Debug mode left on in production is the classic example - it hands attackers a map of the application's internals.",
+    "example": "An application returns a full stack trace on error, revealing the framework version, file paths and database table names an attacker can then target directly.",
+    "prevention": [
+      "Return generic error pages to users; send the detail to server-side logs only.",
+      "Harden by default and automate configuration so environments cannot drift apart.",
+      "Remove unused features, sample applications, default accounts and open ports."
+    ],
+    "url": "https://owasp.org/Top10/A05_2021-Security_Misconfiguration/"
+  },
+  {
+    "code": "A06:2021",
+    "short_name": "Vulnerable and Outdated Components",
+    "name": "A06:2021 - Vulnerable and Outdated Components",
+    "description": "The application runs libraries, frameworks or platform components that are unsupported or have known vulnerabilities.",
+    "plain_language": "Your own code is fine, but something you imported is not. Most applications are mostly other people's code, and that code needs patching too.",
+    "example": "A portal pins a JSON parsing library from four years ago with a published remote-code-execution advisory. No attacker needs to find a new bug.",
+    "prevention": [
+      "Maintain an inventory (SBOM) of every component and its version.",
+      "Subscribe to advisories and patch on a defined cadence, not ad hoc.",
+      "Remove unused dependencies - they carry risk without carrying value."
+    ],
+    "url": "https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/"
+  },
+  {
+    "code": "A07:2021",
+    "short_name": "Identification and Authentication Failures",
+    "name": "A07:2021 - Identification and Authentication Failures",
+    "description": "Weaknesses in confirming a user's identity: credential stuffing is possible, sessions are handled badly, or password and recovery flows can be abused.",
+    "plain_language": "The application cannot reliably tell who it is talking to. Unlimited login attempts, guessable session tokens, or a reset flow that never really proves you own the account.",
+    "example": "An admin login has no MFA and no lockout, so an attacker with one leaked password list can keep trying until something works - and nothing in the logs stops them.",
+    "prevention": [
+      "Require multi-factor authentication, especially on administrative accounts.",
+      "Rate limit and progressively delay failed logins; alert on bursts of failures.",
+      "Regenerate session identifiers on login and invalidate them on logout."
+    ],
+    "url": "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/"
+  },
+  {
+    "code": "A08:2021",
+    "short_name": "Software and Data Integrity Failures",
+    "name": "A08:2021 - Software and Data Integrity Failures",
+    "description": "Code and data are trusted without verifying integrity: unsigned updates, untrusted CI/CD pipelines, or deserialisation of attacker-controlled objects.",
+    "plain_language": "The application believes something is genuine without checking. If your build pipeline pulls a script from a URL and runs it, whoever controls that URL controls your application.",
+    "example": "An auto-update mechanism downloads a package over HTTPS but never verifies its signature, so a compromised mirror can ship malicious code to every install.",
+    "prevention": [
+      "Verify digital signatures on dependencies and updates.",
+      "Harden and review the CI/CD pipeline as production infrastructure.",
+      "Avoid deserialising untrusted data; prefer plain data formats with strict schemas."
+    ],
+    "url": "https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/"
+  },
+  {
+    "code": "A09:2021",
+    "short_name": "Security Logging and Monitoring Failures",
+    "name": "A09:2021 - Security Logging and Monitoring Failures",
+    "description": "Insufficient logging, unclear alerting or missing monitoring means breaches are not detected, and when they are, there is no evidence to investigate with.",
+    "plain_language": "If nothing is recorded, nobody notices the break-in and nobody can reconstruct it afterwards. This is the category a SOC exists to close.",
+    "example": "A portal logs successful logins but not failures, so 4,000 password attempts over one night leave no trace at all.",
+    "prevention": [
+      "Log authentication, access-control and input-validation failures with enough context to act on.",
+      "Ensure logs are tamper-evident and retained long enough to investigate.",
+      "Alert on patterns, not single lines, and test that the alert actually reaches a human."
+    ],
+    "url": "https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/"
+  },
+  {
+    "code": "A10:2021",
+    "short_name": "Server-Side Request Forgery",
+    "name": "A10:2021 - Server-Side Request Forgery (SSRF)",
+    "description": "The application fetches a URL supplied by a user without validating it, letting an attacker make the server issue requests to internal systems it should not reach.",
+    "plain_language": "You ask the server to go and fetch something, and it does - including things only it can reach, like an internal admin page or a cloud metadata service.",
+    "example": "An avatar-import feature accepts any URL. An attacker points it at an internal address and the server helpfully returns the internal response to them.",
+    "prevention": [
+      "Allow-list the destinations the server may fetch; never allow arbitrary URLs.",
+      "Block requests to internal address ranges and cloud metadata endpoints at the network layer.",
+      "Do not return the raw fetched response to the caller."
+    ],
+    "url": "https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery/"
+  }
+]

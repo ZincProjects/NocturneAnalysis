@@ -1,0 +1,923 @@
+slug: phishing-initial-access
+title: "Payroll Pressure: Phishing to Endpoint Compromise"
+category: phishing
+difficulty: beginner
+estimated_minutes: 45
+organization: Northwind Polytechnic
+is_published: true
+
+summary: >-
+  An HR officer reports an urgent payroll email. Minutes later, EDR fires on
+  Outlook spawning hidden PowerShell. Work the alert from first look to a
+  signed-off incident report.
+
+learning_objectives:
+  - Separate severity from confidence when triaging a single endpoint alert.
+  - Read a process tree and recognise why a signed binary can still be hostile.
+  - Decode a base64 PowerShell command line and turn it into a network indicator.
+  - Spot beaconing by its regularity rather than its destination.
+  - Contain an endpoint without destroying the evidence you will need later.
+  - Write a lessons-learned recommendation that names a specific control, not a platitude.
+
+mitre_techniques:
+  - T1566.001
+  - T1204.002
+  - T1059.001
+  - T1547.001
+  - T1071.001
+
+owasp_categories: []
+
+root_cause: >-
+  A spearphishing email passed the mail gateway with SPF and DMARC both failing
+  because the gateway was configured to tag rather than quarantine on
+  authentication failure, and attachment sandboxing was not enabled for
+  shortcut files. The recipient opened a .lnk disguised as a PDF, which
+  executed encoded PowerShell, downloaded a second-stage implant and
+  established Run-key persistence with command-and-control beaconing.
+
+model_recommendations:
+  - Quarantine rather than tag inbound mail that fails DMARC, and alert the SOC on external senders using a lookalike of the institution's own domain.
+  - Enable attachment detonation for shortcut and script file types (.lnk, .js, .hta, .iso), not just Office documents and PDFs.
+  - Deploy an attack-surface-reduction rule blocking Office applications from creating child processes, which would have stopped this before any network activity.
+  - Enforce phishing-resistant MFA so a harvested password alone does not grant portal access.
+  - Run a targeted phishing simulation for finance and HR staff, who are the recurring target of payroll-themed pretexts.
+
+briefing_md: |
+  ## Your shift
+
+  You are the Tier 1 analyst on the morning shift at **Northwind Polytechnic**,
+  a 4,000-student institution with a small in-house IT team. You have an alert
+  queue, a log search tool, and the authority to escalate.
+
+  ## What has happened so far
+
+  At 08:58 this morning, **Priya Raman** (HR officer, workstation `WKS-HR-014`)
+  phoned the Service Desk about an odd payroll email. She mentioned, almost in
+  passing, that she had already opened the attachment and that "a black window
+  flashed up and closed."
+
+  Five minutes later, the endpoint agent on her workstation raised a detection:
+  **Outlook started PowerShell with a hidden window and an encoded command.**
+
+  ## What you need to do
+
+  Work this incident through all six phases. You will be asked to justify your
+  severity call, pull the attack apart in the logs, contain it without
+  destroying evidence, remove what the attacker left behind, return the user to
+  work safely, and write the lessons-learned section yourself.
+
+  Not every alert in your queue is part of this incident, and not every
+  suspicious-looking value in the logs is an indicator. Deciding what to ignore
+  is part of the job.
+
+  > All data in this scenario is synthetic. Addresses use RFC 5737
+  > documentation ranges and domains use RFC 2606 reserved TLDs; none of it
+  > resolves or routes anywhere.
+
+iocs:
+  - value: "billing@secure-login.northwind-corp.example"
+    type: email
+    is_malicious: true
+    description: "Sender address of the spearphishing email. Uses a lookalike of the institution's domain and fails SPF and DMARC."
+    discoverable_in_phase: triage
+    points: 5
+  - value: "northwind-sso.verify-access.example"
+    type: domain
+    is_malicious: true
+    description: "Credential-harvesting page imitating the staff single sign-on portal. The proxy log shows a POST to it, so the password must be treated as disclosed."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "Payroll_Remittance_Q1.pdf.lnk"
+    type: file
+    is_malicious: true
+    description: "The attachment. A Windows shortcut using a double extension to appear as a PDF."
+    discoverable_in_phase: triage
+    points: 5
+  - value: "update-cdn.paylo4d.example"
+    type: domain
+    is_malicious: true
+    description: "Command-and-control domain, registered six days before the incident. Source of the second stage and destination of the 60-second beacon."
+    discoverable_in_phase: investigation
+    points: 10
+  - value: "203.0.113.47"
+    type: ip
+    is_malicious: true
+    description: "Address that update-cdn.paylo4d.example resolves to. Blocking the domain alone leaves the address reachable."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "4c1d9e73f5a2680bb31c47e0a9d85f62103e7b4c8a6d2f9015e3b7c4d8a1f620"
+    type: hash
+    is_malicious: true
+    description: "SHA-256 of the second-stage implant dropped as onedrivesync.exe in AppData\\Roaming."
+    discoverable_in_phase: investigation
+    points: 8
+  - value: "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync"
+    type: registry
+    is_malicious: true
+    description: "Run-key persistence. Re-launches the implant at every logon, so reimaging only the profile would not clear it."
+    discoverable_in_phase: investigation
+    points: 8
+
+  - value: "cdn.northwind.example"
+    type: domain
+    is_malicious: false
+    description: "The institution's own content delivery host on an internal address. It appears constantly in proxy logs because every page load uses it. Blocking it would take the staff portal offline."
+    discoverable_in_phase: investigation
+    points: 6
+  - value: "10.20.4.12"
+    type: ip
+    is_malicious: false
+    description: "The internal DNS resolver. It appears in every single DNS log line, which is exactly why it looks significant and is not."
+    discoverable_in_phase: investigation
+    points: 6
+  - value: "p.raman@northwind.example"
+    type: email
+    is_malicious: false
+    description: "The victim's own mailbox. The account is compromised and needs a reset, but the address is not an indicator of the attacker's infrastructure."
+    discoverable_in_phase: triage
+    points: 4
+
+phases:
+  # ------------------------------------------------------------ triage ----
+  - key: triage
+    title: Triage
+    instructions_md: |
+      Open the alert queue and read what you actually have. Four alerts are
+      waiting; only some belong to this incident.
+
+      Your job in this phase is **not** to solve the case. It is to decide how
+      urgent it is, how sure you are, and who should own it next.
+
+      Two words that get confused constantly, so be deliberate about them:
+
+      - **Severity** is about impact. How bad is this if it is real?
+      - **Confidence** is about evidence. How sure are you that it *is* real?
+
+      A high-severity, low-confidence alert is still worth escalating. A
+      low-severity, certain alert often is not. They are independent axes.
+    objectives:
+      - Review the alert queue and open the endpoint detection.
+      - Assign a severity and a confidence separately.
+      - Escalate to Tier 2 rather than closing or sitting on it.
+    decisions:
+      - key: alert_severity
+        prompt: What severity do you assign to the EDR detection on WKS-HR-014?
+        type: select
+        help_md: |
+          Consider impact, not certainty. One staff workstation is affected so
+          far. There is no evidence yet of a second host, a server, or student
+          data. But hidden encoded PowerShell from a mail client is a strong
+          indicator of successful code execution on that endpoint.
+        options:
+          - value: critical
+            label: Critical
+            description: Widespread or business-stopping impact, or confirmed impact to critical systems.
+          - value: high
+            label: High
+            description: Confirmed or near-certain code execution on a staff endpoint; contained blast radius so far.
+          - value: medium
+            label: Medium
+            description: Suspicious activity that may be benign; limited potential impact.
+          - value: low
+            label: Low
+            description: Policy noise or nuisance software; no meaningful impact.
+        expected: high
+        points: 10
+        require_rationale: true
+        rationale_md: |
+          **High** is the right call here.
+
+          Encoded, window-hidden PowerShell launched by Outlook is close to
+          conclusive evidence of execution on that endpoint, which rules out
+          medium and low. But *critical* should be reserved for incidents whose
+          impact is already widespread or is hitting systems the institution
+          cannot operate without - a domain controller, the student records
+          system, multiple departments at once.
+
+          Right now this is one HR workstation. Calling it critical on the
+          first alert spends credibility you will need later, and in a real SOC
+          it wakes people up at 3am for something that could have waited until
+          09:00. Severity can be raised as the blast radius grows - and in this
+          incident, it will.
+      - key: alert_confidence
+        prompt: How confident are you, right now, that this is a genuine compromise?
+        type: select
+        help_md: |
+          You have the detection and the user's account. You have not yet
+          looked at any network or persistence evidence.
+        options:
+          - value: confirmed_malicious
+            label: Confirmed malicious
+            description: Corroborated by more than one independent source of evidence.
+          - value: likely_malicious
+            label: Likely malicious
+            description: Strong single-source indicator plus a plausible delivery story.
+          - value: uncertain
+            label: Uncertain
+            description: Could reasonably be either; needs investigation before a view.
+          - value: likely_benign
+            label: Likely benign
+            description: Probably legitimate administrative or business activity.
+        expected: likely_malicious
+        points: 10
+        rationale_md: |
+          **Likely malicious.**
+
+          You have one strong indicator (encoded PowerShell from Outlook) and a
+          user account that matches it (she opened an attachment and saw a
+          window flash). That is more than "uncertain."
+
+          It is not yet *confirmed*, because everything you have comes from a
+          single telemetry source and a human recollection. Confirmation
+          arrives in the next phase when the network logs independently show
+          the download and the beacon. Being honest about that distinction is
+          what stops a SOC from crying wolf - and from dismissing real
+          incidents because someone called something "confirmed" once and was
+          wrong.
+    actions:
+      - key: escalate-tier2
+        event_type: ESCALATE
+        label: Escalate to Tier 2
+        target: "Tier 2 Incident Response"
+        description: Hand the case to Tier 2 with your severity and confidence assessment attached.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct. Tier 1's job is accurate, fast triage and a clean handoff -
+          not solving the case alone. The assessment you attached travels with
+          the ticket.
+      - key: close-false-positive
+        event_type: ESCALATE
+        label: Close as false positive
+        target: "EDR-2025-0311-4471"
+        description: Mark the detection as benign administrative activity and close the alert.
+        is_correct: false
+        points: 15
+        requires_confirmation: true
+        feedback_md: |
+          This is the expensive mistake this scenario exists to teach.
+
+          Closing here means the beacon runs all day, the Run key survives every
+          reboot, and the harvested password stays valid. Alert fatigue is real,
+          and "it's probably an admin script" is the most common way a genuine
+          intrusion gets closed in a busy queue. Encoded, hidden PowerShell
+          launched by a *mail client* is never routine administration.
+    hints:
+      - key: triage-hint-severity
+        cost: 3
+        text_md: |
+          Ask yourself two separate questions. "If this is real, how much
+          damage is possible right now?" gives you severity. "How much evidence
+          do I have that it is real?" gives you confidence. Do not let a strong
+          answer to one drag the other along with it.
+      - key: triage-hint-noise
+        cost: 3
+        text_md: |
+          Two of the four alerts in the queue are ordinary background noise - a
+          quarantined adware bundle and denied inbound scanning. Neither
+          involves WKS-HR-014. Deciding they are unrelated *is* triage.
+    success_criteria:
+      required_decision_keys: [alert_severity, alert_confidence]
+      required_action_keys: [escalate-tier2]
+      required_ioc_values: []
+      min_queries: 1
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ----------------------------------------------------- investigation ----
+  - key: investigation
+    title: Investigation
+    instructions_md: |
+      Now pull the incident apart. The full log set is open to you.
+
+      Start from what you know - `WKS-HR-014`, `p.raman`, 09:03 - and pivot
+      outwards. Useful moves:
+
+      - `host:WKS-HR-014` to see everything that endpoint did.
+      - `source:dns` to look at name resolution.
+      - `source:proxy` for what actually left the network.
+
+      Read the EDR alert document carefully. The `-enc` argument is base64 in
+      UTF-16LE; the decoded command is shown for you, and it contains the single
+      most useful indicator in this incident.
+
+      Tag indicators as you find them. Tagging something benign costs you
+      points, so be able to say *why* each value is attacker infrastructure and
+      not just traffic you happened to notice.
+    objectives:
+      - Recover the command-and-control domain from the encoded PowerShell.
+      - Identify the beacon by its interval rather than its destination.
+      - Find the persistence mechanism.
+      - Establish that credentials were also harvested, not just code executed.
+    decisions:
+      - key: attack_techniques
+        prompt: Which MITRE ATT&CK techniques does the evidence support?
+        type: multi_select
+        help_md: |
+          Select only what the logs actually show. Choosing techniques that are
+          not evidenced is the analyst equivalent of guessing, and an
+          instructor reviewing your report will see both what you found and
+          what you claimed without support.
+        options:
+          - value: T1566.001
+            label: "T1566.001 - Phishing: Spearphishing Attachment"
+            description: A targeted email carrying a malicious attachment.
+          - value: T1204.002
+            label: "T1204.002 - User Execution: Malicious File"
+            description: The compromise required the recipient to open the file.
+          - value: T1059.001
+            label: "T1059.001 - Command and Scripting Interpreter: PowerShell"
+            description: PowerShell used to execute attacker code.
+          - value: T1547.001
+            label: "T1547.001 - Boot or Logon Autostart Execution: Registry Run Keys"
+            description: Persistence via a Run key.
+          - value: T1071.001
+            label: "T1071.001 - Application Layer Protocol: Web Protocols"
+            description: Command and control over HTTP/HTTPS.
+          - value: T1190
+            label: "T1190 - Exploit Public-Facing Application"
+            description: Exploitation of an internet-facing service.
+          - value: T1110
+            label: "T1110 - Brute Force"
+            description: Repeated authentication attempts to guess credentials.
+          - value: T1021.002
+            label: "T1021.002 - Remote Services: SMB/Windows Admin Shares"
+            description: Lateral movement over SMB.
+          - value: T1486
+            label: "T1486 - Data Encrypted for Impact"
+            description: Ransomware encryption of victim files.
+        expected: [T1566.001, T1204.002, T1059.001, T1547.001, T1071.001]
+        points: 20
+        rationale_md: |
+          The five correct techniques trace the whole chain: the attachment
+          arrived (T1566.001), the user opened it (T1204.002), PowerShell ran
+          the payload (T1059.001), a Run key made it survive reboot
+          (T1547.001), and it called home over HTTPS (T1071.001).
+
+          The four wrong options describe real techniques that are simply not
+          in evidence here. Nothing internet-facing was exploited, there are no
+          repeated failed logons, no SMB session to a second host, and no
+          encryption. Each of those belongs to a different scenario in this
+          library - and mapping an incident to techniques it does not show is
+          how threat intelligence gets polluted.
+      - key: root_cause
+        prompt: What is the root cause of this incident?
+        type: select
+        help_md: |
+          Root cause means the thing that, if it had been different, would have
+          prevented the incident. Not the last thing that happened.
+        options:
+          - value: user_opened_malicious_attachment
+            label: A malicious attachment reached a user and was opened
+            description: Mail controls let a hostile shortcut file through to a human, who ran it.
+          - value: unpatched_vpn
+            label: An unpatched VPN appliance was exploited
+            description: A known vulnerability in a perimeter device was used for access.
+          - value: sql_injection
+            label: SQL injection against a web application
+            description: A public-facing application was exploited through unsanitised input.
+          - value: stolen_vpn_credentials
+            label: Stolen VPN credentials used for remote access
+            description: Valid credentials obtained elsewhere were reused against remote access.
+          - value: insider_action
+            label: Deliberate action by an insider
+            description: An authorised user intentionally caused the compromise.
+        expected: user_opened_malicious_attachment
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          The attachment is the root cause. Every later step - the PowerShell,
+          the download, the Run key, the beacon - depends on that file reaching
+          a mailbox and being executed.
+
+          Note what the root cause is *not*: it is not "the user made a
+          mistake." Priya received mail that failed SPF and DMARC, carried a
+          double-extension shortcut, and was not sandboxed by the gateway. The
+          control failed before she ever saw it. Incident reports that land on
+          "user error" tend to produce more training and no technical change,
+          and the next identical email gets through too.
+      - key: credential_exposure
+        prompt: Were credentials exposed in this incident?
+        type: select
+        help_md: "Look at the proxy log around 08:43, before the EDR detection fired."
+        options:
+          - value: yes_password_submitted
+            label: "Yes - a password was submitted to the lookalike portal"
+            description: There is evidence of a form POST to the attacker's page.
+          - value: no_only_code_execution
+            label: "No - this was code execution only"
+            description: The attachment ran, but no credentials left the environment.
+          - value: unknown_no_evidence
+            label: "Unknown - the logs cannot tell us either way"
+            description: There is no evidence in scope to decide.
+        expected: yes_password_submitted
+        points: 15
+        rationale_md: |
+          Yes. `log-proxy-002` shows a **POST** to
+          `northwind-sso.verify-access.example/login` at 08:43:47, followed by a
+          302 redirect - the signature of a credential-harvesting page
+          accepting a submission and bouncing the victim to the real site so
+          nothing seems wrong.
+
+          This matters enormously for what comes later. If you treat this as
+          code execution only, you will reimage the laptop and leave a working
+          password in the attacker's hands. Note also that the user's own
+          account of events did not mention clicking the link. People
+          under-report, not usually dishonestly - they genuinely do not
+          remember. The logs are the record; the interview is a lead.
+    actions: []
+    hints:
+      - key: inv-hint-decode
+        cost: 5
+        text_md: |
+          Open the **EDR detection** document rather than working only from the
+          alert summary. It shows the full process tree and the decoded
+          PowerShell command, which contains the URL the second stage came from.
+      - key: inv-hint-beacon
+        cost: 5
+        text_md: |
+          Run `source:dns` and look at the timestamps for
+          `update-cdn.paylo4d.example`. The destination is not what gives it
+          away - the *interval* is. Human browsing is never that regular.
+      - key: inv-hint-persistence
+        cost: 5
+        text_md: |
+          Search `source:edr`. Beyond the original detection there are two more
+          endpoint events: a file being written into AppData, and a registry
+          value being set. One of them is how the implant survives a reboot.
+    success_criteria:
+      required_decision_keys: [attack_techniques, root_cause, credential_exposure]
+      required_action_keys: []
+      required_ioc_values:
+        - "update-cdn.paylo4d.example"
+        - "203.0.113.47"
+        - "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync"
+        - "northwind-sso.verify-access.example"
+      min_queries: 3
+      min_notes: 1
+      require_reflection: false
+      reflection_min_words: 0
+
+  # -------------------------------------------------------- containment ----
+  - key: containment
+    title: Containment
+    instructions_md: |
+      Stop the bleeding. You know what is happening and where; now limit what
+      the attacker can still do.
+
+      Containment is a trade-off, not a checklist. Every action you take has a
+      cost to somebody - a user cannot work, a service goes down, or evidence
+      you needed is destroyed. Choose deliberately and be ready to defend each
+      one.
+
+      Two traps are waiting in the action panel. Both look reasonable.
+    objectives:
+      - Isolate the affected endpoint while preserving volatile evidence.
+      - Disable the account whose password was harvested.
+      - Block the command-and-control infrastructure at both domain and address.
+      - Avoid collateral damage to systems that are not part of the incident.
+    decisions:
+      - key: containment_approach
+        prompt: How should WKS-HR-014 be taken out of play?
+        type: select
+        help_md: |
+          The implant is running in memory. Whatever you do next determines
+          whether anyone can ever analyse it.
+        options:
+          - value: isolate_and_preserve
+            label: Network-isolate the host, leave it powered on
+            description: Cut network reachability from the EDR console; memory and running processes stay intact.
+          - value: power_off_immediately
+            label: Power the machine off at the wall
+            description: Immediate and total, and it stops everything at once.
+          - value: reimage_now
+            label: Reimage the machine straight away
+            description: Fastest route back to a clean, working laptop for the user.
+          - value: wait_for_approval
+            label: Take no action until the IT manager approves
+            description: Follow change control before touching a staff device.
+        expected: isolate_and_preserve
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          **Network isolation with the host left running** is the standard
+          first move, and it is a genuine trade-off rather than an obvious
+          answer.
+
+          Pulling the power destroys memory - and memory is where the
+          unencrypted payload, the injected process and any in-flight
+          credentials live. Reimaging immediately destroys everything,
+          including your ability to answer "what did they take?", which is the
+          question leadership will ask first.
+
+          Waiting for approval is the interesting wrong answer. Change control
+          exists for good reasons, but active command-and-control on a staff
+          endpoint is precisely what an emergency containment authority is for.
+          If your institution does not have one, that belongs in your
+          lessons-learned section.
+    actions:
+      - key: isolate-host-wks-hr-014
+        event_type: CONTAIN_HOST
+        label: Network-isolate WKS-HR-014
+        target: WKS-HR-014
+        description: Cut the endpoint off from the network via the EDR console. It stays powered on and reachable by the response team.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct, and the order matters: isolating before disabling the account
+          means the implant loses its channel before the attacker gets a
+          "something is wrong" signal from a failed logon.
+      - key: disable-account-praman
+        event_type: ISOLATE_ACCOUNT
+        label: Disable the p.raman account and revoke sessions
+        target: "NORTHWIND\\p.raman"
+        description: Disable the account, force sign-out of all active sessions, and flag it for a password reset.
+        is_correct: true
+        points: 15
+        feedback_md: |
+          Correct. The proxy log shows the password was submitted to the
+          attacker's portal, so the credential is compromised independently of
+          the laptop. Isolating the endpoint alone would leave that password
+          working from anywhere on the internet.
+      - key: block-c2-domain
+        event_type: BLOCK_INDICATOR
+        label: Block update-cdn.paylo4d.example at the proxy and DNS
+        target: update-cdn.paylo4d.example
+        description: Add the command-and-control domain to the blocklist and sinkhole it internally.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct, and it protects every other endpoint too - if this email
+          reached one mailbox it very likely reached others.
+      - key: block-c2-ip
+        event_type: BLOCK_INDICATOR
+        label: Block 203.0.113.47 at the perimeter firewall
+        target: "203.0.113.47"
+        description: Deny outbound traffic to the address the C2 domain resolves to.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct. Domain blocking alone is bypassed by hardcoding the address,
+          which second-stage implants routinely do. Block both layers.
+      - key: isolate-host-wks-hr-015
+        event_type: CONTAIN_HOST
+        label: Network-isolate WKS-HR-015
+        target: WKS-HR-015
+        description: Isolate the neighbouring HR workstation as a precaution.
+        is_correct: false
+        points: 10
+        feedback_md: |
+          WKS-HR-015's only appearance in the logs is a quarantined adware
+          bundle - already handled, and unrelated. You have taken a working
+          staff member offline for nothing.
+
+          Precautionary containment is not free. Do it where there is evidence
+          of spread, not where there is evidence of proximity.
+      - key: block-cdn-northwind
+        event_type: BLOCK_INDICATOR
+        label: Block cdn.northwind.example
+        target: cdn.northwind.example
+        description: The domain appears in a very large number of proxy log entries around the time of the incident.
+        is_correct: false
+        points: 15
+        requires_confirmation: true
+        feedback_md: |
+          That is the institution's own content delivery host on an internal
+          address. You have just taken down the staff portal, the timetable
+          system and every page that loads shared assets.
+
+          It appeared everywhere in the logs because it is used by everything.
+          Frequency is not evidence of malice - in fact the most-seen values in
+          any log set are almost always the most legitimate ones.
+    hints:
+      - key: contain-hint-both-layers
+        cost: 5
+        text_md: |
+          Blocking the C2 domain is right but incomplete. Look at what your DNS
+          log says the domain resolves to, and ask what happens if the implant
+          skips DNS entirely.
+      - key: contain-hint-account
+        cost: 5
+        text_md: |
+          Re-read your credential-exposure finding from the investigation
+          phase. If a password left the building, containing the *laptop* does
+          not contain the *incident*.
+    success_criteria:
+      required_decision_keys: [containment_approach]
+      required_action_keys:
+        - isolate-host-wks-hr-014
+        - disable-account-praman
+        - block-c2-domain
+        - block-c2-ip
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # -------------------------------------------------------- eradication ----
+  - key: eradication
+    title: Eradication
+    instructions_md: |
+      Containment stopped the attacker acting. Eradication removes what they
+      left behind, so that restoring service does not simply restore the
+      compromise as well.
+
+      Be precise about what actually needs removing. Over-broad eradication
+      wastes days and destroys evidence; under-broad eradication means you do
+      this whole incident again next week.
+    objectives:
+      - Identify every attacker artefact that must be removed.
+      - Preserve forensic evidence before destroying the affected system.
+    decisions:
+      - key: eradication_steps
+        prompt: Which of these must be carried out to eradicate this compromise?
+        type: multi_select
+        help_md: |
+          Select everything required, and nothing that is not. Both misses and
+          over-reach cost points, because both cost real time in a real
+          incident.
+        options:
+          - value: remove_run_key
+            label: Remove the OneDriveSync Run key
+            description: Delete the HKCU Run value pointing at AppData.
+          - value: remove_implant_binary
+            label: Delete the onedrivesync.exe implant
+            description: Remove the unsigned binary from AppData\Roaming.
+          - value: reset_praman_credentials
+            label: Reset p.raman's password and revoke tokens
+            description: Issue new credentials and invalidate existing sessions and refresh tokens.
+          - value: purge_mail_from_all_mailboxes
+            label: Purge the phishing email from every mailbox
+            description: Search the mail estate for the same sender and attachment hash, and remove all copies.
+          - value: rebuild_endpoint
+            label: Rebuild WKS-HR-014 from a known-good image
+            description: Flatten and reinstall the workstation rather than cleaning it in place.
+          - value: delete_user_mailbox
+            label: Delete p.raman's mailbox
+            description: Remove the mailbox entirely to be certain nothing malicious remains in it.
+          - value: rebuild_file_server
+            label: Rebuild the file server
+            description: Reinstall the departmental file server as a precaution.
+          - value: disable_powershell_estate_wide
+            label: Disable PowerShell across the entire estate
+            description: Remove PowerShell from all endpoints so this cannot happen again.
+        expected:
+          - remove_run_key
+          - remove_implant_binary
+          - reset_praman_credentials
+          - purge_mail_from_all_mailboxes
+          - rebuild_endpoint
+        points: 20
+        rationale_md: |
+          The five correct steps cover persistence, payload, credentials, the
+          delivery vector still sitting in other mailboxes, and the host
+          itself.
+
+          On rebuilding: once an implant has run with user privileges and
+          pulled down a stage you have not analysed, cleaning in place means
+          trusting that you found everything. Rebuild from a known-good image.
+
+          The three wrong options share a shape - they are drastic actions
+          aimed at things that are not compromised. Deleting the mailbox
+          destroys evidence and a staff member's work. The file server never
+          appears in this incident. Disabling PowerShell estate-wide breaks
+          legitimate administration across the institution and would be
+          reversed within a week; constrained language mode and
+          execution-policy controls are the proportionate version of that
+          instinct.
+      - key: evidence_before_rebuild
+        prompt: What must happen before WKS-HR-014 is rebuilt?
+        type: select
+        options:
+          - value: capture_forensic_image
+            label: Capture a forensic disk image and memory dump
+            description: Preserve the evidence while the machine still holds it.
+          - value: rebuild_immediately
+            label: Rebuild immediately - the user needs the laptop
+            description: Prioritise returning the staff member to work.
+          - value: copy_desktop_files
+            label: Copy the user's documents folder and rebuild
+            description: Preserve the user's work only.
+        expected: capture_forensic_image
+        points: 10
+        rationale_md: |
+          Image first. The moment that disk is wiped, every question that comes
+          later - what the second stage did, whether anything was staged for
+          exfiltration, whether other credentials were on that machine -
+          becomes permanently unanswerable.
+
+          This is also where the chain of custody you have been building
+          matters. Your event log records who isolated the host and when; the
+          forensic image records its state at that moment. Together they are
+          what makes the incident defensible if it ever has to be explained to
+          a regulator, an insurer or a parent.
+    actions:
+      - key: request-forensic-image
+        event_type: DOWNLOAD_ARTIFACT
+        label: Request a forensic image of WKS-HR-014
+        target: WKS-HR-014
+        description: Raise a forensic acquisition request for a full disk image and memory capture before rebuild.
+        is_correct: true
+        points: 10
+        feedback_md: |
+          Correct. Requested while the host is isolated but still running,
+          which is the only window in which memory can be captured at all.
+    hints:
+      - key: erad-hint-scope
+        cost: 5
+        text_md: |
+          For each option ask: "does this incident show that system or object
+          was touched?" If the answer is no, removing it is not eradication -
+          it is collateral damage with a security justification attached.
+    success_criteria:
+      required_decision_keys: [eradication_steps, evidence_before_rebuild]
+      required_action_keys: [request-forensic-image]
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ----------------------------------------------------------- recovery ----
+  - key: recovery
+    title: Recovery
+    instructions_md: |
+      Get Priya back to work, and prove that it is safe to do so.
+
+      Recovery is the phase people rush, because by now the exciting part is
+      over and somebody senior is asking when the user gets her laptop back.
+      Rushing it is how incidents recur a fortnight later and everyone
+      concludes "the attackers came back" when in fact they never left.
+    objectives:
+      - Restore the endpoint and account safely.
+      - Define what evidence would prove the environment is clean.
+      - Set a monitoring period rather than declaring victory immediately.
+    decisions:
+      - key: recovery_steps
+        prompt: What is required before WKS-HR-014 and the account return to normal service?
+        type: multi_select
+        options:
+          - value: rebuild_from_known_good
+            label: Rebuild from a known-good image and patch fully before reconnecting
+            description: Clean build, current patch level, then network.
+          - value: reset_credentials_with_mfa
+            label: Reset the password and enrol the account in phishing-resistant MFA
+            description: New credential, plus a factor a harvested password cannot defeat.
+          - value: verify_no_beacon
+            label: Verify no further resolution or connection to the C2 indicators
+            description: Confirm from DNS, proxy and firewall telemetry that the beacon is gone.
+          - value: hunt_other_hosts
+            label: Sweep the estate for the same indicators
+            description: Check whether any other host contacted the C2 or received the same attachment.
+          - value: monitor_host_14_days
+            label: Monitor the rebuilt host and account with raised sensitivity for 14 days
+            description: Heightened alerting for a defined period before standing down.
+          - value: restore_from_yesterday_backup
+            label: Restore the endpoint from yesterday evening's backup
+            description: Fast route back to the user's exact working state.
+          - value: reconnect_and_watch
+            label: Reconnect the original machine and watch what happens
+            description: Return it to the network and monitor for renewed activity.
+        expected:
+          - rebuild_from_known_good
+          - reset_credentials_with_mfa
+          - verify_no_beacon
+          - hunt_other_hosts
+          - monitor_host_14_days
+        points: 20
+        rationale_md: |
+          Rebuild, new credentials with a factor that resists phishing,
+          positive verification that the beacon is gone, a sweep for anyone
+          else who got the same email, and a defined monitoring window.
+
+          Restoring from yesterday's backup is the subtle trap. The attachment
+          arrived at 08:41 *today*, so yesterday's image predates the
+          compromise and is technically clean - but a restore also brings back
+          the pre-incident patch level and configuration, and it silently
+          skips the rebuild discipline. More importantly, students who pick it
+          usually have not checked when the compromise actually began. Get into
+          the habit of asking "is my restore point definitely before patient
+          zero?" - in the ransomware scenario in this library, it is not.
+
+          Reconnecting the original machine to see what happens is using the
+          production network as a malware sandbox.
+      - key: recovery_signoff
+        prompt: Who should sign off that the incident is closed?
+        type: select
+        options:
+          - value: ir_lead_with_evidence
+            label: The incident response lead, against documented closure criteria
+            description: Closure is a decision made against stated evidence.
+          - value: tier1_analyst
+            label: The Tier 1 analyst who triaged it
+            description: The person closest to the alert closes it out.
+          - value: user_confirms_working
+            label: The affected user, once the laptop works again
+            description: Service restored is the test that matters to the business.
+        expected: ir_lead_with_evidence
+        points: 10
+        rationale_md: |
+          Closure is a decision with accountability attached, made against
+          criteria written down in advance - not "the laptop boots" and not the
+          judgement of whoever happens to be on shift.
+
+          "The user says it works" is how an incident gets closed while an
+          attacker still holds a valid token somewhere else in the estate.
+    actions: []
+    hints:
+      - key: rec-hint-backup
+        cost: 5
+        text_md: |
+          Check the timestamp of the phishing email against the age of any
+          backup you are considering restoring. Ask whether the restore point
+          is definitely earlier than the first attacker action - and whether
+          you actually know when that was.
+    success_criteria:
+      required_decision_keys: [recovery_steps, recovery_signoff]
+      required_action_keys: []
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: false
+      reflection_min_words: 0
+
+  # ---------------------------------------------------- lessons learned ----
+  - key: lessons_learned
+    title: Lessons Learned
+    instructions_md: |
+      This is the phase most training tools skip, and the one that actually
+      changes anything.
+
+      An incident that ends with "we contained it and rebuilt the laptop" has
+      taught the institution nothing. The value of the last two hours is in
+      what changes because of them.
+
+      Write your post-incident review below. Aim for specifics: a
+      recommendation an IT manager could act on next week, with a named control
+      and an owner, beats "improve security awareness" every time.
+
+      Your write-up goes into the generated report verbatim, alongside the
+      timeline reconstructed from your own event log.
+    objectives:
+      - Describe what happened in language a non-technical reader can follow.
+      - Identify which controls worked and which did not.
+      - Recommend specific, actionable changes.
+    decisions:
+      - key: primary_control_gap
+        prompt: Which single control failure most enabled this incident?
+        type: select
+        help_md: |
+          Several controls underperformed. You are being asked which one, if
+          fixed, would most likely have stopped the chain before it started.
+        options:
+          - value: mail_gateway_policy
+            label: The mail gateway tagged rather than quarantined a DMARC failure, and did not detonate shortcut attachments
+            description: The message should never have reached a mailbox.
+          - value: user_awareness
+            label: The user was not sufficiently trained to spot phishing
+            description: The recipient opened an attachment they should have questioned.
+          - value: endpoint_av
+            label: Antivirus failed to detect the second-stage binary
+            description: The implant was written to disk without being blocked.
+          - value: firewall_rules
+            label: The firewall allowed outbound HTTPS to an unknown address
+            description: The beacon was permitted to leave the network.
+        expected: mail_gateway_policy
+        points: 15
+        require_rationale: true
+        rationale_md: |
+          The mail gateway. It is the earliest point in the chain where a
+          single configuration change - quarantine on DMARC failure, detonate
+          shortcut files - would have prevented everything downstream.
+
+          The other three are real weaknesses and belong in the report, but
+          they are later, weaker links. Outbound HTTPS to unknown hosts cannot
+          be blocked by default without breaking normal work. Antivirus missing
+          a fresh payload is expected, which is why EDR behavioural detection
+          exists and, note, it *did* fire.
+
+          "User awareness" deserves particular scrutiny. It is the most
+          commonly chosen answer in real post-incident reviews and one of the
+          least effective, because it puts the last line of defence on a person
+          doing a different job under time pressure. Training has value, but a
+          review that lands only on user error usually means the technical
+          controls were never examined.
+    actions: []
+    hints:
+      - key: ll-hint-specific
+        cost: 3
+        text_md: |
+          Test each recommendation by asking: could someone put this in a
+          change ticket on Monday? "Enable attachment detonation for .lnk and
+          .iso files on the mail gateway" passes. "Be more vigilant" does not.
+    success_criteria:
+      required_decision_keys: [primary_control_gap]
+      required_action_keys: []
+      required_ioc_values: []
+      min_queries: 0
+      min_notes: 0
+      require_reflection: true
+      reflection_min_words: 120

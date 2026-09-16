@@ -1,0 +1,897 @@
+[
+  {
+    "id": "log-auth-n001",
+    "ts": "2025-03-11T08:04:18.000Z",
+    "source": "auth",
+    "message": "EventID=4624 Logon Type=2 (Interactive) Account=NORTHWIND\\a.wong Workstation=WKS-HR-015 Status=Success",
+    "host": "WKS-HR-015",
+    "user": "a.wong",
+    "action": "logon_success",
+    "fields": {
+      "event_id": 4624
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-mail-n001",
+    "ts": "2025-03-11T08:05:10.000Z",
+    "source": "mail",
+    "message": "DELIVER from=noreply@northwind.example to=all-staff@northwind.example subject=\"Planned maintenance: staff portal unavailable Saturday 02:00-04:00\" attachments=0 spf=pass dmarc=pass action=delivered",
+    "user": "all-staff",
+    "src_ip": "10.20.1.25",
+    "action": "delivered",
+    "fields": {
+      "spf": "pass",
+      "dmarc": "pass"
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-n001",
+    "ts": "2025-03-11T08:09:41.000Z",
+    "source": "firewall",
+    "message": "DENY proto=TCP src=198.51.100.77 dst=203.0.113.5 dport=22 policy=Default-Deny-Inbound",
+    "src_ip": "198.51.100.77",
+    "dst_ip": "203.0.113.5",
+    "action": "deny",
+    "fields": {
+      "policy": "Default-Deny-Inbound",
+      "dport": 22
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-001",
+    "ts": "2025-03-11T08:12:04.000Z",
+    "source": "auth",
+    "message": "EventID=4624 Logon Type=2 (Interactive) Account=NORTHWIND\\p.raman Workstation=WKS-HR-014 Status=Success",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "action": "logon_success",
+    "fields": {
+      "event_id": 4624,
+      "logon_type": 2
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-auth-n002",
+    "ts": "2025-03-11T08:21:55.000Z",
+    "source": "auth",
+    "message": "EventID=4625 Logon Type=2 (Interactive) Account=NORTHWIND\\k.lim Workstation=WKS-FIN-003 Status=Failure Reason=Bad password",
+    "host": "WKS-FIN-003",
+    "user": "k.lim",
+    "action": "logon_failure",
+    "fields": {
+      "event_id": 4625,
+      "failure_reason": "Bad password"
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-auth-n003",
+    "ts": "2025-03-11T08:22:09.000Z",
+    "source": "auth",
+    "message": "EventID=4624 Logon Type=2 (Interactive) Account=NORTHWIND\\k.lim Workstation=WKS-FIN-003 Status=Success",
+    "host": "WKS-FIN-003",
+    "user": "k.lim",
+    "action": "logon_success",
+    "fields": {
+      "event_id": 4624
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-n001",
+    "ts": "2025-03-11T08:30:02.000Z",
+    "source": "dns",
+    "message": "query=cdn.northwind.example type=A response=10.20.1.40 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "domain": "cdn.northwind.example",
+    "src_ip": "10.20.4.87",
+    "dst_ip": "10.20.1.40",
+    "action": "resolved",
+    "fields": {},
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-n002",
+    "ts": "2025-03-11T08:30:09.000Z",
+    "source": "dns",
+    "message": "query=cdn.northwind.example type=A response=10.20.1.40 rcode=NOERROR client=10.20.4.91",
+    "host": "WKS-HR-015",
+    "domain": "cdn.northwind.example",
+    "src_ip": "10.20.4.91",
+    "dst_ip": "10.20.1.40",
+    "action": "resolved",
+    "fields": {},
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-n001",
+    "ts": "2025-03-11T08:33:12.000Z",
+    "source": "proxy",
+    "message": "GET https://portal.northwind.example/timetable status=200 bytes=18240 category=business",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "portal.northwind.example",
+    "dst_ip": "10.20.1.25",
+    "action": "allowed",
+    "fields": {},
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-mail-001",
+    "ts": "2025-03-11T08:41:52.000Z",
+    "source": "mail",
+    "message": "DELIVER from=billing@secure-login.northwind-corp.example to=p.raman@northwind.example subject=\"URGENT: Payroll remittance requires approval today\" attachments=1 spf=fail dmarc=fail action=delivered",
+    "user": "p.raman",
+    "src_ip": "203.0.113.91",
+    "severity": "medium",
+    "action": "delivered",
+    "fields": {
+      "attachment": "Payroll_Remittance_Q1.pdf.lnk",
+      "attachment_sha256": "9f2b5a41c7d3e08b6142ad95cf3170e2b8d49a6c5e1f7302a4bb9c8d0e5f61a7",
+      "spf": "fail",
+      "dmarc": "fail",
+      "gateway_verdict": "clean",
+      "link_rewrite": "disabled"
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-proxy-001",
+    "ts": "2025-03-11T08:43:20.000Z",
+    "source": "proxy",
+    "message": "GET https://northwind-sso.verify-access.example/login?ref=payroll-q1 status=200 bytes=14822 category=uncategorised user-agent=\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/122\"",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "northwind-sso.verify-access.example",
+    "dst_ip": "203.0.113.91",
+    "action": "allowed",
+    "severity": "medium",
+    "fields": {
+      "status": 200,
+      "bytes": 14822,
+      "category": "uncategorised",
+      "note": "Page served a Northwind-branded login form. The domain is not northwind.example."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-002",
+    "ts": "2025-03-11T08:43:47.000Z",
+    "source": "proxy",
+    "message": "POST https://northwind-sso.verify-access.example/login status=302 bytes=512 content-type=application/x-www-form-urlencoded",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "northwind-sso.verify-access.example",
+    "dst_ip": "203.0.113.91",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 302,
+      "bytes": 512,
+      "note": "A form was submitted to the lookalike portal. Treat p.raman's password as disclosed."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-n001",
+    "ts": "2025-03-11T08:47:30.000Z",
+    "source": "edr",
+    "message": "DETECTION NWD-EDR-0088 host=WKS-HR-015 user=NORTHWIND\\a.wong file=C:\\Users\\a.wong\\Downloads\\FreePDFToolbar.exe verdict=pup action=quarantined",
+    "host": "WKS-HR-015",
+    "user": "a.wong",
+    "severity": "low",
+    "action": "quarantined",
+    "fields": {
+      "rule": "Potentially unwanted program",
+      "disposition": "quarantined"
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-n003",
+    "ts": "2025-03-11T08:52:41.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.4.87",
+    "dst_ip": "10.20.1.25",
+    "action": "resolved",
+    "fields": {},
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-mail-n002",
+    "ts": "2025-03-11T09:01:44.000Z",
+    "source": "mail",
+    "message": "DELIVER from=vendor@campus-supplies.example to=procurement@northwind.example subject=\"Invoice 4471 attached\" attachments=1 spf=pass dmarc=pass action=delivered",
+    "user": "procurement",
+    "src_ip": "203.0.113.60",
+    "action": "delivered",
+    "fields": {
+      "spf": "pass",
+      "dmarc": "pass",
+      "attachment": "invoice-4471.pdf"
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-n002",
+    "ts": "2025-03-11T09:02:03.000Z",
+    "source": "firewall",
+    "message": "DENY proto=TCP src=198.51.100.140 dst=203.0.113.5 dport=3389 policy=Default-Deny-Inbound",
+    "src_ip": "198.51.100.140",
+    "dst_ip": "203.0.113.5",
+    "action": "deny",
+    "fields": {
+      "policy": "Default-Deny-Inbound",
+      "dport": 3389
+    },
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-001",
+    "ts": "2025-03-11T09:03:11.000Z",
+    "source": "edr",
+    "message": "DETECTION NWD-EDR-0142 host=WKS-HR-014 user=NORTHWIND\\p.raman parent=OUTLOOK.EXE child=powershell.exe args=\"-nop -w hidden -enc SQBFAFgA...\" verdict=suspicious",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "severity": "high",
+    "action": "detected",
+    "fields": {
+      "rule": "Office application spawned an encoded PowerShell command",
+      "parent_pid": 4128,
+      "pid": 7742,
+      "signed": true,
+      "detection_id": "EDR-2025-0311-4471"
+    },
+    "is_decoy": false,
+    "reveal_phase": "triage"
+  },
+  {
+    "id": "log-dns-001",
+    "ts": "2025-03-11T09:03:14.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "domain_age_days": 6
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-001",
+    "ts": "2025-03-11T09:03:15.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=10.20.4.87 dst=203.0.113.47 dport=443 policy=Staff-Outbound-Web bytes=291980",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "dst_ip": "203.0.113.47",
+    "action": "allow",
+    "severity": "medium",
+    "fields": {
+      "policy": "Staff-Outbound-Web",
+      "dport": 443,
+      "proto": "TCP"
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-003",
+    "ts": "2025-03-11T09:03:15.000Z",
+    "source": "proxy",
+    "message": "GET https://update-cdn.paylo4d.example/s2 status=200 bytes=291744 content-type=application/octet-stream user-agent=\"WindowsPowerShell/5.1\"",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "allowed",
+    "severity": "critical",
+    "fields": {
+      "status": 200,
+      "bytes": 291744,
+      "user_agent": "WindowsPowerShell/5.1",
+      "note": "A scripting engine, not a browser, downloading a binary stream."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-002",
+    "ts": "2025-03-11T09:03:28.000Z",
+    "source": "edr",
+    "message": "FILE_CREATE host=WKS-HR-014 path=C:\\Users\\p.raman\\AppData\\Roaming\\OneDriveSync\\onedrivesync.exe sha256=4c1d9e73f5a2680bb31c47e0a9d85f62103e7b4c8a6d2f9015e3b7c4d8a1f620 signed=false",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "severity": "high",
+    "action": "file_create",
+    "fields": {
+      "sha256": "4c1d9e73f5a2680bb31c47e0a9d85f62103e7b4c8a6d2f9015e3b7c4d8a1f620",
+      "signed": false,
+      "size_bytes": 291744,
+      "note": "Named to imitate OneDrive but unsigned and in AppData, where no Microsoft binary lives."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-edr-003",
+    "ts": "2025-03-11T09:03:40.000Z",
+    "source": "edr",
+    "message": "REGISTRY_SET host=WKS-HR-014 key=HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync value=C:\\Users\\p.raman\\AppData\\Roaming\\OneDriveSync\\onedrivesync.exe",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "severity": "high",
+    "action": "registry_set",
+    "fields": {
+      "key": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync",
+      "hive": "HKCU",
+      "note": "Run key persistence: this executes at every logon."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-001",
+    "ts": "2025-03-11T09:04:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 1
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-beacon-001",
+    "ts": "2025-03-11T09:04:16.000Z",
+    "source": "proxy",
+    "message": "CONNECT update-cdn.paylo4d.example:443 status=200 bytes_out=684 bytes_in=1120 duration_ms=212",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 200,
+      "bytes_out": 684,
+      "bytes_in": 1120,
+      "note": "Near-identical size and timing on every connection - machine cadence, not human browsing."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-002",
+    "ts": "2025-03-11T09:05:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 2
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-beacon-002",
+    "ts": "2025-03-11T09:05:16.000Z",
+    "source": "proxy",
+    "message": "CONNECT update-cdn.paylo4d.example:443 status=200 bytes_out=684 bytes_in=1120 duration_ms=212",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 200,
+      "bytes_out": 684,
+      "bytes_in": 1120,
+      "note": "Near-identical size and timing on every connection - machine cadence, not human browsing."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-003",
+    "ts": "2025-03-11T09:06:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 3
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-beacon-003",
+    "ts": "2025-03-11T09:06:16.000Z",
+    "source": "proxy",
+    "message": "CONNECT update-cdn.paylo4d.example:443 status=200 bytes_out=684 bytes_in=1120 duration_ms=212",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 200,
+      "bytes_out": 684,
+      "bytes_in": 1120,
+      "note": "Near-identical size and timing on every connection - machine cadence, not human browsing."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-n004",
+    "ts": "2025-03-11T09:06:33.000Z",
+    "source": "dns",
+    "message": "query=telemetry.print-svc.example type=A response=NXDOMAIN rcode=NXDOMAIN client=10.20.4.55",
+    "host": "PRN-SRV-02",
+    "domain": "telemetry.print-svc.example",
+    "src_ip": "10.20.4.55",
+    "action": "nxdomain",
+    "fields": {},
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-004",
+    "ts": "2025-03-11T09:07:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 4
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-beacon-004",
+    "ts": "2025-03-11T09:07:16.000Z",
+    "source": "proxy",
+    "message": "CONNECT update-cdn.paylo4d.example:443 status=200 bytes_out=684 bytes_in=1120 duration_ms=212",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 200,
+      "bytes_out": 684,
+      "bytes_in": 1120,
+      "note": "Near-identical size and timing on every connection - machine cadence, not human browsing."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-n002",
+    "ts": "2025-03-11T09:07:55.000Z",
+    "source": "proxy",
+    "message": "GET https://cdn.northwind.example/assets/app.2f91.js status=200 bytes=91422 category=business",
+    "host": "WKS-FIN-003",
+    "user": "k.lim",
+    "domain": "cdn.northwind.example",
+    "dst_ip": "10.20.1.40",
+    "action": "allowed",
+    "fields": {},
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-005",
+    "ts": "2025-03-11T09:08:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 5
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-beacon-005",
+    "ts": "2025-03-11T09:08:16.000Z",
+    "source": "proxy",
+    "message": "CONNECT update-cdn.paylo4d.example:443 status=200 bytes_out=684 bytes_in=1120 duration_ms=212",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 200,
+      "bytes_out": 684,
+      "bytes_in": 1120,
+      "note": "Near-identical size and timing on every connection - machine cadence, not human browsing."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-006",
+    "ts": "2025-03-11T09:09:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 6
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-beacon-006",
+    "ts": "2025-03-11T09:09:16.000Z",
+    "source": "proxy",
+    "message": "CONNECT update-cdn.paylo4d.example:443 status=200 bytes_out=684 bytes_in=1120 duration_ms=212",
+    "host": "WKS-HR-014",
+    "user": "p.raman",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "allowed",
+    "severity": "high",
+    "fields": {
+      "status": 200,
+      "bytes_out": 684,
+      "bytes_in": 1120,
+      "note": "Near-identical size and timing on every connection - machine cadence, not human browsing."
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-007",
+    "ts": "2025-03-11T09:10:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 7
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-n005",
+    "ts": "2025-03-11T09:11:07.000Z",
+    "source": "dns",
+    "message": "query=cdn.northwind.example type=A response=10.20.1.40 rcode=NOERROR client=10.20.4.63",
+    "host": "WKS-FIN-003",
+    "domain": "cdn.northwind.example",
+    "src_ip": "10.20.4.63",
+    "dst_ip": "10.20.1.40",
+    "action": "resolved",
+    "fields": {},
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-008",
+    "ts": "2025-03-11T09:11:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 8
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-009",
+    "ts": "2025-03-11T09:12:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 9
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-010",
+    "ts": "2025-03-11T09:13:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 10
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-proxy-n003",
+    "ts": "2025-03-11T09:14:02.000Z",
+    "source": "proxy",
+    "message": "GET https://news.campus-press.example/feed status=403 bytes=0 category=news",
+    "host": "WKS-HR-015",
+    "user": "a.wong",
+    "domain": "news.campus-press.example",
+    "dst_ip": "203.0.113.200",
+    "action": "blocked",
+    "fields": {},
+    "is_decoy": true,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-011",
+    "ts": "2025-03-11T09:14:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 11
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-012",
+    "ts": "2025-03-11T09:15:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 12
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-013",
+    "ts": "2025-03-11T09:16:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 13
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-014",
+    "ts": "2025-03-11T09:17:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 14
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-015",
+    "ts": "2025-03-11T09:18:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 15
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-016",
+    "ts": "2025-03-11T09:19:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 16
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-dns-beacon-017",
+    "ts": "2025-03-11T09:20:15.000Z",
+    "source": "dns",
+    "message": "query=update-cdn.paylo4d.example type=A response=203.0.113.47 rcode=NOERROR client=10.20.4.87",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "domain": "update-cdn.paylo4d.example",
+    "dst_ip": "203.0.113.47",
+    "action": "resolved",
+    "severity": "high",
+    "fields": {
+      "resolver": "10.20.4.12",
+      "qtype": "A",
+      "rcode": "NOERROR",
+      "beacon_index": 17
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  },
+  {
+    "id": "log-fw-002",
+    "ts": "2025-03-11T09:20:16.000Z",
+    "source": "firewall",
+    "message": "ALLOW proto=TCP src=10.20.4.87 dst=203.0.113.47 dport=443 policy=Staff-Outbound-Web bytes=1804 session_count=17",
+    "host": "WKS-HR-014",
+    "src_ip": "10.20.4.87",
+    "dst_ip": "203.0.113.47",
+    "action": "allow",
+    "severity": "medium",
+    "fields": {
+      "policy": "Staff-Outbound-Web",
+      "dport": 443,
+      "session_count": 17
+    },
+    "is_decoy": false,
+    "reveal_phase": "investigation"
+  }
+]

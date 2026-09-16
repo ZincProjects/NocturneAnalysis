@@ -15,8 +15,30 @@ const DOC_IPV4_PREFIXES = ["192.0.2.", "198.51.100.", "203.0.113."];
 /** RFC 3849 documentation range. */
 const DOC_IPV6_PREFIX = "2001:db8:";
 
-/** RFC 2606 / RFC 6761 reserved TLDs, plus RFC 8375 home.arpa. */
-const RESERVED_TLDS = ["example", "test", "invalid", "localhost", "local", "arpa"];
+/** RFC 2606 / RFC 6761 reserved TLDs, plus RFC 8375 home.arpa and RFC 6762 .local. */
+const RESERVED_TLDS = ["example", "test", "invalid", "localhost", "local", "arpa", "internal"];
+
+/**
+ * Scenario content is full of dotted strings that are not hostnames:
+ * `powershell.exe`, `Payroll_Remittance_Q1.pdf.lnk`, `p.raman`,
+ * `Net.WebClient`, `app.2f91.js`. Treating those as domains buries the real
+ * signal in noise, so a token is only considered a hostname when its last
+ * label is a TLD that actually exists on the public internet.
+ *
+ * The trade-off is deliberate: a made-up domain under an obscure real TLD
+ * could slip through. That is acceptable because the failure mode is a
+ * scenario author writing an unresolvable name anyway, whereas a check nobody
+ * can keep green gets switched off - and then it protects nothing at all.
+ */
+const REAL_TLDS = new Set([
+  "com", "net", "org", "edu", "gov", "mil", "int", "info", "biz", "name", "pro",
+  "io", "ai", "co", "dev", "app", "cloud", "tech", "site", "online", "xyz", "top",
+  "shop", "store", "blog", "news", "live", "media", "digital", "systems", "network",
+  "sg", "my", "id", "th", "vn", "ph", "hk", "tw", "cn", "jp", "kr", "in", "au", "nz",
+  "uk", "ie", "fr", "de", "nl", "be", "es", "it", "pt", "ch", "at", "se", "no", "fi",
+  "dk", "pl", "cz", "ru", "ua", "tr", "za", "br", "mx", "ar", "cl", "ca", "us", "eu",
+  "me", "tv", "cc", "ly", "gg", "sh", "st", "to", "fm", "am", "im", "is", "la",
+]);
 
 /** RFC 1918 + loopback + link-local. Private space is fine: it cannot route. */
 const PRIVATE_IPV4_PATTERNS = [
@@ -62,6 +84,12 @@ function hasReservedTld(host: string): boolean {
   return RESERVED_TLDS.includes(tld);
 }
 
+/** True when the token's final label is a TLD that resolves on the real internet. */
+function looksLikeRealHostname(host: string): boolean {
+  const tld = host.toLowerCase().replace(/\.$/, "").split(".").pop() ?? "";
+  return REAL_TLDS.has(tld);
+}
+
 /**
  * Hosts that legitimately appear in prose and are not scenario infrastructure
  * (framework references, the product's own docs links). Kept explicit and
@@ -99,6 +127,8 @@ export function scanForUnsafeReferences(text: string, location: string): SafetyV
     if (isValidIpv4(host)) continue;
     if (PROSE_ALLOWLIST.has(host.toLowerCase())) continue;
     if (hasReservedTld(host)) continue;
+    // Filenames, process names and usernames are dotted but are not hosts.
+    if (!looksLikeRealHostname(host)) continue;
     violations.push({
       kind: "domain",
       value: host,
