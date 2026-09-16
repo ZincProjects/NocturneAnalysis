@@ -1,0 +1,747 @@
+{
+  "scenario_slug": "phishing-initial-access",
+  "analyst_handle": "night.owl",
+  "organization_name": "Northwind Polytechnic (Demo)",
+  "events": [
+    {
+      "id": "sample-phishing-initial-access-0001",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SESSION_START",
+      "phase": "triage",
+      "payload": {
+        "scenario_slug": "phishing-initial-access",
+        "resumed": false
+      },
+      "created_at": "2025-05-06T09:12:03.000Z",
+      "prev_hash": "",
+      "hash": "f5a7b168be2f054280983be91bff6ec5132884bd14907e278abf912044283fd4",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0002",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "VIEW_ALERT",
+      "phase": "triage",
+      "payload": {
+        "alert_id": "alert-user-reported-phish",
+        "severity": "medium"
+      },
+      "created_at": "2025-05-06T09:12:31.000Z",
+      "prev_hash": "f5a7b168be2f054280983be91bff6ec5132884bd14907e278abf912044283fd4",
+      "hash": "a36bedffca759928c1d85c2cabe8e528fd7cb38bbce3d68f68e8992611436bc2",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0003",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "VIEW_ALERT",
+      "phase": "triage",
+      "payload": {
+        "alert_id": "alert-edr-4471",
+        "severity": "high"
+      },
+      "created_at": "2025-05-06T09:12:50.000Z",
+      "prev_hash": "a36bedffca759928c1d85c2cabe8e528fd7cb38bbce3d68f68e8992611436bc2",
+      "hash": "ddf71739776a3e155cd4adde7370191840eb3f332cce450d1826c9c02b43e21d",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0004",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "RUN_QUERY",
+      "phase": "triage",
+      "payload": {
+        "query": "source:edr",
+        "result_count": 4,
+        "filters": {}
+      },
+      "created_at": "2025-05-06T09:13:32.000Z",
+      "prev_hash": "ddf71739776a3e155cd4adde7370191840eb3f332cce450d1826c9c02b43e21d",
+      "hash": "f381bbe0cfc619a088e8bb20790bc0ad2c731599765f22604bc25968f37a8319",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0005",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "triage",
+      "payload": {
+        "decision_key": "alert_severity",
+        "decision_value": "high",
+        "rationale": "One staff endpoint with near-certain code execution, but no evidence yet of a second host or of anything touching student records. High rather than critical - I would raise it the moment the blast radius grows."
+      },
+      "created_at": "2025-05-06T09:14:38.000Z",
+      "prev_hash": "f381bbe0cfc619a088e8bb20790bc0ad2c731599765f22604bc25968f37a8319",
+      "hash": "3268023980be8d1a2731eab8c8f5f5a70de029058b57eed8cd1cfdce4d01f169",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0006",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "triage",
+      "payload": {
+        "decision_key": "alert_confidence",
+        "decision_value": "likely_malicious"
+      },
+      "created_at": "2025-05-06T09:15:35.000Z",
+      "prev_hash": "3268023980be8d1a2731eab8c8f5f5a70de029058b57eed8cd1cfdce4d01f169",
+      "hash": "014d0dd1046dc617746125a6d1b51a21dc8061d2d66470f9f9dc534fae48a20b",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0007",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "ESCALATE",
+      "phase": "triage",
+      "payload": {
+        "action_key": "escalate-tier2",
+        "target": "Tier 2 Incident Response"
+      },
+      "created_at": "2025-05-06T09:16:25.000Z",
+      "prev_hash": "014d0dd1046dc617746125a6d1b51a21dc8061d2d66470f9f9dc534fae48a20b",
+      "hash": "72043a83e457bd01ed7351968264dbf3a7de7e09cded3624c7a32c6b5dc65e50",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0008",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "investigation",
+      "payload": {
+        "from": "triage",
+        "to": "investigation"
+      },
+      "created_at": "2025-05-06T09:16:41.000Z",
+      "prev_hash": "72043a83e457bd01ed7351968264dbf3a7de7e09cded3624c7a32c6b5dc65e50",
+      "hash": "087245ea34f3f633f229675861f63ea6c236c7422cd7a639cbdacdd4c6889ec6",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0009",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "host:WKS-HR-015",
+        "result_count": 2,
+        "filters": {}
+      },
+      "created_at": "2025-05-06T09:17:24.000Z",
+      "prev_hash": "087245ea34f3f633f229675861f63ea6c236c7422cd7a639cbdacdd4c6889ec6",
+      "hash": "a5902f3b81a162a4972fd7b9604b11e9d00bde457cc7e2514e7dca02889138c5",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0010",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:dns",
+        "result_count": 23,
+        "filters": {}
+      },
+      "created_at": "2025-05-06T09:17:58.000Z",
+      "prev_hash": "a5902f3b81a162a4972fd7b9604b11e9d00bde457cc7e2514e7dca02889138c5",
+      "hash": "a3abcc6ebda042cb604ae4a5c5e0eadf686e5e98fdca3b87c31c13549fcb3ba7",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0011",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:proxy",
+        "result_count": 12,
+        "filters": {}
+      },
+      "created_at": "2025-05-06T09:18:23.000Z",
+      "prev_hash": "a3abcc6ebda042cb604ae4a5c5e0eadf686e5e98fdca3b87c31c13549fcb3ba7",
+      "hash": "a916a50d1ca9762484c289730010db10fc4580ccfcc181dc2de8980b2af8de31",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0012",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "RUN_QUERY",
+      "phase": "investigation",
+      "payload": {
+        "query": "source:edr",
+        "result_count": 4,
+        "filters": {}
+      },
+      "created_at": "2025-05-06T09:19:02.000Z",
+      "prev_hash": "a916a50d1ca9762484c289730010db10fc4580ccfcc181dc2de8980b2af8de31",
+      "hash": "be9cc10de8b8833b2db26bcf7819bc4099b5b5c2227b0de20433d9f7ffd782b4",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0013",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-auth-001",
+        "source": "auth"
+      },
+      "created_at": "2025-05-06T09:19:15.000Z",
+      "prev_hash": "be9cc10de8b8833b2db26bcf7819bc4099b5b5c2227b0de20433d9f7ffd782b4",
+      "hash": "ee5f967dc1d4002d9e5e424383f250ad683e3fda48b0708cb3593351a1874216",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0014",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-mail-001",
+        "source": "mail"
+      },
+      "created_at": "2025-05-06T09:19:42.000Z",
+      "prev_hash": "ee5f967dc1d4002d9e5e424383f250ad683e3fda48b0708cb3593351a1874216",
+      "hash": "68bee0f72427f2b99997c16447ad189d563448a3c36496c1d668b2733ce48781",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0015",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-proxy-001",
+        "source": "proxy"
+      },
+      "created_at": "2025-05-06T09:20:00.000Z",
+      "prev_hash": "68bee0f72427f2b99997c16447ad189d563448a3c36496c1d668b2733ce48781",
+      "hash": "098284c3c44b01913df30f8f2ced6bb11dce17d0352d40451dd0b73e350e1719",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0016",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-proxy-002",
+        "source": "proxy"
+      },
+      "created_at": "2025-05-06T09:20:09.000Z",
+      "prev_hash": "098284c3c44b01913df30f8f2ced6bb11dce17d0352d40451dd0b73e350e1719",
+      "hash": "b444372089fa74695c0f5ad1e21aba71817a524306aab34849d5ac58b5e88a3f",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0017",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-edr-001",
+        "source": "edr"
+      },
+      "created_at": "2025-05-06T09:20:32.000Z",
+      "prev_hash": "b444372089fa74695c0f5ad1e21aba71817a524306aab34849d5ac58b5e88a3f",
+      "hash": "eab7e7d0e6d7e8c31ec6badacf669c1b9736bb867847b14397dd4eb1b528cf52",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0018",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "VIEW_LOG_ENTRY",
+      "phase": "investigation",
+      "payload": {
+        "log_id": "log-dns-001",
+        "source": "dns"
+      },
+      "created_at": "2025-05-06T09:20:46.000Z",
+      "prev_hash": "eab7e7d0e6d7e8c31ec6badacf669c1b9736bb867847b14397dd4eb1b528cf52",
+      "hash": "997121234d5eaa5ec97f67dde328509472653ae962ae7ff7034fc57e19c5d0d3",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0019",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "billing@secure-login.northwind-corp.example",
+        "ioc_type": "email"
+      },
+      "created_at": "2025-05-06T09:21:26.000Z",
+      "prev_hash": "997121234d5eaa5ec97f67dde328509472653ae962ae7ff7034fc57e19c5d0d3",
+      "hash": "f8ff4c144c711215d24c18a90a2e7122d17b994bd4e7b3347d0bca5a9da2d8c1",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0020",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "northwind-sso.verify-access.example",
+        "ioc_type": "domain"
+      },
+      "created_at": "2025-05-06T09:21:57.000Z",
+      "prev_hash": "f8ff4c144c711215d24c18a90a2e7122d17b994bd4e7b3347d0bca5a9da2d8c1",
+      "hash": "2289768e9bb7c05c9fb446ca6cf0bd489b8e4453ce8af82b69a5eba4322e2dba",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0021",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "Payroll_Remittance_Q1.pdf.lnk",
+        "ioc_type": "file"
+      },
+      "created_at": "2025-05-06T09:22:19.000Z",
+      "prev_hash": "2289768e9bb7c05c9fb446ca6cf0bd489b8e4453ce8af82b69a5eba4322e2dba",
+      "hash": "a1cc06d68eadf9167994ad52bc3602caea9b15ba489904b2c643665c255e63a3",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0022",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "update-cdn.paylo4d.example",
+        "ioc_type": "domain"
+      },
+      "created_at": "2025-05-06T09:22:55.000Z",
+      "prev_hash": "a1cc06d68eadf9167994ad52bc3602caea9b15ba489904b2c643665c255e63a3",
+      "hash": "0d72e3741faeb11d0e31190e3288486ffe4d7b2108d908aab0f8dd0d5b538bad",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0023",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "203.0.113.47",
+        "ioc_type": "ip"
+      },
+      "created_at": "2025-05-06T09:23:22.000Z",
+      "prev_hash": "0d72e3741faeb11d0e31190e3288486ffe4d7b2108d908aab0f8dd0d5b538bad",
+      "hash": "aa401d9e2cf4b913163b61b1dba4949d4fe9d851931ce51956d077eaeeb981d0",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0024",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "4c1d9e73f5a2680bb31c47e0a9d85f62103e7b4c8a6d2f9015e3b7c4d8a1f620",
+        "ioc_type": "hash"
+      },
+      "created_at": "2025-05-06T09:23:40.000Z",
+      "prev_hash": "aa401d9e2cf4b913163b61b1dba4949d4fe9d851931ce51956d077eaeeb981d0",
+      "hash": "6eb7e1c3889de06d8e8f00b65028b6b34456bbfcf05ae74d7472084975ad6bcd",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0025",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "TAG_IOC",
+      "phase": "investigation",
+      "payload": {
+        "value": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDriveSync",
+        "ioc_type": "registry"
+      },
+      "created_at": "2025-05-06T09:24:12.000Z",
+      "prev_hash": "6eb7e1c3889de06d8e8f00b65028b6b34456bbfcf05ae74d7472084975ad6bcd",
+      "hash": "cfff15af3d1c1fac546a16edee247e33e91f09a9c6e6301adbcb9a446885932e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0026",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "REQUEST_HINT",
+      "phase": "investigation",
+      "payload": {
+        "hint_key": "inv-hint-beacon",
+        "cost": 5
+      },
+      "created_at": "2025-05-06T09:24:27.000Z",
+      "prev_hash": "cfff15af3d1c1fac546a16edee247e33e91f09a9c6e6301adbcb9a446885932e",
+      "hash": "d4099c8af8bbc4d14ab8a2404773a2b6293106eb3668127bfe83008048e0f0b5",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0027",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "ADD_NOTE",
+      "phase": "investigation",
+      "payload": {
+        "text": "Investigation: working through the evidence and recording what it supports before moving on."
+      },
+      "created_at": "2025-05-06T09:25:25.000Z",
+      "prev_hash": "d4099c8af8bbc4d14ab8a2404773a2b6293106eb3668127bfe83008048e0f0b5",
+      "hash": "5eb8a806d8a060fb129d6e7c80d764e9ea02be26e603966a72423a92cf43f630",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0028",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "attack_techniques",
+        "decision_value": [
+          "T1566.001",
+          "T1204.002",
+          "T1059.001",
+          "T1547.001",
+          "T1071.001"
+        ]
+      },
+      "created_at": "2025-05-06T09:26:31.000Z",
+      "prev_hash": "5eb8a806d8a060fb129d6e7c80d764e9ea02be26e603966a72423a92cf43f630",
+      "hash": "4336e58943092377110cd3eba5ff6b93ec85ae09e71770e540a9140ac50ca4d3",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0029",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "root_cause",
+        "decision_value": "user_opened_malicious_attachment",
+        "rationale": "Every later step depends on the attachment reaching a mailbox and being executed. The controls failed before the user was ever involved."
+      },
+      "created_at": "2025-05-06T09:27:28.000Z",
+      "prev_hash": "4336e58943092377110cd3eba5ff6b93ec85ae09e71770e540a9140ac50ca4d3",
+      "hash": "4d886d9ef4d43b67d8879471c241d287902e125fbfb9cf79c0a59f7ea8168e17",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0030",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "investigation",
+      "payload": {
+        "decision_key": "credential_exposure",
+        "decision_value": "yes_password_submitted"
+      },
+      "created_at": "2025-05-06T09:28:39.000Z",
+      "prev_hash": "4d886d9ef4d43b67d8879471c241d287902e125fbfb9cf79c0a59f7ea8168e17",
+      "hash": "ef0eff174da292a2cecf9c3447e107c67bd8e3d10878d55be82f2d4c2ace0b39",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0031",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "containment",
+      "payload": {
+        "from": "investigation",
+        "to": "containment"
+      },
+      "created_at": "2025-05-06T09:28:55.000Z",
+      "prev_hash": "ef0eff174da292a2cecf9c3447e107c67bd8e3d10878d55be82f2d4c2ace0b39",
+      "hash": "2f12c99652ffec8b9e467e0a66523a1d6d003a0f48c7151f9ad749a675fb0b2e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0032",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "containment",
+      "payload": {
+        "decision_key": "containment_approach",
+        "decision_value": "isolate_and_preserve",
+        "rationale": "Isolating from the EDR console cuts the C2 channel but leaves memory intact, which is the only place the unencrypted payload exists. Pulling power would destroy the evidence we need to answer what was taken."
+      },
+      "created_at": "2025-05-06T09:30:11.000Z",
+      "prev_hash": "2f12c99652ffec8b9e467e0a66523a1d6d003a0f48c7151f9ad749a675fb0b2e",
+      "hash": "8cd0e2ed2780817fbf1c3438da023b8f8d252acf2f6bdd3e87329891465633e5",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0033",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "CONTAIN_HOST",
+      "phase": "containment",
+      "payload": {
+        "action_key": "isolate-host-wks-hr-014",
+        "target": "WKS-HR-014"
+      },
+      "created_at": "2025-05-06T09:30:57.000Z",
+      "prev_hash": "8cd0e2ed2780817fbf1c3438da023b8f8d252acf2f6bdd3e87329891465633e5",
+      "hash": "667b441d6acf22e1f182caf5c045f456dd37897fc884580686e92000754b8d58",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0034",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "ISOLATE_ACCOUNT",
+      "phase": "containment",
+      "payload": {
+        "action_key": "disable-account-praman",
+        "target": "NORTHWIND\\p.raman"
+      },
+      "created_at": "2025-05-06T09:31:34.000Z",
+      "prev_hash": "667b441d6acf22e1f182caf5c045f456dd37897fc884580686e92000754b8d58",
+      "hash": "673e16b1bfd4ce3c541e81322fbf7fe436f3f117882ec1336c0020f218f74d99",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0035",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "BLOCK_INDICATOR",
+      "phase": "containment",
+      "payload": {
+        "action_key": "block-c2-domain",
+        "target": "update-cdn.paylo4d.example"
+      },
+      "created_at": "2025-05-06T09:32:25.000Z",
+      "prev_hash": "673e16b1bfd4ce3c541e81322fbf7fe436f3f117882ec1336c0020f218f74d99",
+      "hash": "42fc511d48a4a8d74bc06b9cc058e5c520f1e0b14f0cdfef2b6539ba1b8eb787",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0036",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "BLOCK_INDICATOR",
+      "phase": "containment",
+      "payload": {
+        "action_key": "block-c2-ip",
+        "target": "203.0.113.47"
+      },
+      "created_at": "2025-05-06T09:33:07.000Z",
+      "prev_hash": "42fc511d48a4a8d74bc06b9cc058e5c520f1e0b14f0cdfef2b6539ba1b8eb787",
+      "hash": "9714c60ab6718677c7604993a63c0555042857a47f1c663931df6e01dfc0aa56",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0037",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "eradication",
+      "payload": {
+        "from": "containment",
+        "to": "eradication"
+      },
+      "created_at": "2025-05-06T09:33:38.000Z",
+      "prev_hash": "9714c60ab6718677c7604993a63c0555042857a47f1c663931df6e01dfc0aa56",
+      "hash": "5e41ac80a0b345f0d8a0fa0df0926da457184b20a62e5dae06bacef01d029e2d",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0038",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "eradication",
+      "payload": {
+        "decision_key": "eradication_steps",
+        "decision_value": [
+          "remove_run_key",
+          "remove_implant_binary",
+          "reset_praman_credentials",
+          "purge_mail_from_all_mailboxes",
+          "rebuild_endpoint"
+        ]
+      },
+      "created_at": "2025-05-06T09:34:46.000Z",
+      "prev_hash": "5e41ac80a0b345f0d8a0fa0df0926da457184b20a62e5dae06bacef01d029e2d",
+      "hash": "7dab2ad80c8f412d848a436ce60ab4f439149e9e2fee5f9f1ddb32fd839da986",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0039",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "eradication",
+      "payload": {
+        "decision_key": "evidence_before_rebuild",
+        "decision_value": "capture_forensic_image"
+      },
+      "created_at": "2025-05-06T09:35:45.000Z",
+      "prev_hash": "7dab2ad80c8f412d848a436ce60ab4f439149e9e2fee5f9f1ddb32fd839da986",
+      "hash": "2beb07295e60e97bd52223770c00b90f3f9322e6165a5c124f80a7a812e354ae",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0040",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "DOWNLOAD_ARTIFACT",
+      "phase": "eradication",
+      "payload": {
+        "action_key": "request-forensic-image",
+        "target": "WKS-HR-014"
+      },
+      "created_at": "2025-05-06T09:36:37.000Z",
+      "prev_hash": "2beb07295e60e97bd52223770c00b90f3f9322e6165a5c124f80a7a812e354ae",
+      "hash": "6fde2af765d43de3bcf81b9d0a621a540135be820a485c0ef660f0ec92544e0e",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0041",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "recovery",
+      "payload": {
+        "from": "eradication",
+        "to": "recovery"
+      },
+      "created_at": "2025-05-06T09:36:55.000Z",
+      "prev_hash": "6fde2af765d43de3bcf81b9d0a621a540135be820a485c0ef660f0ec92544e0e",
+      "hash": "e8d665aaade4ecf1198b4a78f959246e0695c75da258cf46dfc0e543df46b335",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0042",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "recovery",
+      "payload": {
+        "decision_key": "recovery_steps",
+        "decision_value": [
+          "rebuild_from_known_good",
+          "reset_credentials_with_mfa",
+          "verify_no_beacon",
+          "hunt_other_hosts",
+          "monitor_host_14_days"
+        ]
+      },
+      "created_at": "2025-05-06T09:38:13.000Z",
+      "prev_hash": "e8d665aaade4ecf1198b4a78f959246e0695c75da258cf46dfc0e543df46b335",
+      "hash": "b43f65c5cba6e82a3508a3938189b195ac304a87a8252ffe87719586caeddbe1",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0043",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "recovery",
+      "payload": {
+        "decision_key": "recovery_signoff",
+        "decision_value": "ir_lead_with_evidence"
+      },
+      "created_at": "2025-05-06T09:39:22.000Z",
+      "prev_hash": "b43f65c5cba6e82a3508a3938189b195ac304a87a8252ffe87719586caeddbe1",
+      "hash": "eeea1399dfb35082c38d9b03547d94c713ca7cf0baf1bfb46a658b01f2b6547b",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0044",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "PHASE_TRANSITION",
+      "phase": "lessons_learned",
+      "payload": {
+        "from": "recovery",
+        "to": "lessons_learned"
+      },
+      "created_at": "2025-05-06T09:39:36.000Z",
+      "prev_hash": "eeea1399dfb35082c38d9b03547d94c713ca7cf0baf1bfb46a658b01f2b6547b",
+      "hash": "3bd2c2d22c844f0653d3a067bc104a78f30154793493fbf73507758c4d673cdf",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0045",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_DECISION",
+      "phase": "lessons_learned",
+      "payload": {
+        "decision_key": "primary_control_gap",
+        "decision_value": "mail_gateway_policy",
+        "rationale": "The gateway is the earliest point where one configuration change stops the whole chain. The other gaps are real but further down and harder to close without breaking legitimate work."
+      },
+      "created_at": "2025-05-06T09:40:50.000Z",
+      "prev_hash": "3bd2c2d22c844f0653d3a067bc104a78f30154793493fbf73507758c4d673cdf",
+      "hash": "6781b56cae5e69adb2d5c275b81e17ef6566b72e0176877cb919a92962b44ae6",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0046",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SUBMIT_REPORT",
+      "phase": "lessons_learned",
+      "payload": {
+        "reflection": {
+          "what_happened": "A member of HR staff received a payroll-themed email from a lookalike domain that failed both SPF and DMARC. The mail gateway was configured to tag rather than quarantine on authentication failure, so it was delivered. The attachment was a Windows shortcut using a double extension to appear as a PDF; opening it launched PowerShell with a hidden window and a base64-encoded command, which downloaded a second-stage implant and wrote it into AppData. The implant established Run-key persistence and began beaconing to a command-and-control domain registered six days earlier, at a steady sixty-second interval. Separately, and before the attachment was opened, the same user submitted their credentials to a fake single sign-on page linked from the same email, so the account was compromised independently of the endpoint.",
+          "what_worked": "The endpoint agent's behavioural rule fired within seconds of PowerShell being spawned by Outlook, which is the detection that gave us the incident at all - signature-based antivirus never saw the payload. The user also phoned the Service Desk about the email before anyone contacted her, which meant we had her account of events early. Network telemetry let us confirm the beacon independently of the endpoint, so the finding did not rest on a single source.",
+          "what_to_change": "The gateway decision is the one that mattered: a message failing DMARC from a domain imitating our own should not reach a mailbox. Shortcut and script attachments were not being detonated, only Office documents and PDFs, which is why a .lnk walked through. An attack-surface-reduction rule blocking Office applications from creating child processes would have stopped the chain before any network activity. Finally, the harvested password would have been useless against phishing-resistant MFA, and we should stop treating the endpoint and the identity as the same incident boundary.",
+          "recommended_controls": [
+            "Quarantine rather than tag inbound mail that fails DMARC, and alert the SOC on external senders using a lookalike of the institution's domain",
+            "Enable attachment detonation for shortcut and script file types (.lnk, .js, .hta, .iso), not only Office documents and PDFs",
+            "Deploy the ASR rule blocking Office applications from creating child processes",
+            "Enforce phishing-resistant MFA on staff accounts so a harvested password alone grants nothing"
+          ]
+        },
+        "executive_summary": "A member of HR staff received a payroll-themed email from a lookalike domain that failed both SPF and DMARC. The mail gateway was configured to tag rather than quarantine on authentication failure, so it was delivered. The attachment was a Windows shortcut using a double extension to appear as a PDF; opening it launched PowerShell with a hidden window and a base64-encoded command, which downloaded a second-stage implant and wrote it into AppData. The implant established Run-key persistence and began beaconing to a command-and-control domain registered six days earlier, at a steady sixty-second interval. Separately, and before the attachment was opened, the same user submitted their credentials to a fake single sign-on page linked from the same email, so the account was compromised independently of the endpoint."
+      },
+      "created_at": "2025-05-06T09:42:12.000Z",
+      "prev_hash": "6781b56cae5e69adb2d5c275b81e17ef6566b72e0176877cb919a92962b44ae6",
+      "hash": "19f09a7b3e7710365031c1ab0970d18826d098ecd7bac04348280e32481814d3",
+      "client_meta": null
+    },
+    {
+      "id": "sample-phishing-initial-access-0047",
+      "session_id": "sample-phishing-initial-access",
+      "user_id": "sample-user-phishing-initial-access",
+      "event_type": "SESSION_COMPLETE",
+      "phase": "lessons_learned",
+      "payload": {
+        "total_phases": 6
+      },
+      "created_at": "2025-05-06T09:42:15.000Z",
+      "prev_hash": "19f09a7b3e7710365031c1ab0970d18826d098ecd7bac04348280e32481814d3",
+      "hash": "f6d5a565325bd27b50495fa6985906e3377bf6830f1bc1f13526d2fe67934e1e",
+      "client_meta": null
+    }
+  ]
+}
