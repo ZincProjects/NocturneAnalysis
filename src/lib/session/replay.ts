@@ -142,15 +142,20 @@ export function replaySession(events: SessionEvent[]): ReplayedSession {
 
   let pausedAt: string | null = null;
   let pausedMs = 0;
-  let currentTiming: PhaseTiming | null = null;
+
+  // The open phase is always the last entry in phaseTimings. Tracking it there
+  // rather than in a separate variable keeps the two from disagreeing.
+  const closeOpenTiming = (at: string) => {
+    const open = state.phaseTimings.at(-1);
+    if (open && open.exited_at === null) {
+      open.exited_at = at;
+      open.duration_ms = Date.parse(at) - Date.parse(open.entered_at);
+    }
+  };
 
   const openTiming = (phase: PhaseKey, at: string) => {
-    if (currentTiming) {
-      currentTiming.exited_at = at;
-      currentTiming.duration_ms = Date.parse(at) - Date.parse(currentTiming.entered_at);
-    }
-    currentTiming = { phase, entered_at: at, exited_at: null, duration_ms: null };
-    state.phaseTimings.push(currentTiming);
+    closeOpenTiming(at);
+    state.phaseTimings.push({ phase, entered_at: at, exited_at: null, duration_ms: null });
   };
 
   for (const event of ordered) {
@@ -161,7 +166,7 @@ export function replaySession(events: SessionEvent[]): ReplayedSession {
         const p = event.payload as Payload<"SESSION_START">;
         state.startedAt ??= event.created_at;
         state.scenarioSlug = p.scenario_slug ?? state.scenarioSlug;
-        if (!currentTiming) openTiming(state.currentPhase, event.created_at);
+        if (state.phaseTimings.length === 0) openTiming(state.currentPhase, event.created_at);
         break;
       }
 
@@ -178,11 +183,7 @@ export function replaySession(events: SessionEvent[]): ReplayedSession {
 
       case "SESSION_COMPLETE":
         state.completedAt = event.created_at;
-        if (currentTiming) {
-          currentTiming.exited_at = event.created_at;
-          currentTiming.duration_ms =
-            Date.parse(event.created_at) - Date.parse(currentTiming.entered_at);
-        }
+        closeOpenTiming(event.created_at);
         break;
 
       case "PHASE_TRANSITION": {

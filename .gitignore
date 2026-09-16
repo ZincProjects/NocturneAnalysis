@@ -52,3 +52,4 @@ supabase/.temp/
 
 # Generated sample output
 /content/samples/*.pdf
+!.env.example

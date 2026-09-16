@@ -250,6 +250,10 @@ create policy "staff read badges in their org"
     and auth_is_staff()
   );
 
+create policy "sample badges are world readable"
+  on session_badges for select
+  using (exists (select 1 from sessions s where s.id = session_id and s.is_sample));
+
 -- ------------------------------------------------ instructor_comments -----
 
 create policy "students read comments on their own sessions"
