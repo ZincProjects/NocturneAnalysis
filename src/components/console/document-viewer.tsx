@@ -102,7 +102,7 @@ function EmailDocument({ content, onTag }: { content: Content; onTag: (v: string
   return (
     <div className="space-y-4">
       <div className="rounded-md border border-border">
-        <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 border-b border-border p-3 font-mono text-xs">
+        <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 border-b border-border p-3 font-mono text-xs">
           <Field label="From">
             <span className="font-sans">{asString(content.from_display)}</span>{" "}
             <button
@@ -165,7 +165,7 @@ function EmailDocument({ content, onTag }: { content: Content; onTag: (v: string
           <summary className="cursor-pointer text-xs font-medium">
             Message headers ({Object.keys(headers).length})
           </summary>
-          <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 font-mono text-[0.6875rem]">
+          <dl className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 font-mono text-[0.6875rem]">
             {Object.entries(headers).map(([key, value]) => (
               <Field key={key} label={key}>
                 {value}
@@ -187,7 +187,7 @@ function EdrDocument({ content, onTag }: { content: Content; onTag: (v: string) 
 
   return (
     <div className="space-y-4">
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-md border border-border p-3 font-mono text-xs">
+      <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 rounded-md border border-border p-3 font-mono text-xs">
         <Field label="Detection">{asString(content.detection_id)}</Field>
         <Field label="Rule">
           <span className="font-sans">{asString(content.rule_name)}</span>
@@ -302,7 +302,7 @@ function EdrDocument({ content, onTag }: { content: Content; onTag: (v: string) 
 function TicketDocument({ content }: { content: Content }) {
   return (
     <div className="space-y-3 rounded-md border border-border p-3">
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 font-mono text-xs">
+      <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 font-mono text-xs">
         <Field label="Ticket">{asString(content.ticket_id)}</Field>
         <Field label="Opened">{formatUtc(asString(content.opened_at))}</Field>
         <Field label="By">{asString(content.opened_by)}</Field>

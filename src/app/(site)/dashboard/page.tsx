@@ -219,7 +219,7 @@ export default async function DashboardPage() {
       ) : null}
 
       {/* ------------------------------------------------------ coverage */}
-      <section className="mt-10 grid gap-6 lg:grid-cols-[1fr_20rem]">
+      <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">

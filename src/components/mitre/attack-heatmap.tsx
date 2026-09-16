@@ -60,7 +60,10 @@ export function AttackHeatmap({
   const coveredCount = techniques.filter((t) => covered.has(t.technique_id)).length;
 
   return (
-    <div className="space-y-3">
+    // min-w-0 and max-w-full keep the grid scrolling inside its own box. Without
+    // them its min-w-max row sets the minimum width of any grid or flex parent,
+    // and the whole page scrolls sideways instead.
+    <div className="min-w-0 max-w-full space-y-3">
       <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
         <span>
           <span className="font-medium text-foreground tabular-nums">{coveredCount}</span> of{" "}
@@ -80,7 +83,10 @@ export function AttackHeatmap({
         </span>
       </div>
 
-      <div className="scrollbar-thin overflow-x-auto pb-2">
+      {/* `relative` matters: the sr-only labels in each cell are absolutely
+          positioned, and without a positioned scroller they escape its clipping
+          and stretch the whole page sideways. */}
+      <div className="scrollbar-thin relative overflow-x-auto pb-2">
         <div className="flex min-w-max gap-1.5">
           {populated.map((tactic) => {
             const bucket = byTactic.get(tactic.name) ?? [];

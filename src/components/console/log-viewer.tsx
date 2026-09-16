@@ -216,7 +216,7 @@ export function LogViewer({
 
               {expanded ? (
                 <div className="space-y-3 border-t border-border/60 bg-secondary/40 px-8 py-3">
-                  <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+                  <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1">
                     <dt className="text-muted-foreground">timestamp</dt>
                     <dd className="tabular-nums">{formatUtc(entry.ts)}</dd>
                     {(

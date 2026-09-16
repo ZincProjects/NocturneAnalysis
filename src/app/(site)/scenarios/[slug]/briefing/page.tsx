@@ -78,7 +78,7 @@ export default async function BriefingPage({ params }: { params: Promise<{ slug:
         </p>
       ) : null}
 
-      <div className="mt-8 grid gap-5 lg:grid-cols-[1fr_16rem]">
+      <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_16rem]">
         <div className="space-y-6">
           <Card>
             <CardHeader>

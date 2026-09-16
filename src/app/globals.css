@@ -151,6 +151,14 @@
   ::selection {
     background-color: color-mix(in oklch, var(--primary) 35%, transparent);
   }
+
+  /* A scroll container only clips absolutely positioned descendants when it is
+     itself positioned. Without this, the sr-only labels inside wide tables and
+     the ATT&CK grid escape and make the whole page scroll sideways. In the base
+     layer so an explicit `absolute` or `sticky` utility still wins. */
+  :where(.overflow-x-auto, .overflow-auto, .overflow-y-auto) {
+    position: relative;
+  }
 }
 
 @layer utilities {
