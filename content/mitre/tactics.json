@@ -1,0 +1,77 @@
+[
+  {
+    "shortname": "reconnaissance",
+    "name": "Reconnaissance",
+    "tactic_id": "TA0043"
+  },
+  {
+    "shortname": "resource-development",
+    "name": "Resource Development",
+    "tactic_id": "TA0042"
+  },
+  {
+    "shortname": "initial-access",
+    "name": "Initial Access",
+    "tactic_id": "TA0001"
+  },
+  {
+    "shortname": "execution",
+    "name": "Execution",
+    "tactic_id": "TA0002"
+  },
+  {
+    "shortname": "persistence",
+    "name": "Persistence",
+    "tactic_id": "TA0003"
+  },
+  {
+    "shortname": "privilege-escalation",
+    "name": "Privilege Escalation",
+    "tactic_id": "TA0004"
+  },
+  {
+    "shortname": "stealth",
+    "name": "Stealth",
+    "tactic_id": "TA0005"
+  },
+  {
+    "shortname": "defense-impairment",
+    "name": "Defense Impairment",
+    "tactic_id": "TA0112"
+  },
+  {
+    "shortname": "credential-access",
+    "name": "Credential Access",
+    "tactic_id": "TA0006"
+  },
+  {
+    "shortname": "discovery",
+    "name": "Discovery",
+    "tactic_id": "TA0007"
+  },
+  {
+    "shortname": "lateral-movement",
+    "name": "Lateral Movement",
+    "tactic_id": "TA0008"
+  },
+  {
+    "shortname": "collection",
+    "name": "Collection",
+    "tactic_id": "TA0009"
+  },
+  {
+    "shortname": "command-and-control",
+    "name": "Command and Control",
+    "tactic_id": "TA0011"
+  },
+  {
+    "shortname": "exfiltration",
+    "name": "Exfiltration",
+    "tactic_id": "TA0010"
+  },
+  {
+    "shortname": "impact",
+    "name": "Impact",
+    "tactic_id": "TA0040"
+  }
+]

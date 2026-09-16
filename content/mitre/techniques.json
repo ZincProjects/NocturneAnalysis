@@ -1,0 +1,1160 @@
+[
+  {
+    "technique_id": "T1003.001",
+    "name": "LSASS Memory",
+    "tactic": "Credential Access",
+    "tactic_id": "credential-access",
+    "tactics": [
+      "Credential Access"
+    ],
+    "tactic_ids": [
+      "credential-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1003/001",
+    "description": "Adversaries may attempt to access credential material stored in the process memory of the Local Security Authority Subsystem Service (LSASS). After a user logs on, the system generates and stores a variety of credential materials in LSASS process memory. These credential materials can be harvested by an administrative user or SYSTEM and used to conduct Lateral Movement using Use Alternate Authentication Material.",
+    "is_subtechnique": true,
+    "parent_id": "T1003"
+  },
+  {
+    "technique_id": "T1005",
+    "name": "Data from Local System",
+    "tactic": "Collection",
+    "tactic_id": "collection",
+    "tactics": [
+      "Collection"
+    ],
+    "tactic_ids": [
+      "collection"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1005",
+    "description": "Adversaries may search local system sources, such as file systems, configuration files, local databases, virtual machine files, or process memory, to find files of interest and sensitive data prior to Exfiltration.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1016",
+    "name": "System Network Configuration Discovery",
+    "tactic": "Discovery",
+    "tactic_id": "discovery",
+    "tactics": [
+      "Discovery"
+    ],
+    "tactic_ids": [
+      "discovery"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1016",
+    "description": "Adversaries may look for details about the network configuration and settings, such as IP and/or MAC addresses, of systems they access or through information discovery of remote systems. Several operating system administration utilities exist that can be used to gather this information. Examples include Arp, ipconfig/ifconfig, nbtstat, and route.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1018",
+    "name": "Remote System Discovery",
+    "tactic": "Discovery",
+    "tactic_id": "discovery",
+    "tactics": [
+      "Discovery"
+    ],
+    "tactic_ids": [
+      "discovery"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1018",
+    "description": "Adversaries may attempt to get a listing of other systems by IP address, hostname, or other logical identifier on a network that may be used for Lateral Movement from the current system. Functionality could exist within remote access tools to enable this, but utilities available on the operating system could also be used such as Ping, `net view` using Net, or, on ESXi servers, `esxcli network diag ping`.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1021.001",
+    "name": "Remote Desktop Protocol",
+    "tactic": "Lateral Movement",
+    "tactic_id": "lateral-movement",
+    "tactics": [
+      "Lateral Movement"
+    ],
+    "tactic_ids": [
+      "lateral-movement"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1021/001",
+    "description": "Adversaries may use Valid Accounts to log into a computer using the Remote Desktop Protocol (RDP). The adversary may then perform actions as the logged-on user.",
+    "is_subtechnique": true,
+    "parent_id": "T1021"
+  },
+  {
+    "technique_id": "T1021.002",
+    "name": "SMB/Windows Admin Shares",
+    "tactic": "Lateral Movement",
+    "tactic_id": "lateral-movement",
+    "tactics": [
+      "Lateral Movement"
+    ],
+    "tactic_ids": [
+      "lateral-movement"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1021/002",
+    "description": "Adversaries may use Valid Accounts to interact with a remote network share using Server Message Block (SMB). The adversary may then perform actions as the logged-on user.",
+    "is_subtechnique": true,
+    "parent_id": "T1021"
+  },
+  {
+    "technique_id": "T1021.006",
+    "name": "Windows Remote Management",
+    "tactic": "Lateral Movement",
+    "tactic_id": "lateral-movement",
+    "tactics": [
+      "Lateral Movement"
+    ],
+    "tactic_ids": [
+      "lateral-movement"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1021/006",
+    "description": "Adversaries may use Valid Accounts to interact with remote systems using Windows Remote Management (WinRM). The adversary may then perform actions as the logged-on user.",
+    "is_subtechnique": true,
+    "parent_id": "T1021"
+  },
+  {
+    "technique_id": "T1027",
+    "name": "Obfuscated Files or Information",
+    "tactic": "Stealth",
+    "tactic_id": "stealth",
+    "tactics": [
+      "Stealth"
+    ],
+    "tactic_ids": [
+      "stealth"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1027",
+    "description": "Adversaries may attempt to make an executable or file difficult to discover or analyze by encrypting, encoding, or otherwise obfuscating its contents on the system or in transit. This is common behavior that can be used across different platforms and the network to evade defenses.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1041",
+    "name": "Exfiltration Over C2 Channel",
+    "tactic": "Exfiltration",
+    "tactic_id": "exfiltration",
+    "tactics": [
+      "Exfiltration"
+    ],
+    "tactic_ids": [
+      "exfiltration"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1041",
+    "description": "Adversaries may steal data by exfiltrating it over an existing command and control channel. Stolen data is encoded into the normal communications channel using the same protocol as command and control communications.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1046",
+    "name": "Network Service Discovery",
+    "tactic": "Discovery",
+    "tactic_id": "discovery",
+    "tactics": [
+      "Discovery"
+    ],
+    "tactic_ids": [
+      "discovery"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1046",
+    "description": "Adversaries may attempt to get a listing of services running on remote hosts and local network infrastructure devices, including those that may be vulnerable to remote software exploitation. Common methods to acquire this information include port, vulnerability, and/or wordlist scans using tools that are brought onto a system.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1048.003",
+    "name": "Exfiltration Over Unencrypted Non-C2 Protocol",
+    "tactic": "Exfiltration",
+    "tactic_id": "exfiltration",
+    "tactics": [
+      "Exfiltration"
+    ],
+    "tactic_ids": [
+      "exfiltration"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1048/003",
+    "description": "Adversaries may steal data by exfiltrating it over an un-encrypted network protocol other than that of the existing command and control channel. The data may also be sent to an alternate network location from the main command and control server.",
+    "is_subtechnique": true,
+    "parent_id": "T1048"
+  },
+  {
+    "technique_id": "T1053.005",
+    "name": "Scheduled Task",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution",
+      "Persistence",
+      "Privilege Escalation"
+    ],
+    "tactic_ids": [
+      "execution",
+      "persistence",
+      "privilege-escalation"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1053/005",
+    "description": "Adversaries may abuse the Windows Task Scheduler to perform task scheduling for initial or recurring execution of malicious code. There are multiple ways to access the Task Scheduler in Windows. The schtasks utility can be run directly on the command line, or the Task Scheduler can be opened through the GUI within the Administrator Tools section of the Control Panel. In some cases, adversaries have used a .NET wrapper for the Windows Task Scheduler, and alternatively, adversaries have used the Windows netapi32 library and Windows Management Instrumentation (WMI) to create a scheduled task. Adversaries may also utilize the Powershell Cmdlet `Invoke-CimMethod`, which leverages WMI class `PS_ScheduledTask` to create a scheduled task via an XML path.",
+    "is_subtechnique": true,
+    "parent_id": "T1053"
+  },
+  {
+    "technique_id": "T1057",
+    "name": "Process Discovery",
+    "tactic": "Discovery",
+    "tactic_id": "discovery",
+    "tactics": [
+      "Discovery"
+    ],
+    "tactic_ids": [
+      "discovery"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1057",
+    "description": "Adversaries may attempt to get information about running processes on a system. Information obtained could be used to gain an understanding of common software/applications running on systems within the network. Administrator or otherwise elevated access may provide better process details. Adversaries may use the information from Process Discovery during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1059",
+    "name": "Command and Scripting Interpreter",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution"
+    ],
+    "tactic_ids": [
+      "execution"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1059",
+    "description": "Adversaries may abuse command and script interpreters to execute commands, scripts, or binaries. These interfaces and languages provide ways of interacting with computer systems and are a common feature across many different platforms. Most systems come with some built-in command-line interface and scripting capabilities, for example, macOS and Linux distributions include some flavor of Unix Shell while Windows installations include the Windows Command Shell and PowerShell.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1059.001",
+    "name": "PowerShell",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution"
+    ],
+    "tactic_ids": [
+      "execution"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1059/001",
+    "description": "Adversaries may abuse PowerShell commands and scripts for execution. PowerShell is a powerful interactive command-line interface and scripting environment included in the Windows operating system. Adversaries can use PowerShell to perform a number of actions, including discovery of information and execution of code. Examples include the `Start-Process` cmdlet which can be used to run an executable and the `Invoke-Command` cmdlet which runs a command locally or on a remote computer (though administrator permissions are required to use PowerShell to connect to remote systems).",
+    "is_subtechnique": true,
+    "parent_id": "T1059"
+  },
+  {
+    "technique_id": "T1059.003",
+    "name": "Windows Command Shell",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution"
+    ],
+    "tactic_ids": [
+      "execution"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1059/003",
+    "description": "Adversaries may abuse the Windows command shell for execution. The Windows command shell (cmd) is the primary command prompt on Windows systems. The Windows command prompt can be used to control almost any aspect of a system, with various permission levels required for different subsets of commands. The command prompt can be invoked remotely via Remote Services such as SSH.",
+    "is_subtechnique": true,
+    "parent_id": "T1059"
+  },
+  {
+    "technique_id": "T1059.005",
+    "name": "Visual Basic",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution"
+    ],
+    "tactic_ids": [
+      "execution"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1059/005",
+    "description": "Adversaries may abuse Visual Basic (VB) for execution. VB is a programming language created by Microsoft with interoperability with many Windows technologies such as Component Object Model and the Native API through the Windows API. Although tagged as legacy with no planned future evolutions, VB is integrated and supported in the .NET Framework and cross-platform .NET Core.",
+    "is_subtechnique": true,
+    "parent_id": "T1059"
+  },
+  {
+    "technique_id": "T1068",
+    "name": "Exploitation for Privilege Escalation",
+    "tactic": "Privilege Escalation",
+    "tactic_id": "privilege-escalation",
+    "tactics": [
+      "Privilege Escalation"
+    ],
+    "tactic_ids": [
+      "privilege-escalation"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1068",
+    "description": "Adversaries may exploit software vulnerabilities in an attempt to elevate privileges. Exploitation of a software vulnerability occurs when an adversary takes advantage of a programming error in a program, service, or within the operating system software or kernel itself to execute adversary-controlled code. Security constructs such as permission levels will often hinder access to information and use of certain techniques, so adversaries will likely need to perform privilege escalation to include use of software exploitation to circumvent those restrictions.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1070.004",
+    "name": "File Deletion",
+    "tactic": "Stealth",
+    "tactic_id": "stealth",
+    "tactics": [
+      "Stealth"
+    ],
+    "tactic_ids": [
+      "stealth"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1070/004",
+    "description": "Adversaries may delete files left behind by the actions of their intrusion activity. Malware, tools, or other non-native files dropped or created on a system by an adversary (ex: Ingress Tool Transfer) may leave traces to indicate to what was done within a network and how. Removal of these files can occur during an intrusion, or as part of a post-intrusion process to minimize the adversary's footprint.",
+    "is_subtechnique": true,
+    "parent_id": "T1070"
+  },
+  {
+    "technique_id": "T1071.001",
+    "name": "Web Protocols",
+    "tactic": "Command and Control",
+    "tactic_id": "command-and-control",
+    "tactics": [
+      "Command and Control"
+    ],
+    "tactic_ids": [
+      "command-and-control"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1071/001",
+    "description": "Adversaries may communicate using application layer protocols associated with web traffic to avoid detection/network filtering by blending in with existing traffic. Commands to the remote system, and often the results of those commands, will be embedded within the protocol traffic between the client and server.",
+    "is_subtechnique": true,
+    "parent_id": "T1071"
+  },
+  {
+    "technique_id": "T1074.001",
+    "name": "Local Data Staging",
+    "tactic": "Collection",
+    "tactic_id": "collection",
+    "tactics": [
+      "Collection"
+    ],
+    "tactic_ids": [
+      "collection"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1074/001",
+    "description": "Adversaries may stage collected data in a central location or directory on the local system prior to Exfiltration. Data may be kept in separate files or combined into one file through techniques such as Archive Collected Data. Interactive command shells may be used, and common functionality within cmd and bash may be used to copy data into a staging location.",
+    "is_subtechnique": true,
+    "parent_id": "T1074"
+  },
+  {
+    "technique_id": "T1078",
+    "name": "Valid Accounts",
+    "tactic": "Stealth",
+    "tactic_id": "stealth",
+    "tactics": [
+      "Stealth",
+      "Persistence",
+      "Privilege Escalation",
+      "Initial Access"
+    ],
+    "tactic_ids": [
+      "stealth",
+      "persistence",
+      "privilege-escalation",
+      "initial-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1078",
+    "description": "Adversaries may obtain and abuse credentials of existing accounts as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion. Compromised credentials may be used to bypass access controls placed on various resources on systems within the network and may even be used for persistent access to remote systems and externally available services, such as VPNs, Outlook Web Access, network devices, and remote desktop. Compromised credentials may also grant an adversary increased privilege to specific systems or access to restricted areas of the network. Adversaries may choose not to use malware or tools in conjunction with the legitimate access those credentials provide to make it harder to detect their presence.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1082",
+    "name": "System Information Discovery",
+    "tactic": "Discovery",
+    "tactic_id": "discovery",
+    "tactics": [
+      "Discovery"
+    ],
+    "tactic_ids": [
+      "discovery"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1082",
+    "description": "An adversary may attempt to get detailed information about the operating system and hardware, including version, patches, hotfixes, service packs, and architecture. Adversaries may use this information to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions. This behavior is distinct from Local Storage Discovery which is an adversary's discovery of local drive, disks and/or volumes.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1083",
+    "name": "File and Directory Discovery",
+    "tactic": "Discovery",
+    "tactic_id": "discovery",
+    "tactics": [
+      "Discovery"
+    ],
+    "tactic_ids": [
+      "discovery"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1083",
+    "description": "Adversaries may enumerate files and directories or may search in specific locations of a host or network share for certain information within a file system. Adversaries may use the information from File and Directory Discovery during automated discovery to shape follow-on behaviors, including whether or not the adversary fully infects the target and/or attempts specific actions.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1087.002",
+    "name": "Domain Account",
+    "tactic": "Discovery",
+    "tactic_id": "discovery",
+    "tactics": [
+      "Discovery"
+    ],
+    "tactic_ids": [
+      "discovery"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1087/002",
+    "description": "Adversaries may attempt to get a listing of domain accounts. This information can help adversaries determine which domain accounts exist to aid in follow-on behavior such as targeting specific accounts which possess particular privileges.",
+    "is_subtechnique": true,
+    "parent_id": "T1087"
+  },
+  {
+    "technique_id": "T1090",
+    "name": "Proxy",
+    "tactic": "Command and Control",
+    "tactic_id": "command-and-control",
+    "tactics": [
+      "Command and Control"
+    ],
+    "tactic_ids": [
+      "command-and-control"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1090",
+    "description": "Adversaries may use a connection proxy to direct network traffic between systems or act as an intermediary for network communications to a command and control server to avoid direct connections to their infrastructure. Many tools exist that enable traffic redirection through proxies or port redirection, including HTRAN, ZXProxy, and ZXPortMap. Adversaries use these types of proxies to manage command and control communications, reduce the number of simultaneous outbound network connections, provide resiliency in the face of connection loss, or to ride over existing trusted communications paths between victims to avoid suspicion. Adversaries may chain together multiple proxies to further disguise the source of malicious traffic.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1098",
+    "name": "Account Manipulation",
+    "tactic": "Persistence",
+    "tactic_id": "persistence",
+    "tactics": [
+      "Persistence",
+      "Privilege Escalation"
+    ],
+    "tactic_ids": [
+      "persistence",
+      "privilege-escalation"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1098",
+    "description": "Adversaries may manipulate accounts to maintain and/or elevate access to victim systems. Account manipulation may consist of any action that preserves or modifies adversary access to a compromised account, such as modifying credentials or permission groups. These actions could also include account activity designed to subvert security policies, such as performing iterative password updates to bypass password duration policies and preserve the life of compromised credentials.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1105",
+    "name": "Ingress Tool Transfer",
+    "tactic": "Command and Control",
+    "tactic_id": "command-and-control",
+    "tactics": [
+      "Command and Control"
+    ],
+    "tactic_ids": [
+      "command-and-control"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1105",
+    "description": "Adversaries may transfer tools or other files from an external system into a compromised environment. Tools or files may be copied from an external adversary-controlled system to the victim network through the command and control channel or through alternate protocols such as ftp. Once present, adversaries may also transfer/spread tools between victim devices within a compromised environment (i.e. Lateral Tool Transfer).",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1110",
+    "name": "Brute Force",
+    "tactic": "Credential Access",
+    "tactic_id": "credential-access",
+    "tactics": [
+      "Credential Access"
+    ],
+    "tactic_ids": [
+      "credential-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1110",
+    "description": "Adversaries may use brute force techniques to gain access to accounts when passwords are unknown or when password hashes are obtained. Without knowledge of the password for an account or set of accounts, an adversary may systematically guess the password using a repetitive or iterative mechanism. Brute forcing passwords can take place via interaction with a service that will check the validity of those credentials or offline against previously acquired credential data, such as password hashes.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1110.001",
+    "name": "Password Guessing",
+    "tactic": "Credential Access",
+    "tactic_id": "credential-access",
+    "tactics": [
+      "Credential Access"
+    ],
+    "tactic_ids": [
+      "credential-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1110/001",
+    "description": "Adversaries with no prior knowledge of legitimate credentials within the system or environment may guess passwords to attempt access to accounts. Without knowledge of the password for an account, an adversary may opt to systematically guess the password using a repetitive or iterative mechanism. An adversary may guess login credentials without prior knowledge of system or environment passwords during an operation by using a list of common passwords. Password guessing may or may not take into account the target's policies on password complexity or use policies that may lock accounts out after a number of failed attempts.",
+    "is_subtechnique": true,
+    "parent_id": "T1110"
+  },
+  {
+    "technique_id": "T1110.003",
+    "name": "Password Spraying",
+    "tactic": "Credential Access",
+    "tactic_id": "credential-access",
+    "tactics": [
+      "Credential Access"
+    ],
+    "tactic_ids": [
+      "credential-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1110/003",
+    "description": "Adversaries may use a single or small list of commonly used passwords against many different accounts to attempt to acquire valid account credentials. Password spraying uses one password (e.g. 'Password01'), or a small list of commonly used passwords, that may match the complexity policy of the domain. Logins are attempted with that password against many different accounts on a network to avoid account lockouts that would normally occur when brute forcing a single account with many passwords.",
+    "is_subtechnique": true,
+    "parent_id": "T1110"
+  },
+  {
+    "technique_id": "T1112",
+    "name": "Modify Registry",
+    "tactic": "Defense Impairment",
+    "tactic_id": "defense-impairment",
+    "tactics": [
+      "Defense Impairment",
+      "Persistence"
+    ],
+    "tactic_ids": [
+      "defense-impairment",
+      "persistence"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1112",
+    "description": "Adversaries may interact with the Windows Registry as part of a variety of other techniques to aid in defense evasion, persistence, and execution.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1114.001",
+    "name": "Local Email Collection",
+    "tactic": "Collection",
+    "tactic_id": "collection",
+    "tactics": [
+      "Collection"
+    ],
+    "tactic_ids": [
+      "collection"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1114/001",
+    "description": "Adversaries may target user email on local systems to collect sensitive information. Files containing email data can be acquired from a user’s local system, such as Outlook storage or cache files.",
+    "is_subtechnique": true,
+    "parent_id": "T1114"
+  },
+  {
+    "technique_id": "T1119",
+    "name": "Automated Collection",
+    "tactic": "Collection",
+    "tactic_id": "collection",
+    "tactics": [
+      "Collection"
+    ],
+    "tactic_ids": [
+      "collection"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1119",
+    "description": "Once established within a system or network, an adversary may use automated techniques for collecting internal data. Methods for performing this technique could include use of a Command and Scripting Interpreter to search for and copy information fitting set criteria such as file type, location, or name at specific time intervals.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1133",
+    "name": "External Remote Services",
+    "tactic": "Persistence",
+    "tactic_id": "persistence",
+    "tactics": [
+      "Persistence",
+      "Initial Access"
+    ],
+    "tactic_ids": [
+      "persistence",
+      "initial-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1133",
+    "description": "Adversaries may leverage external-facing remote services to initially access and/or persist within a network. Remote services such as VPNs, Citrix, and other access mechanisms allow users to connect to internal enterprise network resources from external locations. There are often remote service gateways that manage connections and credential authentication for these services. Services such as Windows Remote Management and VNC can also be used externally.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1134",
+    "name": "Access Token Manipulation",
+    "tactic": "Stealth",
+    "tactic_id": "stealth",
+    "tactics": [
+      "Stealth",
+      "Privilege Escalation"
+    ],
+    "tactic_ids": [
+      "stealth",
+      "privilege-escalation"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1134",
+    "description": "Adversaries may modify access tokens to operate under a different user or system security context to perform actions and bypass access controls. Windows uses access tokens to determine the ownership of a running process. A user can manipulate access tokens to make a running process appear as though it is the child of a different process or belongs to someone other than the user that started the process. When this occurs, the process also takes on the security context associated with the new token.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1136.001",
+    "name": "Local Account",
+    "tactic": "Persistence",
+    "tactic_id": "persistence",
+    "tactics": [
+      "Persistence"
+    ],
+    "tactic_ids": [
+      "persistence"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1136/001",
+    "description": "Adversaries may create a local account to maintain access to victim systems. Local accounts are those configured by an organization for use by users, remote support, services, or for administration on a single system or service.",
+    "is_subtechnique": true,
+    "parent_id": "T1136"
+  },
+  {
+    "technique_id": "T1140",
+    "name": "Deobfuscate/Decode Files or Information",
+    "tactic": "Stealth",
+    "tactic_id": "stealth",
+    "tactics": [
+      "Stealth"
+    ],
+    "tactic_ids": [
+      "stealth"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1140",
+    "description": "Adversaries may use Obfuscated Files or Information to hide artifacts of an intrusion from analysis. They may require separate mechanisms to decode or deobfuscate that information depending on how they intend to use it. Methods for doing that include built-in functionality of malware or by using utilities present on the system.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1189",
+    "name": "Drive-by Compromise",
+    "tactic": "Initial Access",
+    "tactic_id": "initial-access",
+    "tactics": [
+      "Initial Access"
+    ],
+    "tactic_ids": [
+      "initial-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1189",
+    "description": "Adversaries may gain access to a system through a user visiting a website over the normal course of browsing. Multiple ways of delivering exploit code to a browser exist (i.e., Drive-by Target), including:",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1190",
+    "name": "Exploit Public-Facing Application",
+    "tactic": "Initial Access",
+    "tactic_id": "initial-access",
+    "tactics": [
+      "Initial Access"
+    ],
+    "tactic_ids": [
+      "initial-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1190",
+    "description": "Adversaries may attempt to exploit a weakness in an Internet-facing host or system to initially access a network. The weakness in the system can be a software bug, a temporary glitch, or a misconfiguration.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1195.002",
+    "name": "Compromise Software Supply Chain",
+    "tactic": "Initial Access",
+    "tactic_id": "initial-access",
+    "tactics": [
+      "Initial Access"
+    ],
+    "tactic_ids": [
+      "initial-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1195/002",
+    "description": "Adversaries may manipulate application software prior to receipt by a final consumer for the purpose of data or system compromise. Supply chain compromise of software can take place in a number of ways, including manipulation of the application source code, manipulation of the update/distribution mechanism for that software, or replacing compiled releases with a modified version.",
+    "is_subtechnique": true,
+    "parent_id": "T1195"
+  },
+  {
+    "technique_id": "T1203",
+    "name": "Exploitation for Client Execution",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution"
+    ],
+    "tactic_ids": [
+      "execution"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1203",
+    "description": "Adversaries may exploit software vulnerabilities in client applications to execute code. Vulnerabilities can exist in software due to unsecure coding practices that can lead to unanticipated behavior. Adversaries can take advantage of certain vulnerabilities through targeted exploitation for the purpose of arbitrary code execution. Oftentimes the most valuable exploits to an offensive toolkit are those that can be used to obtain code execution on a remote system because they can be used to gain access to that system. Users will expect to see files related to the applications they commonly used to do work, so they are a useful target for exploit research and development because of their high utility.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1204",
+    "name": "User Execution",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution"
+    ],
+    "tactic_ids": [
+      "execution"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1204",
+    "description": "An adversary may rely upon specific actions by a user in order to gain execution. Users may be subjected to social engineering to get them to execute malicious code by, for example, opening a malicious document file or link. These user actions will typically be observed as follow-on behavior from forms of Phishing.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1204.001",
+    "name": "Malicious Link",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution"
+    ],
+    "tactic_ids": [
+      "execution"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1204/001",
+    "description": "An adversary may rely upon a user clicking a malicious link in order to gain execution. Users may be subjected to social engineering to get them to click on a link that will lead to code execution. This user action will typically be observed as follow-on behavior from Spearphishing Link. Clicking on a link may also lead to other execution techniques such as exploitation of a browser or application vulnerability via Exploitation for Client Execution. Links may also lead users to download files that require execution via Malicious File.",
+    "is_subtechnique": true,
+    "parent_id": "T1204"
+  },
+  {
+    "technique_id": "T1204.002",
+    "name": "Malicious File",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution"
+    ],
+    "tactic_ids": [
+      "execution"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1204/002",
+    "description": "An adversary may rely upon a user opening a malicious file in order to gain execution. Users may be subjected to social engineering to get them to open a file that will lead to code execution. This user action will typically be observed as follow-on behavior from Spearphishing Attachment. Adversaries may use several types of files that require a user to execute them, including .doc, .pdf, .xls, .rtf, .scr, .exe, .lnk, .pif, .cpl, .reg, and .iso.",
+    "is_subtechnique": true,
+    "parent_id": "T1204"
+  },
+  {
+    "technique_id": "T1218.011",
+    "name": "Rundll32",
+    "tactic": "Stealth",
+    "tactic_id": "stealth",
+    "tactics": [
+      "Stealth"
+    ],
+    "tactic_ids": [
+      "stealth"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1218/011",
+    "description": "Adversaries may abuse rundll32.exe to proxy execution of malicious code. Using rundll32.exe, vice executing directly (i.e. Shared Modules), may avoid triggering security tools that may not monitor execution of the rundll32.exe process because of allowlists or false positives from normal operations. Rundll32.exe is commonly associated with executing DLL payloads (ex: `rundll32.exe {DLLname, DLLfunction}`).",
+    "is_subtechnique": true,
+    "parent_id": "T1218"
+  },
+  {
+    "technique_id": "T1485",
+    "name": "Data Destruction",
+    "tactic": "Impact",
+    "tactic_id": "impact",
+    "tactics": [
+      "Impact"
+    ],
+    "tactic_ids": [
+      "impact"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1485",
+    "description": "Adversaries may destroy data and files on specific systems or in large numbers on a network to interrupt availability to systems, services, and network resources. Data destruction is likely to render stored data irrecoverable by forensic techniques through overwriting files or data on local and remote drives. Common operating system file deletion commands such as `del` and `rm` often only remove pointers to files without wiping the contents of the files themselves, making the files recoverable by proper forensic methodology. This behavior is distinct from Disk Content Wipe and Disk Structure Wipe because individual files are destroyed rather than sections of a storage disk or the disk's logical structure.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1486",
+    "name": "Data Encrypted for Impact",
+    "tactic": "Impact",
+    "tactic_id": "impact",
+    "tactics": [
+      "Impact"
+    ],
+    "tactic_ids": [
+      "impact"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1486",
+    "description": "Adversaries may encrypt data on target systems or on large numbers of systems in a network to interrupt availability to system and network resources. They can attempt to render stored data inaccessible by encrypting files or data on local and remote drives and withholding access to a decryption key. This may be done in order to extract monetary compensation from a victim in exchange for decryption or a decryption key (ransomware) or to render data permanently inaccessible in cases where the key is not saved or transmitted.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1489",
+    "name": "Service Stop",
+    "tactic": "Impact",
+    "tactic_id": "impact",
+    "tactics": [
+      "Impact"
+    ],
+    "tactic_ids": [
+      "impact"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1489",
+    "description": "Adversaries may stop or disable services on a system to render those services unavailable to legitimate users. Stopping critical services or processes can inhibit or stop response to an incident or aid in the adversary's overall objectives to cause damage to the environment.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1490",
+    "name": "Inhibit System Recovery",
+    "tactic": "Impact",
+    "tactic_id": "impact",
+    "tactics": [
+      "Impact"
+    ],
+    "tactic_ids": [
+      "impact"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1490",
+    "description": "Adversaries may delete or remove built-in data and turn off services designed to aid in the recovery of a corrupted system to prevent recovery. This may deny access to available backups and recovery options.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1491.001",
+    "name": "Internal Defacement",
+    "tactic": "Impact",
+    "tactic_id": "impact",
+    "tactics": [
+      "Impact"
+    ],
+    "tactic_ids": [
+      "impact"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1491/001",
+    "description": "An adversary may deface systems internal to an organization in an attempt to intimidate or mislead users, thus discrediting the integrity of the systems. This may take the form of modifications to internal websites or server login messages, or directly to user systems with the replacement of the desktop wallpaper. Disturbing or offensive images may be used as a part of Internal Defacement in order to cause user discomfort, or to pressure compliance with accompanying messages. Since internally defacing systems exposes an adversary's presence, it often takes place after other intrusion goals have been accomplished.",
+    "is_subtechnique": true,
+    "parent_id": "T1491"
+  },
+  {
+    "technique_id": "T1505.003",
+    "name": "Web Shell",
+    "tactic": "Persistence",
+    "tactic_id": "persistence",
+    "tactics": [
+      "Persistence"
+    ],
+    "tactic_ids": [
+      "persistence"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1505/003",
+    "description": "Adversaries may backdoor web servers with web shells to establish persistent access to systems. A Web shell is a Web script that is placed on an openly accessible Web server to allow an adversary to access the Web server as a gateway into a network. A Web shell may provide a set of functions to execute or a command-line interface on the system that hosts the Web server.",
+    "is_subtechnique": true,
+    "parent_id": "T1505"
+  },
+  {
+    "technique_id": "T1543.003",
+    "name": "Windows Service",
+    "tactic": "Persistence",
+    "tactic_id": "persistence",
+    "tactics": [
+      "Persistence",
+      "Privilege Escalation"
+    ],
+    "tactic_ids": [
+      "persistence",
+      "privilege-escalation"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1543/003",
+    "description": "Adversaries may create or modify Windows services to repeatedly execute malicious payloads as part of persistence. When Windows boots up, it starts programs or applications called services that perform background system functions. Windows service configuration information, including the file path to the service's executable or recovery programs/commands, is stored in the Windows Registry.",
+    "is_subtechnique": true,
+    "parent_id": "T1543"
+  },
+  {
+    "technique_id": "T1547.001",
+    "name": "Registry Run Keys / Startup Folder",
+    "tactic": "Persistence",
+    "tactic_id": "persistence",
+    "tactics": [
+      "Persistence",
+      "Privilege Escalation"
+    ],
+    "tactic_ids": [
+      "persistence",
+      "privilege-escalation"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1547/001",
+    "description": "Adversaries may achieve persistence by adding a program to a startup folder or referencing it with a Registry run key. Adding an entry to the \"run keys\" in the Registry or startup folder will cause the program referenced to be executed when a user logs in. These programs will be executed under the context of the user and will have the account's associated permissions level.",
+    "is_subtechnique": true,
+    "parent_id": "T1547"
+  },
+  {
+    "technique_id": "T1548.002",
+    "name": "Bypass User Account Control",
+    "tactic": "Privilege Escalation",
+    "tactic_id": "privilege-escalation",
+    "tactics": [
+      "Privilege Escalation"
+    ],
+    "tactic_ids": [
+      "privilege-escalation"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1548/002",
+    "description": "Adversaries may bypass UAC mechanisms to elevate process privileges on system. Windows User Account Control (UAC) allows a program to elevate its privileges (tracked as integrity levels ranging from low to high) to perform a task under administrator-level permissions, possibly by prompting the user for confirmation. The impact to the user ranges from denying the operation under high enforcement to allowing the user to perform the action if they are in the local administrators group and click through the prompt or allowing them to enter an administrator password to complete the action.",
+    "is_subtechnique": true,
+    "parent_id": "T1548"
+  },
+  {
+    "technique_id": "T1550.002",
+    "name": "Pass the Hash",
+    "tactic": "Lateral Movement",
+    "tactic_id": "lateral-movement",
+    "tactics": [
+      "Lateral Movement"
+    ],
+    "tactic_ids": [
+      "lateral-movement"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1550/002",
+    "description": "Adversaries may “pass the hash” using stolen password hashes to move laterally within an environment, bypassing normal system access controls. Pass the hash (PtH) is a method of authenticating as a user without having access to the user's cleartext password. This method bypasses standard authentication steps that require a cleartext password, moving directly into the portion of the authentication that uses the password hash.",
+    "is_subtechnique": true,
+    "parent_id": "T1550"
+  },
+  {
+    "technique_id": "T1552.001",
+    "name": "Credentials In Files",
+    "tactic": "Credential Access",
+    "tactic_id": "credential-access",
+    "tactics": [
+      "Credential Access"
+    ],
+    "tactic_ids": [
+      "credential-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1552/001",
+    "description": "Adversaries may search local file systems and remote file shares for files containing insecurely stored credentials. These can be files created by users to store their own credentials, shared credential stores for a group of individuals, configuration files containing passwords for a system or service, or source code/binary files containing embedded passwords.",
+    "is_subtechnique": true,
+    "parent_id": "T1552"
+  },
+  {
+    "technique_id": "T1555",
+    "name": "Credentials from Password Stores",
+    "tactic": "Credential Access",
+    "tactic_id": "credential-access",
+    "tactics": [
+      "Credential Access"
+    ],
+    "tactic_ids": [
+      "credential-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1555",
+    "description": "Adversaries may search for common password storage locations to obtain user credentials. Passwords are stored in several places on a system, depending on the operating system or application holding the credentials. There are also specific applications and services that store passwords to make them easier for users to manage and maintain, such as password managers and cloud secrets vaults. Once credentials are obtained, they can be used to perform lateral movement and access restricted information.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1558.003",
+    "name": "Kerberoasting",
+    "tactic": "Credential Access",
+    "tactic_id": "credential-access",
+    "tactics": [
+      "Credential Access"
+    ],
+    "tactic_ids": [
+      "credential-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1558/003",
+    "description": "Adversaries may abuse a valid Kerberos ticket-granting ticket (TGT) or sniff network traffic to obtain a ticket-granting service (TGS) ticket that may be vulnerable to Brute Force.",
+    "is_subtechnique": true,
+    "parent_id": "T1558"
+  },
+  {
+    "technique_id": "T1560",
+    "name": "Archive Collected Data",
+    "tactic": "Collection",
+    "tactic_id": "collection",
+    "tactics": [
+      "Collection"
+    ],
+    "tactic_ids": [
+      "collection"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1560",
+    "description": "An adversary may compress and/or encrypt data that is collected prior to exfiltration. Compressing the data can help to obfuscate the collected data and minimize the amount of data sent over the network. Encryption can be used to hide information that is being exfiltrated from detection or make exfiltration less conspicuous upon inspection by a defender.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1560.001",
+    "name": "Archive via Utility",
+    "tactic": "Collection",
+    "tactic_id": "collection",
+    "tactics": [
+      "Collection"
+    ],
+    "tactic_ids": [
+      "collection"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1560/001",
+    "description": "Adversaries may use utilities to compress and/or encrypt collected data prior to exfiltration. Many utilities include functionalities to compress, encrypt, or otherwise package data into a format that is easier/more secure to transport.",
+    "is_subtechnique": true,
+    "parent_id": "T1560"
+  },
+  {
+    "technique_id": "T1566",
+    "name": "Phishing",
+    "tactic": "Initial Access",
+    "tactic_id": "initial-access",
+    "tactics": [
+      "Initial Access"
+    ],
+    "tactic_ids": [
+      "initial-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1566",
+    "description": "Adversaries may send phishing messages to gain access to victim systems. All forms of phishing are electronically delivered social engineering. Phishing can be targeted, known as spearphishing. In spearphishing, a specific individual, company, or industry will be targeted by the adversary. More generally, adversaries can conduct non-targeted phishing, such as in mass malware spam campaigns.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1566.001",
+    "name": "Spearphishing Attachment",
+    "tactic": "Initial Access",
+    "tactic_id": "initial-access",
+    "tactics": [
+      "Initial Access"
+    ],
+    "tactic_ids": [
+      "initial-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1566/001",
+    "description": "Adversaries may send spearphishing emails with a malicious attachment in an attempt to gain access to victim systems. Spearphishing attachment is a specific variant of spearphishing. Spearphishing attachment is different from other forms of spearphishing in that it employs the use of malware attached to an email. All forms of spearphishing are electronically delivered social engineering targeted at a specific individual, company, or industry. In this scenario, adversaries attach a file to the spearphishing email and usually rely upon User Execution to gain execution. Spearphishing may also involve social engineering techniques, such as posing as a trusted source.",
+    "is_subtechnique": true,
+    "parent_id": "T1566"
+  },
+  {
+    "technique_id": "T1566.002",
+    "name": "Spearphishing Link",
+    "tactic": "Initial Access",
+    "tactic_id": "initial-access",
+    "tactics": [
+      "Initial Access"
+    ],
+    "tactic_ids": [
+      "initial-access"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1566/002",
+    "description": "Adversaries may send spearphishing emails with a malicious link in an attempt to gain access to victim systems. Spearphishing with a link is a specific variant of spearphishing. It is different from other forms of spearphishing in that it employs the use of links to download malware contained in email, instead of attaching malicious files to the email itself, to avoid defenses that may inspect email attachments. Spearphishing may also involve social engineering techniques, such as posing as a trusted source.",
+    "is_subtechnique": true,
+    "parent_id": "T1566"
+  },
+  {
+    "technique_id": "T1567.002",
+    "name": "Exfiltration to Cloud Storage",
+    "tactic": "Exfiltration",
+    "tactic_id": "exfiltration",
+    "tactics": [
+      "Exfiltration"
+    ],
+    "tactic_ids": [
+      "exfiltration"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1567/002",
+    "description": "Adversaries may exfiltrate data to a cloud storage service rather than over their primary command and control channel. Cloud storage services allow for the storage, edit, and retrieval of data from a remote cloud storage server over the Internet.",
+    "is_subtechnique": true,
+    "parent_id": "T1567"
+  },
+  {
+    "technique_id": "T1568.002",
+    "name": "Domain Generation Algorithms",
+    "tactic": "Command and Control",
+    "tactic_id": "command-and-control",
+    "tactics": [
+      "Command and Control"
+    ],
+    "tactic_ids": [
+      "command-and-control"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1568/002",
+    "description": "Adversaries may make use of Domain Generation Algorithms (DGAs) to dynamically identify a destination domain for command and control traffic rather than relying on a list of static IP addresses or domains. This has the advantage of making it much harder for defenders to block, track, or take over the command and control channel, as there potentially could be thousands of domains that malware can check for instructions.",
+    "is_subtechnique": true,
+    "parent_id": "T1568"
+  },
+  {
+    "technique_id": "T1569.002",
+    "name": "Service Execution",
+    "tactic": "Execution",
+    "tactic_id": "execution",
+    "tactics": [
+      "Execution"
+    ],
+    "tactic_ids": [
+      "execution"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1569/002",
+    "description": "Adversaries may abuse the Windows service control manager to execute malicious commands or payloads. The Windows service control manager (`services.exe`) is an interface to manage and manipulate services. The service control manager is accessible to users via GUI components as well as system utilities such as `sc.exe` and Net.",
+    "is_subtechnique": true,
+    "parent_id": "T1569"
+  },
+  {
+    "technique_id": "T1570",
+    "name": "Lateral Tool Transfer",
+    "tactic": "Lateral Movement",
+    "tactic_id": "lateral-movement",
+    "tactics": [
+      "Lateral Movement"
+    ],
+    "tactic_ids": [
+      "lateral-movement"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1570",
+    "description": "Adversaries may transfer tools or other files between systems in a compromised environment. Once brought into the victim environment (i.e., Ingress Tool Transfer) files may then be copied from one system to another to stage adversary tools or other files over the course of an operation.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1573.002",
+    "name": "Asymmetric Cryptography",
+    "tactic": "Command and Control",
+    "tactic_id": "command-and-control",
+    "tactics": [
+      "Command and Control"
+    ],
+    "tactic_ids": [
+      "command-and-control"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1573/002",
+    "description": "Adversaries may employ a known asymmetric encryption algorithm to conceal command and control traffic rather than relying on any inherent protections provided by a communication protocol. Asymmetric cryptography, also known as public key cryptography, uses a keypair per party: one public that can be freely distributed, and one private. Due to how the keys are generated, the sender encrypts data with the receiver’s public key and the receiver decrypts the data with their private key. This ensures that only the intended recipient can read the encrypted data. Common public key encryption algorithms include RSA and ElGamal.",
+    "is_subtechnique": true,
+    "parent_id": "T1573"
+  },
+  {
+    "technique_id": "T1598",
+    "name": "Phishing for Information",
+    "tactic": "Reconnaissance",
+    "tactic_id": "reconnaissance",
+    "tactics": [
+      "Reconnaissance"
+    ],
+    "tactic_ids": [
+      "reconnaissance"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1598",
+    "description": "Adversaries may send phishing messages to elicit sensitive information that can be used during targeting. Phishing for information is an attempt to trick targets into divulging information, frequently credentials or other actionable information. Phishing for information is different from Phishing in that the objective is gathering data from the victim rather than executing malicious code.",
+    "is_subtechnique": false,
+    "parent_id": null
+  },
+  {
+    "technique_id": "T1685",
+    "name": "Disable or Modify Tools",
+    "tactic": "Defense Impairment",
+    "tactic_id": "defense-impairment",
+    "tactics": [
+      "Defense Impairment"
+    ],
+    "tactic_ids": [
+      "defense-impairment"
+    ],
+    "url": "https://attack.mitre.org/techniques/T1685",
+    "description": "Adversaries may disable, degrade, or tamper with security tools or applications (e.g., endpoint detection and response (EDR) tools, intrusion detection systems (IDS), antivirus, logging agents, sensors, etc.) to impair or reduce visibility of defensive capabilities. This may include stopping specific services, killing processes, modifying or deleting tool configuration files and Registry keys, or preventing tools from updating. This may also include impairing defenses more broadly by disrupting preventative, detection, and response mechanisms across host, network, and cloud environments.",
+    "is_subtechnique": false,
+    "parent_id": null
+  }
+]
