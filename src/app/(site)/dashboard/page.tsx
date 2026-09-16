@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, Award, GraduationCap, Play, Target } from "lucide-react";
+import { ArrowRight, Award, Compass, GraduationCap, Play, Target } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,6 +72,31 @@ export default async function DashboardPage() {
   const coveredTechniques = new Set(
     finished.flatMap((s) => s.bundle?.scenario.mitre_techniques ?? []),
   );
+
+  // Scenarios not yet finished, ranked by how much new ATT&CK ground they cover.
+  const techniqueNames = new Map(listMitreTechniques().map((t) => [t.technique_id, t.name]));
+  const nextSteps = scenarios
+    .filter(({ scenario }) => !completedSlugs.has(scenario.slug))
+    .map(({ scenario }) => ({
+      slug: scenario.slug,
+      title: scenario.title,
+      difficulty: scenario.difficulty,
+      minutes: scenario.estimated_minutes,
+      sessionId: inProgress.find((s) => s.slug === scenario.slug)?.id ?? null,
+      newTechniques: scenario.mitre_techniques
+        .filter((id) => !coveredTechniques.has(id))
+        .map((id) => ({ id, name: techniqueNames.get(id) ?? id })),
+    }))
+    .filter((step) => step.newTechniques.length > 0)
+    .sort((a, b) => b.newTechniques.length - a.newTechniques.length);
+
+  const scored = finished.filter((s) => s.score !== null && s.max_score);
+  const averageScore =
+    scored.length > 0
+      ? Math.round(
+          (scored.reduce((sum, s) => sum + (s.score ?? 0) / (s.max_score ?? 1), 0) / scored.length) * 100,
+        )
+      : null;
 
   const earnedBadgeKeys = new Set(
     (badgeRows ?? [])
@@ -225,26 +250,104 @@ export default async function DashboardPage() {
 
       {/* ------------------------------------------------------ coverage */}
       <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Target className="size-4 text-primary" aria-hidden />
-              Your ATT&amp;CK coverage
-            </CardTitle>
-            <CardDescription>
-              Techniques exercised across the incidents you have completed. Shaded cells are ones
-              you have worked; the rest are what the library still has to teach you.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AttackHeatmap
-              tactics={listMitreTactics()}
-              techniques={listMitreTechniques()}
-              highlighted={[...coveredTechniques]}
-              scope="student"
-            />
-          </CardContent>
-        </Card>
+        <div className="flex min-w-0 flex-col gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Target className="size-4 text-primary" aria-hidden />
+                Your ATT&amp;CK coverage
+              </CardTitle>
+              <CardDescription>
+                Techniques exercised across the incidents you have completed. Shaded cells are ones
+                you have worked; the rest are what the library still has to teach you.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AttackHeatmap
+                tactics={listMitreTactics()}
+                techniques={listMitreTechniques()}
+                highlighted={[...coveredTechniques]}
+                scope="student"
+              />
+            </CardContent>
+          </Card>
+
+          {/* The sidebar is taller than the heatmap, so this card takes the rest
+              of the column with something a student can act on. */}
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Compass className="size-4 text-primary" aria-hidden />
+                Where to go next
+              </CardTitle>
+              <CardDescription>
+                {nextSteps.length > 0
+                  ? "Each incident below teaches techniques you have not exercised yet."
+                  : "You have exercised every technique the library teaches."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                  { label: "Incidents completed", value: `${finished.length}` },
+                  { label: "In progress", value: `${inProgress.length}` },
+                  {
+                    label: "Techniques exercised",
+                    value: `${coveredTechniques.size} / ${listMitreTechniques().length}`,
+                  },
+                  { label: "Average score", value: averageScore === null ? "-" : `${averageScore}%` },
+                ].map((stat) => (
+                  <div key={stat.label} className="rounded-md border border-border p-3">
+                    <dt className="text-xs text-muted-foreground">{stat.label}</dt>
+                    <dd className="mt-1 text-lg font-semibold tabular-nums">{stat.value}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              {nextSteps.length > 0 ? (
+                <ul className="grid gap-3 md:grid-cols-2">
+                  {nextSteps.map((step) => (
+                    <li key={step.slug} className="flex flex-col gap-3 rounded-md border border-border p-3">
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                          <DifficultyChip difficulty={step.difficulty} />
+                          <span className="text-muted-foreground">~{step.minutes} min</span>
+                          {step.sessionId ? <Badge variant="secondary">In progress</Badge> : null}
+                        </div>
+                        <p className="mt-1 text-sm font-medium">{step.title}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          +{step.newTechniques.length} new{" "}
+                          {step.newTechniques.length === 1 ? "technique" : "techniques"}
+                        </p>
+                      </div>
+                      <ul className="flex flex-wrap gap-1.5">
+                        {step.newTechniques.map((technique) => (
+                          <li
+                            key={technique.id}
+                            title={technique.name}
+                            className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[0.6875rem] text-muted-foreground"
+                          >
+                            {technique.id}
+                          </li>
+                        ))}
+                      </ul>
+                      <Button variant="outline" size="sm" asChild className="mt-auto w-full">
+                        <Link
+                          href={
+                            step.sessionId ? `/console/${step.sessionId}` : `/scenarios/${step.slug}/briefing`
+                          }
+                        >
+                          {step.sessionId ? "Resume the incident" : "Read the briefing"}
+                          <ArrowRight className="size-4" />
+                        </Link>
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="space-y-6">
           <Card>
