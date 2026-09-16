@@ -1,0 +1,90 @@
+NocturneAnalysis
+Copyright [YEAR] [LICENSOR NAME]
+
+Licensed under the PolyForm Noncommercial License 1.0.0. See LICENSE.md.
+A commercial licence is required for institution-wide, hosted or resold use.
+See COMMERCIAL-LICENSE.md.
+
+================================================================================
+THIRD-PARTY NOTICES
+================================================================================
+
+MITRE ATT&CK(R)
+--------------------------------------------------------------------------------
+This product includes technique identifiers, names, tactic assignments and
+descriptions derived from the MITRE ATT&CK(R) knowledge base.
+
+  (c) 2025 The MITRE Corporation. This work is reproduced and distributed with
+  the permission of The MITRE Corporation.
+
+ATT&CK(R) and MITRE ATT&CK(R) are registered trademarks of The MITRE
+Corporation. Used under the ATT&CK Terms of Use:
+https://attack.mitre.org/resources/legal-and-branding/terms-of-use/
+
+The MITRE Corporation has not reviewed, approved or endorsed NocturneAnalysis.
+
+The content in content/mitre/ is generated from the official attack-stix-data
+repository by scripts/build-mitre-data.ts and is not modified beyond selecting
+a subset and stripping citation markers from descriptions. See
+content/mitre/version.json for the ATT&CK version in use.
+
+
+OWASP Top 10
+--------------------------------------------------------------------------------
+This product references the OWASP Top 10:2021 category codes, names and
+descriptions.
+
+  (c) The OWASP Foundation. Licensed under Creative Commons Attribution-ShareAlike
+  4.0 International (CC BY-SA 4.0):
+  https://creativecommons.org/licenses/by-sa/4.0/
+
+OWASP(R) is a registered trademark of the OWASP Foundation, Inc. The OWASP
+Foundation has not reviewed, approved or endorsed NocturneAnalysis.
+
+Note on scope: the "plain_language", "example" and "prevention" fields in
+content/owasp/top10-2021.json are original writing produced for this platform
+and are not OWASP text. The category codes, names and summary descriptions are
+derived from the OWASP Top 10:2021 under the licence above.
+
+
+NIST SP 800-61
+--------------------------------------------------------------------------------
+The incident response lifecycle taught by this platform is based on NIST Special
+Publication 800-61, "Computer Security Incident Handling Guide", published by
+the National Institute of Standards and Technology. NIST publications are US
+Government works and are not subject to copyright in the United States. NIST
+does not endorse this product.
+
+
+Open-source dependencies
+--------------------------------------------------------------------------------
+This product bundles open-source software. Each package retains its own licence;
+run `npm run licenses` for the current inventory. The principal components are:
+
+  Next.js, React                        MIT
+  Tailwind CSS                          MIT
+  Radix UI                              MIT
+  Supabase client libraries             MIT
+  @react-pdf/renderer                   MIT
+  Recharts                              MIT
+  Zod                                   MIT
+  Motion                                MIT
+  lucide-react                          ISC
+  Inter, JetBrains Mono (typefaces)     SIL Open Font License 1.1
+
+================================================================================
+SYNTHETIC CONTENT
+================================================================================
+
+All incident content in this product is synthetic. Organisations, people,
+hostnames, addresses, file hashes and email content in content/scenarios/ are
+invented. IP addresses are drawn from the RFC 5737 documentation ranges
+(192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24) or RFC 1918 private space, and
+domain names use RFC 2606 reserved TLDs, so none of it resolves or routes.
+
+This is enforced mechanically rather than by convention:
+`npm run content:validate` scans every content file and fails the build on any
+address or hostname that could refer to real infrastructure. See
+src/lib/content/safety.ts.
+
+Any resemblance to a real institution, person or system is coincidental.

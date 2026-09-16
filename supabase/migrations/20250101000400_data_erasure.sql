@@ -120,3 +120,11 @@ comment on function app.purge_student_data(uuid, text, text) is
   'PDPA erasure path. Service role only. Removes a student''s sessions and audit '
   'log, retaining a countersigned record that the erasure occurred. Restores the '
   'append-only triggers even on failure.';
+
+-- ------------------------------------------------------------- realtime ---
+-- Tables the live class view and live alert feed subscribe to. Realtime still
+-- applies Row Level Security, so a subscriber only receives rows they could
+-- have selected: an instructor sees their own organisation's sessions and
+-- nobody else's.
+alter publication supabase_realtime add table sessions;
+alter publication supabase_realtime add table session_events;

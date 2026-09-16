@@ -16,7 +16,9 @@
     "db:seed": "tsx scripts/seed.ts",
     "samples:build": "tsx scripts/build-samples.ts",
     "db:apply": "tsx scripts/apply-seed.ts",
-    "edge:sync": "tsx scripts/sync-edge-shared.ts"
+    "edge:sync": "tsx scripts/sync-edge-shared.ts",
+    "enrol": "tsx scripts/enrol.ts",
+    "licenses": "npx --yes license-checker-rseidelsohn --production --summary"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",

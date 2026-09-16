@@ -203,6 +203,19 @@ export interface GradeResult {
 const REFLECTION_POINTS = 20;
 
 /**
+ * Meeting the stated minimum (word count plus one recommended control) earns
+ * the base; each further control earns more, up to full marks.
+ *
+ * The ramp is deliberate - one recommendation satisfies the phase gate, and
+ * an incident review that produces a single action is thin - but it is only
+ * fair if the student can see it, so the reflection form shows this threshold
+ * rather than leaving them to discover it in the report.
+ */
+export const REFLECTION_BASE_POINTS = 10;
+export const REFLECTION_POINTS_PER_CONTROL = 5;
+export const REFLECTION_CONTROLS_FOR_FULL_MARKS = 2;
+
+/**
  * MITRE coverage is taken from the student's explicit technique selection in
  * the investigation phase (decision key `attack_techniques`) rather than being
  * inferred. Inferring it would credit a student for techniques they never
@@ -316,7 +329,10 @@ export function gradeSession(bundle: ScenarioBundle, state: ReplayedSession): Gr
   const lessonsCriteria = scenario.phases.at(-1)!.success_criteria;
   const reflectionEarned =
     reflectionWords >= lessonsCriteria.reflection_min_words && controls >= 1
-      ? Math.min(REFLECTION_POINTS, 10 + controls * 5)
+      ? Math.min(
+          REFLECTION_POINTS,
+          REFLECTION_BASE_POINTS + controls * REFLECTION_POINTS_PER_CONTROL,
+        )
       : 0;
 
   const techniqueDecision = state.decisions.find((d) => d.decision_key === TECHNIQUE_DECISION_KEY);

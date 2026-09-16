@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { SessionReflection } from "@/lib/events/payloads";
+import { REFLECTION_CONTROLS_FOR_FULL_MARKS } from "@/lib/grading/engine";
 
 /**
  * The lessons-learned write-up.
@@ -71,8 +72,10 @@ export function ReflectionForm({
     onChange({ ...value, recommended_controls: updated });
   }
 
+  const controlCount = controls.filter((c) => c.trim().length > 0).length;
   const meetsWords = wordCount >= minWords;
-  const meetsControls = controls.filter((c) => c.trim().length > 0).length >= 1;
+  const meetsControls = controlCount >= 1;
+  const meetsFullMarks = controlCount >= REFLECTION_CONTROLS_FOR_FULL_MARKS;
 
   return (
     <div className="space-y-5">
@@ -143,15 +146,18 @@ export function ReflectionForm({
         </Button>
       </div>
 
-      <div className="rounded-md border border-border bg-secondary/40 p-3 text-xs">
+      <div className="space-y-1 rounded-md border border-border bg-secondary/40 p-3 text-xs">
         <p className={cn("font-medium", meetsWords ? "text-chart-5" : "text-muted-foreground")}>
-          {wordCount} / {minWords} words
-          {meetsWords ? " - enough to submit" : ""}
+          {wordCount} / {minWords} words{meetsWords ? " - enough to submit" : ""}
         </p>
-        <p className={cn("mt-1", meetsControls ? "text-chart-5" : "text-muted-foreground")}>
-          {controls.filter((c) => c.trim()).length} recommended control
-          {controls.filter((c) => c.trim()).length === 1 ? "" : "s"}
-          {meetsControls ? " - at least one is required" : " - at least one is required"}
+        <p className={cn(meetsControls ? "text-chart-5" : "text-muted-foreground")}>
+          {controlCount} recommended control{controlCount === 1 ? "" : "s"} - at least one is
+          required
+        </p>
+        <p className={cn(meetsFullMarks ? "text-chart-5" : "text-muted-foreground")}>
+          {meetsFullMarks
+            ? "Full marks for this section."
+            : `${REFLECTION_CONTROLS_FOR_FULL_MARKS} or more earns full marks for this section.`}
         </p>
       </div>
     </div>
