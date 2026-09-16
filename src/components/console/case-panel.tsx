@@ -13,7 +13,7 @@ import { DecisionForm } from "@/components/console/decision-form";
 import { ActionPanel } from "@/components/console/action-panel";
 import { ReflectionForm } from "@/components/console/reflection-form";
 import { cn } from "@/lib/utils";
-import { PHASE_LABELS, PHASE_NIST_MAPPING, type PhaseKey } from "@/lib/events/types";
+import { PHASE_LABELS, PHASE_NIST_MAPPING } from "@/lib/events/types";
 import type { ActionSpec, PhaseSpec } from "@/lib/content/schema";
 import type { SessionReflection } from "@/lib/events/payloads";
 import type { PhaseGate } from "@/lib/grading/engine";

@@ -68,7 +68,7 @@ describe("canonicalJson", () => {
   it("refuses values it cannot represent deterministically", () => {
     expect(() => canonicalJson({ n: Number.NaN })).toThrow(TypeError);
     expect(() => canonicalJson({ n: Number.POSITIVE_INFINITY })).toThrow(TypeError);
-    expect(() => canonicalJson({ n: 1n })).toThrow(TypeError);
+    expect(() => canonicalJson({ n: BigInt(1) })).toThrow(TypeError);
   });
 
   it("escapes characters that would otherwise change the preimage", () => {
@@ -77,9 +77,34 @@ describe("canonicalJson", () => {
 });
 
 describe("chainPreimage", () => {
-  it("separates fields so payload text cannot impersonate a later field", () => {
-    // Without a separator these two events would produce the same preimage:
-    // the first payload's trailing text would run into the timestamp.
+  it("separates fields so one cannot borrow characters from the next", () => {
+    // These two events are different, but their fields concatenate to exactly
+    // the same string. Without a delimiter between fields they would share a
+    // preimage and therefore a digest, and one event could be swapped for
+    // another that hashes identically.
+    const a = chainPreimage({
+      prevHash: "",
+      eventType: "ADD_NOTE",
+      payload: {},
+      createdAt: "2025-01-01T00:00:00.000Z",
+    });
+    const b = chainPreimage({
+      prevHash: "",
+      eventType: "_NOTE",
+      payload: {},
+      createdAt: "2025-01-01T00:00:00.000ZADD",
+    });
+
+    // The naive concatenation really would collide - that is the point.
+    expect("{}" + "2025-01-01T00:00:00.000Z" + "ADD_NOTE").toBe(
+      "{}" + "2025-01-01T00:00:00.000ZADD" + "_NOTE",
+    );
+
+    // The delimited preimage does not.
+    expect(a).not.toBe(b);
+  });
+
+  it("keeps a payload containing the delimiter from forging another preimage", () => {
     const a = chainPreimage({
       prevHash: "",
       eventType: "ADD_NOTE",
@@ -89,9 +114,12 @@ describe("chainPreimage", () => {
     const b = chainPreimage({
       prevHash: "",
       eventType: "ADD_NOTE",
-      payload: { text: "x2025-01-01T00:00:00.000Z" },
+      payload: { text: "x\u001f2025-01-01T00:00:00.000Z" },
       createdAt: "",
     });
+
+    // JSON escaping keeps the delimiter inside the quoted string rather than
+    // terminating the field, so the payload cannot impersonate the timestamp.
     expect(a).not.toBe(b);
   });
 

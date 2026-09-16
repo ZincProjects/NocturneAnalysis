@@ -19,7 +19,7 @@
  * the timestamp field, letting two different events collide on one digest.
  */
 
-const RS = "";
+const RS = "\u001f";
 
 export const GENESIS_PREV_HASH = "";
 

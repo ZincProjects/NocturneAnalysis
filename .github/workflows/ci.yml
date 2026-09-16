@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      # Schema, cross-file consistency, and the synthetic-data sweep. This is
+      # the check behind the product's central claim to a school's IT
+      # department, so it gates every merge.
+      - name: Validate content
+        run: npm run content:validate
+
+      - name: Unit tests
+        run: npm run test
+
+      # The Edge Function carries a copy of the hash module. If it drifts from
+      # the source, the function writes digests the app cannot verify.
+      - name: Check Edge Function shared modules are in sync
+        run: |
+          npm run edge:sync
+          git diff --exit-code supabase/functions/_shared
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+
+      # Only the public suite runs here: it needs no credentials and no
+      # database. The authenticated run needs a real Supabase project and is
+      # run against a preview deployment.
+      - name: End-to-end (public pages)
+        run: npx playwright test e2e/public-pages.spec.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

@@ -24,7 +24,6 @@ import {
   listOwaspCategories,
 } from "@/lib/content/fs-loader";
 import { scanForUnsafeReferences, type SafetyViolation } from "@/lib/content/safety";
-import { PHASE_KEYS } from "@/lib/events/types";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 

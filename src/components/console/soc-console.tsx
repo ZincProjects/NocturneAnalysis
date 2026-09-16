@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { Activity, FileText, Radar, ScrollText, ShieldCheck, Terminal } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AlertQueue } from "@/components/console/alert-queue";
@@ -21,7 +20,7 @@ import { TechniqueChip, OwaspChip } from "@/components/shared/chips";
 import { useSessionLog } from "@/lib/console/use-session-log";
 import { visibleAtPhase } from "@/lib/console/query";
 import { evaluatePhaseGate } from "@/lib/grading/engine";
-import { nextPhase, type PhaseKey, type SessionEvent } from "@/lib/events/types";
+import { nextPhase, type SessionEvent } from "@/lib/events/types";
 import type { SessionReflection } from "@/lib/events/payloads";
 import type {
   ActionSpec,

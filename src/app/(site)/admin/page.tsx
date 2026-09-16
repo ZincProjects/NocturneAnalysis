@@ -8,7 +8,6 @@ import { LiveClassFeed } from "@/components/admin/live-class-feed";
 import { requireStaff } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { listScenarios } from "@/lib/content/loader";
-import { PHASE_LABELS } from "@/lib/events/types";
 import { formatDuration } from "@/lib/utils";
 
 export const metadata: Metadata = {
