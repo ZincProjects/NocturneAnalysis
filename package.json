@@ -14,7 +14,9 @@
     "content:validate": "tsx scripts/validate-content.ts",
     "mitre:build": "tsx scripts/build-mitre-data.ts",
     "db:seed": "tsx scripts/seed.ts",
-    "samples:build": "tsx scripts/build-samples.ts"
+    "samples:build": "tsx scripts/build-samples.ts",
+    "db:apply": "tsx scripts/apply-seed.ts",
+    "edge:sync": "tsx scripts/sync-edge-shared.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",
