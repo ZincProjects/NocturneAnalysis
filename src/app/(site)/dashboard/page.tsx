@@ -25,8 +25,13 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const scenarios = listScenarios();
 
-  const [{ data: sessions }, { data: badgeRows }, { data: assignments }, { data: onboarding }] =
-    await Promise.all([
+  const [
+    { data: sessions },
+    { data: badgeRows },
+    { data: assignments },
+    { data: onboarding },
+    { data: scenarioRows },
+  ] = await Promise.all([
       supabase
         .from("sessions")
         .select("id, scenario_id, status, current_phase, score, max_score, started_at, completed_at")
@@ -42,9 +47,9 @@ export default async function DashboardPage() {
         .select("score, max_score, completed_at")
         .eq("user_id", viewer.userId)
         .maybeSingle(),
+      supabase.from("scenarios").select("id, slug, title"),
     ]);
 
-  const { data: scenarioRows } = await supabase.from("scenarios").select("id, slug, title");
   const slugById = new Map((scenarioRows ?? []).map((s) => [s.id, s.slug]));
   const bundleBySlug = new Map(scenarios.map((b) => [b.scenario.slug, b]));
 

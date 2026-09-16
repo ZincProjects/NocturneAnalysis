@@ -58,11 +58,12 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  // getUser() revalidates the token with Supabase. getSession() only decodes
-  // the cookie, which a client could have tampered with.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims() refreshes an expired session and verifies the JWT signature
+  // against the project's signing keys, without the Auth-server round trip
+  // getUser() makes on every request. getSession() alone would only decode the
+  // cookie, which a client could have tampered with.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims?.sub ? data.claims : null;
 
   const { pathname } = request.nextUrl;
 

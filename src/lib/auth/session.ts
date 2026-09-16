@@ -41,28 +41,28 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
 
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  // getClaims verifies the session JWT locally against the project's published
+  // signing keys (cached after the first request), where getUser makes a round
+  // trip to the Auth server on every call. This runs on every page render, so
+  // that round trip was a large share of each navigation.
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const claims = claimsData?.claims;
+  if (!claims?.sub) return null;
 
-  const { data: profile } = await supabase
+  // Profile and organisation in one query rather than two.
+  const { data: row } = await supabase
     .from("profiles")
-    .select("*")
-    .eq("id", user.id)
+    .select("*, organizations(*)")
+    .eq("id", claims.sub)
     .maybeSingle();
-  if (!profile) return null;
+  if (!row) return null;
 
-  const { data: org } = await supabase
-    .from("organizations")
-    .select("*")
-    .eq("id", profile.org_id)
-    .maybeSingle();
+  const { organizations: org, ...profile } = row as unknown as Profile & { organizations: Organization | null };
   if (!org) return null;
 
   return {
-    userId: user.id,
-    email: user.email ?? null,
+    userId: claims.sub,
+    email: typeof claims.email === "string" ? claims.email : null,
     profile,
     org,
     isStaff: profile.role === "instructor" || profile.role === "admin",
