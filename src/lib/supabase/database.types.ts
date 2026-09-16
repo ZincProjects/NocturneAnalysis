@@ -188,23 +188,29 @@ export type Database = {
         Row: {
           created_at: string;
           id: string;
+          join_code: string;
           kind: Database["public"]["Enums"]["org_kind"];
           leaderboard_enabled: boolean;
           name: string;
+          self_signup: boolean;
         };
         Insert: {
           created_at?: string;
           id?: string;
+          join_code?: string;
           kind?: Database["public"]["Enums"]["org_kind"];
           leaderboard_enabled?: boolean;
           name: string;
+          self_signup?: boolean;
         };
         Update: {
           created_at?: string;
           id?: string;
+          join_code?: string;
           kind?: Database["public"]["Enums"]["org_kind"];
           leaderboard_enabled?: boolean;
           name?: string;
+          self_signup?: boolean;
         };
         Relationships: [];
       };
@@ -558,6 +564,7 @@ export type Database = {
       };
     };
     Functions: {
+      lookup_join_code: { Args: { p_code: string }; Returns: string };
       session_chain_head: { Args: { p_session_id: string }; Returns: string };
       verify_session_chain: {
         Args: { p_session_id: string };

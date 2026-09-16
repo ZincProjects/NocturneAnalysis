@@ -18,6 +18,7 @@
     "db:apply": "tsx scripts/apply-seed.ts",
     "edge:sync": "tsx scripts/sync-edge-shared.ts",
     "enrol": "tsx scripts/enrol.ts",
+    "demo:users": "tsx scripts/demo-users.ts",
     "licenses": "npx --yes license-checker-rseidelsohn --production --summary"
   },
   "dependencies": {

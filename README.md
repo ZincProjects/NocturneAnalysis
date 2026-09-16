@@ -52,7 +52,7 @@ Then open <http://localhost:3000>.
 
 `/samples`, `/scenarios`, `/mitre` and `/owasp` work immediately with no
 account. To work a scenario you need to be enrolled — see
-[Enrolling students](#enrolling-students).
+[Accounts and sign-in](#accounts-and-sign-in).
 
 ## Requirements
 
@@ -103,26 +103,51 @@ Deploy the Edge Function:
 supabase functions deploy append-event
 ```
 
-## Enrolling students
+## Accounts and sign-in
 
-Accounts are created from the command line, not from a browser form, because
-creating them needs the service role. Exposing that to a logged-in session
-would mean one compromised instructor account could create accounts across the
-whole tenant.
+There are three ways to get an account:
 
-```bash
-# roster.csv: email,display name,handle,cohort
-npm run enrol -- --org "Northwind Polytechnic" --file roster.csv --dry-run
-npm run enrol -- --org "Northwind Polytechnic" --file roster.csv
-npm run enrol -- --org "Northwind Polytechnic" --file staff.csv --role instructor
-```
+1. **Class code (self-service).** Each organisation has a class code, shown to
+   instructors on **Admin → Students**. A student opens `/login`, chooses
+   **Create account**, and enters the code. They always join as a student -
+   the role is set by the database, never by the sign-up form. Without a code
+   they join the built-in *Independent Learners* organisation.
+2. **Roster (instructor-managed).** Needs the service role, so it runs from
+   the command line:
 
-Students sign in with a magic link. No passwords are issued — a platform that
-teaches people to recognise credential phishing should not be emailing
-passwords around.
+   ```bash
+   # roster.csv: email,display name,handle,cohort
+   npm run enrol -- --org "Northwind Polytechnic" --file roster.csv --dry-run
+   npm run enrol -- --org "Northwind Polytechnic" --file roster.csv
+   npm run enrol -- --org "Northwind Polytechnic" --file staff.csv --role instructor
+   ```
+
+   Enrolled accounts have no password. They sign in with an emailed link and
+   can set a password at `/account/password`.
+3. **Demo accounts.** `npm run demo:users` creates
+   `student@northwind.example` and `instructor@northwind.example` in the demo
+   organisation and prints a fresh password for each. The `.example` addresses
+   cannot receive email, so these accounts only work with a password.
 
 Choose handles that do not identify the student: they appear on leaderboards
 and in generated reports.
+
+### Email delivery
+
+Sign-up confirmations, sign-in links and password resets are sent by Supabase
+Auth. **Supabase's built-in email service is for testing only**: it delivers
+only to members of your Supabase organisation and only a few messages an hour.
+Students will not receive anything until you configure custom SMTP under
+**Authentication → Emails → SMTP settings** (any provider works - Resend,
+Postmark, SES, or a school mail relay).
+
+The links in those emails also have to come back to your site. In
+**Authentication → URL Configuration**, set the Site URL to your deployment
+and add `https://<your-domain>/auth/callback` to the redirect URLs. Links are
+opened in the browser that requested them; to make them work across devices,
+change the email templates to link to
+`{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email` (use
+`type=recovery` for the reset template) - the callback handles both forms.
 
 ## Authoring scenarios
 
@@ -256,8 +281,8 @@ resulting report; it needs `E2E_TEST_EMAIL` and `E2E_TEST_PASSWORD` in
    settings, for Production and Preview.
 3. In Supabase: **Authentication → URL Configuration**, set the Site URL to
    your production origin and add `https://<origin>/auth/callback` plus your
-   Vercel preview pattern as redirect URLs. Magic links fail silently if this
-   does not match.
+   Vercel preview pattern as redirect URLs. Email links fail if this does not
+   match. Configure custom SMTP (see [Email delivery](#email-delivery)).
 4. `supabase db push` and `supabase functions deploy append-event`.
 5. `npm run db:apply` to load the scenario library.
 
@@ -295,6 +320,7 @@ tests/                   Vitest
 | `npm run db:apply` | Push the content library to a project over PostgREST |
 | `npm run samples:build` | Regenerate the public sample sessions |
 | `npm run enrol` | Enrol students or staff from a roster |
+| `npm run demo:users` | Create or reset the demo accounts and print their passwords |
 | `npm run edge:sync` | Copy shared modules into the Edge Function bundle |
 
 ## Licence

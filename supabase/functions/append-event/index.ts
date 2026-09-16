@@ -178,6 +178,25 @@ Deno.serve(async (req: Request) => {
     return fail(409, "This session has already been submitted");
   }
 
+  // The status only flips once the report has been generated, which can fail
+  // or lag. The SUBMIT_REPORT event is the real line: nothing the student does
+  // after it may change the graded record, except the single SESSION_COMPLETE
+  // the console writes straight after submitting.
+  if (ownsSession && !staffInOrg) {
+    const { data: closing } = await asService
+      .from("session_events")
+      .select("event_type")
+      .eq("session_id", sessionId)
+      .in("event_type", ["SUBMIT_REPORT", "SESSION_COMPLETE"]);
+
+    const types = new Set((closing ?? []).map((row: { event_type: string }) => row.event_type));
+    const allowedClose = eventType === "SESSION_COMPLETE" && !types.has("SESSION_COMPLETE");
+
+    if (types.has("SUBMIT_REPORT") && !allowedClose) {
+      return fail(409, "This session has already been submitted");
+    }
+  }
+
   // Two appends racing for the same predecessor is normal in a console that
   // logs on every interaction. The database rejects the loser; retrying with a
   // freshly read head resolves it. Beyond a few attempts something else is

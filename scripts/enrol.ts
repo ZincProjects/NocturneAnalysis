@@ -210,6 +210,9 @@ async function main() {
       email: entry.email,
       email_confirm: true,
       user_metadata: { display_name: entry.displayName },
+      // Tells the sign-up trigger this account's profile comes from the
+      // roster, so it does not place the student in the self-sign-up org.
+      app_metadata: { provisioned: true },
     });
 
     if (userError || !user?.user) {

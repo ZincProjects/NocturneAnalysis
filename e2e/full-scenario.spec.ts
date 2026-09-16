@@ -27,8 +27,7 @@ test.describe("a complete incident, triage to submitted report", () => {
 
   async function signIn(page: Page) {
     await page.goto("/login");
-    await page.getByRole("button", { name: /use a password instead/i }).click();
-    await page.getByLabel(/school email address/i).fill(EMAIL!);
+    await page.getByLabel(/email address/i).fill(EMAIL!);
     await page.getByLabel(/^password$/i).fill(PASSWORD!);
     await page.getByRole("button", { name: /^sign in$/i }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 30_000 });

@@ -20,7 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
  * path, which is honest about what is built rather than presenting a button
  * that does not work.
  */
-export function InviteStudents({ orgName }: { orgName: string }) {
+export function InviteStudents({ orgName, joinCode }: { orgName: string; joinCode: string }) {
   const [roster, setRoster] = React.useState("");
   const [copied, setCopied] = React.useState(false);
 
@@ -48,12 +48,21 @@ export function InviteStudents({ orgName }: { orgName: string }) {
         </CardTitle>
         <CardDescription>
           Paste a roster, one student per line, as{" "}
-          <code>email,display name,handle,cohort</code>. Students sign in with a magic link - no
-          passwords are issued.
+          <code>email,display name,handle,cohort</code>. Enrolled students sign in with an emailed link
+          and can set a password afterwards.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
+        <div className="rounded-md border border-primary/40 bg-primary/5 p-3 text-sm">
+          <p className="font-medium">Class code</p>
+          <p className="mt-1 font-mono text-2xl tracking-widest">{joinCode}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Students can create their own account at /login with this code and join {orgName} as a
+            student. Share it only with your class.
+          </p>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="roster">Roster for {orgName}</Label>
           <Textarea
@@ -86,9 +95,7 @@ export function InviteStudents({ orgName }: { orgName: string }) {
               npm run enrol -- --org &quot;{orgName}&quot; --file roster.csv
             </pre>
             <p>
-              A self-service enrolment screen backed by a scoped server action is a planned
-              enhancement. It is listed here rather than mocked up because a button that silently
-              does nothing is worse than an honest instruction.
+              Or skip the roster entirely and give students the class code above.
             </p>
           </div>
         </div>

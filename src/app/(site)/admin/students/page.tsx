@@ -47,7 +47,7 @@ export default async function AdminStudentsPage() {
 
   return (
     <div className="space-y-8">
-      <InviteStudents orgName={viewer.org.name} />
+      <InviteStudents orgName={viewer.org.name} joinCode={viewer.org.join_code} />
 
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">

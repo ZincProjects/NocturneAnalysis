@@ -143,7 +143,8 @@ export async function generateReportForSession(sessionId: string): Promise<Gener
   await admin
     .from("sessions")
     .update({
-      status: "submitted",
+      // Regenerating a report must not undo an instructor's grade.
+      status: session.status === "graded" ? "graded" : "submitted",
       score: model.grade.score,
       max_score: model.grade.max_score,
       completed_at: model.completed_at ?? new Date().toISOString(),
