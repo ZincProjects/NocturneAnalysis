@@ -16,6 +16,113 @@ export type Database = {
   };
   public: {
     Tables: {
+      ctf_challenges: {
+        Row: {
+          category: "web" | "crypto" | "forensics" | "misc";
+          created_at: string;
+          explanation_md: string;
+          file_path: string | null;
+          flag_hash: string;
+          hints: Json;
+          id: string;
+          is_active: boolean;
+          points: number;
+          prompt_md: string;
+          slug: string;
+          sort_order: number;
+          title: string;
+        };
+        Insert: {
+          category: "web" | "crypto" | "forensics" | "misc";
+          created_at?: string;
+          explanation_md?: string;
+          file_path?: string | null;
+          flag_hash: string;
+          hints?: Json;
+          id?: string;
+          is_active?: boolean;
+          points: number;
+          prompt_md: string;
+          slug: string;
+          sort_order?: number;
+          title: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ctf_challenges"]["Insert"]>;
+        Relationships: [];
+      };
+      ctf_event: {
+        Row: {
+          ends_at: string;
+          id: number;
+          is_active: boolean;
+          passcode_hash: string | null;
+          starts_at: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          ends_at: string;
+          id?: number;
+          is_active?: boolean;
+          passcode_hash?: string | null;
+          starts_at: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ctf_event"]["Insert"]>;
+        Relationships: [];
+      };
+      ctf_hint_reveals: {
+        Row: { challenge_id: string; hint_index: number; id: number; player_id: string; revealed_at: string };
+        Insert: { challenge_id: string; hint_index: number; player_id: string; revealed_at?: string };
+        Update: Partial<Database["public"]["Tables"]["ctf_hint_reveals"]["Insert"]>;
+        Relationships: [];
+      };
+      ctf_players: {
+        Row: {
+          created_at: string;
+          handle: string;
+          id: string;
+          passcode_hash: string | null;
+          team_name: string | null;
+          token_hash: string;
+        };
+        Insert: {
+          created_at?: string;
+          handle: string;
+          id?: string;
+          passcode_hash?: string | null;
+          team_name?: string | null;
+          token_hash: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ctf_players"]["Insert"]>;
+        Relationships: [];
+      };
+      ctf_site_secrets: {
+        Row: { key: string; value: string };
+        Insert: { key: string; value: string };
+        Update: { key?: string; value?: string };
+        Relationships: [];
+      };
+      ctf_submissions: {
+        Row: {
+          challenge_id: string;
+          created_at: string;
+          id: number;
+          is_correct: boolean;
+          player_id: string;
+          submitted_value: string;
+        };
+        Insert: {
+          challenge_id: string;
+          created_at?: string;
+          is_correct: boolean;
+          player_id: string;
+          submitted_value: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ctf_submissions"]["Insert"]>;
+        Relationships: [];
+      };
       assignments: {
         Row: {
           assigned_by: string;
@@ -551,6 +658,34 @@ export type Database = {
       };
     };
     Views: {
+      ctf_challenge_stats: {
+        Row: {
+          attempts: number;
+          category: string;
+          challenge_id: string;
+          is_active: boolean;
+          players: number;
+          points: number;
+          slug: string;
+          solves: number;
+          sort_order: number;
+          title: string;
+        };
+        Relationships: [];
+      };
+      ctf_scoreboard: {
+        Row: {
+          created_at: string;
+          handle: string;
+          hint_cost: number;
+          last_solve_at: string | null;
+          player_id: string;
+          score: number;
+          solves: number;
+          team_name: string | null;
+        };
+        Relationships: [];
+      };
       leaderboard_entries: {
         Row: {
           cohort: string | null;
@@ -564,6 +699,18 @@ export type Database = {
       };
     };
     Functions: {
+      ctf_challenge_detail: { Args: { p_token: string; p_slug: string }; Returns: Json };
+      ctf_event_info: { Args: Record<string, never>; Returns: Json };
+      ctf_intranet_memo: { Args: Record<string, never>; Returns: string | null };
+      ctf_join: { Args: { p_handle: string; p_team: string; p_passcode: string }; Returns: Json };
+      ctf_note: { Args: { p_token: string; p_id: number }; Returns: Json };
+      ctf_player_state: { Args: { p_token: string }; Returns: Json };
+      ctf_public_scoreboard: { Args: Record<string, never>; Returns: Json };
+      ctf_reveal_hint: { Args: { p_token: string; p_slug: string }; Returns: Json };
+      ctf_submit: {
+        Args: { p_token: string; p_slug: string; p_value: string; p_flag_hash: string };
+        Returns: Json;
+      };
       lookup_join_code: { Args: { p_code: string }; Returns: string };
       session_chain_head: { Args: { p_session_id: string }; Returns: string };
       verify_session_chain: {

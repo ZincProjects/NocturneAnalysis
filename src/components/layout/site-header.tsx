@@ -10,6 +10,7 @@ const PUBLIC_LINKS = [
   { href: "/scenarios", label: "Scenarios" },
   { href: "/mitre", label: "ATT&CK" },
   { href: "/owasp", label: "OWASP" },
+  { href: "/ctf", label: "CTF" },
   { href: "/samples", label: "Sample reports" },
   { href: "/for-schools", label: "For schools" },
 ];
@@ -19,6 +20,7 @@ const STUDENT_LINKS = [
   { href: "/scenarios", label: "Scenarios" },
   { href: "/mitre", label: "ATT&CK" },
   { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/ctf", label: "CTF" },
 ];
 
 export async function SiteHeader() {

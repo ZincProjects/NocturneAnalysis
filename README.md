@@ -69,6 +69,7 @@ Copy `.env.example` to `.env.local`. Three variables are required:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Publishable key. Safe in the browser — every table is behind row-level security |
 | `NEXT_PUBLIC_SITE_URL` | Absolute origin, used to build magic-link redirects |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Server only.** Required for report generation and the CLI scripts |
+| `CTF_ADMIN_PASSCODE` | **Server only, optional.** Turns on the Nocturne CTF organiser screen at `/ctf/admin` (8+ characters) |
 
 The service-role key is needed because grading has to happen somewhere the
 student cannot influence, and it writes to tables no student may write to.
@@ -184,6 +185,45 @@ mapping — and that nothing in the content could refer to real infrastructure.
   the student explicitly selected, never inferred.
 - `require_reflection: true` on the lessons-learned phase.
 - Decoy alerts and noise log lines. Deciding what to ignore is the skill.
+
+## Nocturne CTF
+
+`/ctf` is a small jeopardy-style capture the flag that runs beside the
+scenarios: eight challenges across web, crypto, forensics and misc, one live
+scoreboard, one event window. Students join with a handle - no account, no
+email - and a random token in an httpOnly cookie keeps their place.
+
+| Page | |
+|---|---|
+| `/ctf` | Event status, countdown, join form |
+| `/ctf/challenges` | Challenge grid with per-category progress |
+| `/ctf/challenges/[slug]` | Prompt, download, flag form, paid hints, write-up after solving |
+| `/ctf/scoreboard` | Public, polls every 5 seconds, first-blood markers. Made for a projector |
+| `/ctf/admin` | Organiser screen: event window, join passcode, challenge on/off, attempt counts, reset or remove players |
+
+**Running a round.** Set `CTF_ADMIN_PASSCODE` (and `SUPABASE_SERVICE_ROLE_KEY`),
+open `/ctf/admin`, set the start and end, optionally a join passcode, and put
+`/ctf/scoreboard` on the projector. Before the start players see a countdown;
+after the end submissions stop and the scoreboard freezes.
+
+**How flags stay secret.** Players never touch the CTF tables. Every action is
+a `ctf_*` database function that takes the player token and applies the rules
+in one transaction: the event window, one solve per challenge, and a
+one-minute lockout after every fifth wrong guess in a row. The database stores
+`sha256(normalizeFlag(flag))` only (the rule is in `src/lib/ctf/flag.ts`: trim,
+strip an optional `flag{}` wrapper, lowercase). Guesses are visible to no
+one - not other players, not the organiser screen.
+
+**Seeding.** `scripts/ctf-seed.ts` is the only place plaintext flags exist. It
+regenerates the files in `public/ctf-files`, then upserts the challenges. If
+this repository is public, students can read that script: change the flags (or
+set `CTF_FLAG_<SLUG>` variables) and re-run it before a round where that
+matters. `tests/ctf.test.ts` solves every file-based challenge from the
+committed files, so they cannot drift from the flags.
+
+The two web challenges are deliberately vulnerable (a robots.txt-revealed page
+and an IDOR in `/api/ctf/notes/[id]`). Both only serve fictional data from this
+app's own database.
 
 ## Synthetic data
 
@@ -322,6 +362,7 @@ tests/                   Vitest
 | `npm run enrol` | Enrol students or staff from a roster |
 | `npm run demo:users` | Create or reset the demo accounts and print their passwords |
 | `npm run edge:sync` | Copy shared modules into the Edge Function bundle |
+| `npm run ctf:seed` | Regenerate the CTF challenge files and seed the challenges (`-- --sql <file>` without a service key) |
 
 ## Licence
 

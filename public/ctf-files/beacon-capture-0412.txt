@@ -1,0 +1,9 @@
+# Northwind SOC - network capture extract
+# case:      IR-2025-0412
+# host:      WKS-FIN-003 (10.20.5.33)
+# direction: outbound, tcp/8443
+# note:      final payload before containment; implant uses single-byte XOR
+
+28222f29353d272029222b112c373a2b
+11252b373d11222b2f382b113e2f3a3a
+2b3c203d33

@@ -53,3 +53,6 @@ supabase/.temp/
 # Generated sample output
 /content/samples/*.pdf
 !.env.example
+
+# CTF seed SQL holds challenge secrets
+ctf-seed*.sql

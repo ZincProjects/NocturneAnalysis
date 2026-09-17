@@ -16,6 +16,10 @@ const PUBLIC_PREFIXES = [
   "/mitre",
   "/owasp",
   "/legal",
+  // Nocturne CTF has its own handle-based players, independent of sign-in.
+  "/ctf",
+  "/ctf-files",
+  "/api/ctf",
 ];
 
 function isPublic(pathname: string): boolean {

@@ -1,0 +1,602 @@
+[
+  {
+    "id": "log-dns-001",
+    "ts": "2025-04-12T14:01:13.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-002",
+    "ts": "2025-04-12T14:03:47.000Z",
+    "source": "dns",
+    "message": "query=updates.vendor-patch.example type=A response=203.0.113.20 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "updates.vendor-patch.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-003",
+    "ts": "2025-04-12T14:06:29.000Z",
+    "source": "dns",
+    "message": "query=updates.vendor-patch.example type=A response=203.0.113.20 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "updates.vendor-patch.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-004",
+    "ts": "2025-04-12T14:07:28.000Z",
+    "source": "dns",
+    "message": "query=wpad.northwind.example type=A response=- rcode=NXDOMAIN client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "wpad.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "nxdomain",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NXDOMAIN"
+    }
+  },
+  {
+    "id": "log-dns-005",
+    "ts": "2025-04-12T14:09:02.000Z",
+    "source": "dns",
+    "message": "query=login.office-suite.example type=A response=198.51.100.14 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "login.office-suite.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-006",
+    "ts": "2025-04-12T14:09:46.000Z",
+    "source": "dns",
+    "message": "query=f26a6f1a.cdn.northwind.example type=A response=10.20.1.40 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "f26a6f1a.cdn.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-007",
+    "ts": "2025-04-12T14:10:06.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-008",
+    "ts": "2025-04-12T14:11:05.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-009",
+    "ts": "2025-04-12T14:12:01.000Z",
+    "source": "dns",
+    "message": "query=updates.vendor-patch.example type=A response=203.0.113.20 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "updates.vendor-patch.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-010",
+    "ts": "2025-04-12T14:12:04.000Z",
+    "source": "dns",
+    "message": "query=wpad.northwind.example type=A response=- rcode=NXDOMAIN client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "wpad.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "nxdomain",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NXDOMAIN"
+    }
+  },
+  {
+    "id": "log-dns-011",
+    "ts": "2025-04-12T14:13:19.000Z",
+    "source": "dns",
+    "message": "query=updates.vendor-patch.example type=A response=203.0.113.20 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "updates.vendor-patch.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-012",
+    "ts": "2025-04-12T14:18:47.000Z",
+    "source": "dns",
+    "message": "query=wpad.northwind.example type=A response=- rcode=NXDOMAIN client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "wpad.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "nxdomain",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NXDOMAIN"
+    }
+  },
+  {
+    "id": "log-dns-013",
+    "ts": "2025-04-12T14:20:42.000Z",
+    "source": "dns",
+    "message": "query=wpad.northwind.example type=A response=- rcode=NXDOMAIN client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "wpad.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "nxdomain",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NXDOMAIN"
+    }
+  },
+  {
+    "id": "log-dns-014",
+    "ts": "2025-04-12T14:22:13.000Z",
+    "source": "dns",
+    "message": "query=87e1cd09.cdn.northwind.example type=A response=10.20.1.40 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "87e1cd09.cdn.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-015",
+    "ts": "2025-04-12T14:23:24.000Z",
+    "source": "dns",
+    "message": "query=fs01.northwind.example type=A response=10.20.2.15 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "fs01.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-016",
+    "ts": "2025-04-12T14:25:30.000Z",
+    "source": "dns",
+    "message": "query=time.northwind.example type=A response=10.20.1.11 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "time.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-017",
+    "ts": "2025-04-12T14:26:54.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-018",
+    "ts": "2025-04-12T14:30:20.000Z",
+    "source": "dns",
+    "message": "query=aG9zdD1XS1MtRklOLTAwMw.sync.telemetry-cdn.example type=TXT response=\"ack\" rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "aG9zdD1XS1MtRklOLTAwMw.sync.telemetry-cdn.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "TXT",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-019",
+    "ts": "2025-04-12T14:30:29.000Z",
+    "source": "dns",
+    "message": "query=d1dd9bd8.cdn.northwind.example type=A response=10.20.1.40 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "d1dd9bd8.cdn.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-020",
+    "ts": "2025-04-12T14:30:53.000Z",
+    "source": "dns",
+    "message": "query=dXNlcj1rLmxpbQ.sync.telemetry-cdn.example type=TXT response=\"ack\" rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "dXNlcj1rLmxpbQ.sync.telemetry-cdn.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "TXT",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-021",
+    "ts": "2025-04-12T14:31:20.000Z",
+    "source": "dns",
+    "message": "query=c3RhZ2U9Y29sbGVjdA.sync.telemetry-cdn.example type=TXT response=\"ack\" rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "c3RhZ2U9Y29sbGVjdA.sync.telemetry-cdn.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "TXT",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-022",
+    "ts": "2025-04-12T14:31:21.000Z",
+    "source": "dns",
+    "message": "query=time.northwind.example type=A response=10.20.1.11 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "time.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-023",
+    "ts": "2025-04-12T14:31:50.000Z",
+    "source": "dns",
+    "message": "query=ZmxhZ3tkbnNfcXVlcmllc19jYXJyeV9tb3JlX3RoYW5fbmFtZXN9.sync.telemetry-cdn.example type=TXT response=\"ack\" rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "ZmxhZ3tkbnNfcXVlcmllc19jYXJyeV9tb3JlX3RoYW5fbmFtZXN9.sync.telemetry-cdn.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "TXT",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-024",
+    "ts": "2025-04-12T14:32:02.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-025",
+    "ts": "2025-04-12T14:32:23.000Z",
+    "source": "dns",
+    "message": "query=ZmlsZXM9MyBvaw.sync.telemetry-cdn.example type=TXT response=\"ack\" rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "ZmlsZXM9MyBvaw.sync.telemetry-cdn.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "TXT",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-026",
+    "ts": "2025-04-12T14:32:29.000Z",
+    "source": "dns",
+    "message": "query=711e0c27.cdn.northwind.example type=A response=10.20.1.40 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "711e0c27.cdn.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-027",
+    "ts": "2025-04-12T14:32:53.000Z",
+    "source": "dns",
+    "message": "query=c3RhZ2U9ZG9uZQ.sync.telemetry-cdn.example type=TXT response=\"ack\" rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "c3RhZ2U9ZG9uZQ.sync.telemetry-cdn.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "TXT",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-028",
+    "ts": "2025-04-12T14:37:14.000Z",
+    "source": "dns",
+    "message": "query=wpad.northwind.example type=A response=- rcode=NXDOMAIN client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "wpad.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "nxdomain",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NXDOMAIN"
+    }
+  },
+  {
+    "id": "log-dns-029",
+    "ts": "2025-04-12T14:40:02.000Z",
+    "source": "dns",
+    "message": "query=updates.vendor-patch.example type=A response=203.0.113.20 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "updates.vendor-patch.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-030",
+    "ts": "2025-04-12T14:42:03.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-031",
+    "ts": "2025-04-12T14:42:13.000Z",
+    "source": "dns",
+    "message": "query=fs01.northwind.example type=A response=10.20.2.15 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "fs01.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-032",
+    "ts": "2025-04-12T14:44:21.000Z",
+    "source": "dns",
+    "message": "query=wpad.northwind.example type=A response=- rcode=NXDOMAIN client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "wpad.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "nxdomain",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NXDOMAIN"
+    }
+  },
+  {
+    "id": "log-dns-033",
+    "ts": "2025-04-12T14:45:22.000Z",
+    "source": "dns",
+    "message": "query=updates.vendor-patch.example type=A response=203.0.113.20 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "updates.vendor-patch.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-034",
+    "ts": "2025-04-12T14:46:12.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-035",
+    "ts": "2025-04-12T14:49:43.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-036",
+    "ts": "2025-04-12T14:51:47.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-037",
+    "ts": "2025-04-12T14:53:31.000Z",
+    "source": "dns",
+    "message": "query=portal.northwind.example type=A response=10.20.1.25 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "portal.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-038",
+    "ts": "2025-04-12T14:55:28.000Z",
+    "source": "dns",
+    "message": "query=wpad.northwind.example type=A response=- rcode=NXDOMAIN client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "wpad.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "nxdomain",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NXDOMAIN"
+    }
+  },
+  {
+    "id": "log-dns-039",
+    "ts": "2025-04-12T14:56:55.000Z",
+    "source": "dns",
+    "message": "query=login.office-suite.example type=A response=198.51.100.14 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "login.office-suite.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  },
+  {
+    "id": "log-dns-040",
+    "ts": "2025-04-12T14:58:41.000Z",
+    "source": "dns",
+    "message": "query=3b2f3693.cdn.northwind.example type=A response=10.20.1.40 rcode=NOERROR client=10.20.5.33",
+    "host": "WKS-FIN-003",
+    "domain": "3b2f3693.cdn.northwind.example",
+    "src_ip": "10.20.5.33",
+    "dst_ip": "10.20.1.10",
+    "action": "resolved",
+    "fields": {
+      "query_type": "A",
+      "rcode": "NOERROR"
+    }
+  }
+]

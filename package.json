@@ -19,6 +19,7 @@
     "edge:sync": "tsx scripts/sync-edge-shared.ts",
     "enrol": "tsx scripts/enrol.ts",
     "demo:users": "tsx scripts/demo-users.ts",
+    "ctf:seed": "tsx scripts/ctf-seed.ts",
     "licenses": "npx --yes license-checker-rseidelsohn --production --summary"
   },
   "dependencies": {
