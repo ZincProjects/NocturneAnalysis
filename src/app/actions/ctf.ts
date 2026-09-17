@@ -22,14 +22,17 @@ import type { CtfHint, CtfSubmitResult } from "@/lib/ctf/types";
 
 export interface JoinState {
   error: string | null;
+  /** Echoed back so a rejected form keeps what the player typed. */
+  handle?: string;
+  team?: string;
 }
 
 export async function joinCtf(_prev: JoinState, form: FormData): Promise<JoinState> {
   const db = ctfDb();
-  if (!db) return { error: "The CTF is not configured on this deployment." };
-
   const handle = String(form.get("handle") ?? "").slice(0, 64);
   const team = String(form.get("team") ?? "").slice(0, 64);
+  if (!db) return { error: "The CTF is not configured on this deployment.", handle, team };
+
   const passcode = String(form.get("passcode") ?? "").slice(0, 128);
 
   const { data, error } = await db.rpc("ctf_join", {
@@ -38,7 +41,7 @@ export async function joinCtf(_prev: JoinState, form: FormData): Promise<JoinSta
     p_passcode: passcode,
   });
 
-  if (error) return { error: ctfMessage(ctfErrorCode(error)) };
+  if (error) return { error: ctfMessage(ctfErrorCode(error)), handle, team };
 
   const { token } = data as unknown as { token: string };
   await setPlayerToken(token);

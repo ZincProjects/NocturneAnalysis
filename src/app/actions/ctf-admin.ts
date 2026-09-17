@@ -48,7 +48,10 @@ export async function adminSignOut(): Promise<void> {
 }
 
 export async function updateEvent(_prev: AdminFormState, form: FormData): Promise<AdminFormState> {
-  const db = await requireAdmin();
+  if (adminConfigProblem() || !(await isAdmin())) {
+    return { error: "Your organiser session has expired. Reload the page and enter the passcode again." };
+  }
+  const db = createAdminClient();
 
   const title = String(form.get("title") ?? "").trim() || "Nocturne CTF";
   const startsAt = new Date(String(form.get("starts_at") ?? ""));

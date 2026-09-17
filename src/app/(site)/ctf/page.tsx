@@ -5,6 +5,7 @@ import { ArrowRight, Binary, FileSearch, Globe, Puzzle, Timer, Trophy } from "lu
 import { leaveCtf } from "@/app/actions/ctf";
 import { Countdown } from "@/components/ctf/countdown";
 import { JoinForm } from "@/components/ctf/join-form";
+import { LocalTime } from "@/components/ctf/local-time";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,16 +25,11 @@ const CATEGORY_CARDS = [
   { icon: Puzzle, label: "Misc", text: "Name an ATT&CK technique, then find a message hidden in pixels." },
 ];
 
-function formatWhen(iso: string | null) {
-  if (!iso) return "";
-  return new Date(iso).toLocaleString("en-SG", { dateStyle: "medium", timeStyle: "short" });
-}
-
 function EventStatus({ event }: { event: CtfEvent }) {
   if (event.status === "upcoming" && event.starts_at) {
     return (
       <div className="space-y-3">
-        <Badge variant="secondary">Starts {formatWhen(event.starts_at)}</Badge>
+        <Badge variant="secondary">Starts <LocalTime iso={event.starts_at} /></Badge>
         <Countdown target={event.starts_at} serverNow={event.server_now} />
       </div>
     );
@@ -41,13 +37,13 @@ function EventStatus({ event }: { event: CtfEvent }) {
   if (event.status === "live" && event.ends_at) {
     return (
       <div className="space-y-3">
-        <Badge variant="success">Live now - ends {formatWhen(event.ends_at)}</Badge>
+        <Badge variant="success">Live now - ends <LocalTime iso={event.ends_at} /></Badge>
         <Countdown target={event.ends_at} serverNow={event.server_now} />
       </div>
     );
   }
   if (event.status === "ended") {
-    return <Badge variant="outline">This round ended {formatWhen(event.ends_at)}. The final scoreboard is up.</Badge>;
+    return <Badge variant="outline">This round ended <LocalTime iso={event.ends_at} />. The final scoreboard is up.</Badge>;
   }
   return <Badge variant="outline">No round is scheduled right now.</Badge>;
 }
@@ -161,7 +157,7 @@ export default async function CtfLandingPage() {
                   </Button>
                   <form action={leaveCtf}>
                     <Button type="submit" variant="ghost" size="sm" className="w-full text-muted-foreground">
-                      Not you? Leave on this browser
+                      Not you? Leave this browser (the handle cannot be reclaimed)
                     </Button>
                   </form>
                 </CardContent>

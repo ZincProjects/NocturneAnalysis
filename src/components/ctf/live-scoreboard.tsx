@@ -9,13 +9,9 @@ import type { CtfScoreboard } from "@/lib/ctf/types";
 import { cn } from "@/lib/utils";
 
 import { Countdown } from "./countdown";
+import { LocalTime } from "./local-time";
 
 const POLL_MS = 5000;
-
-function timeOf(iso: string | null): string {
-  if (!iso) return "-";
-  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-}
 
 /**
  * Polls every five seconds rather than holding a Realtime socket open: a
@@ -141,7 +137,7 @@ export function LiveScoreboard({ initial, highlight }: { initial: CtfScoreboard;
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">{row.solves}</td>
                         <td className="hidden px-4 py-3 text-right font-mono text-xs text-muted-foreground tabular-nums sm:table-cell">
-                          {timeOf(row.last_solve_at)}
+                          <LocalTime iso={row.last_solve_at} format="time" />
                         </td>
                         <td className="px-4 py-3 text-right font-mono text-lg font-semibold tabular-nums">{row.score}</td>
                       </tr>
@@ -178,7 +174,7 @@ export function LiveScoreboard({ initial, highlight }: { initial: CtfScoreboard;
                       {challenge.first_blood ? (
                         <>
                           <div className="font-medium text-[var(--sev-critical)]">{challenge.first_blood}</div>
-                          <div className="font-mono text-xs text-muted-foreground">{timeOf(challenge.first_blood_at)}</div>
+                          <div className="font-mono text-xs text-muted-foreground"><LocalTime iso={challenge.first_blood_at} format="time" /></div>
                         </>
                       ) : (
                         <span className="text-xs text-muted-foreground">Unclaimed</span>

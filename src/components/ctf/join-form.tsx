@@ -18,6 +18,7 @@ export function JoinForm({ requiresPasscode }: { requiresPasscode: boolean }) {
         <Input
           id="ctf-handle"
           name="handle"
+          defaultValue={state.handle}
           required
           minLength={3}
           maxLength={24}
@@ -36,7 +37,7 @@ export function JoinForm({ requiresPasscode }: { requiresPasscode: boolean }) {
         <Label htmlFor="ctf-team">
           Team <span className="font-normal text-muted-foreground">(optional)</span>
         </Label>
-        <Input id="ctf-team" name="team" maxLength={32} autoComplete="off" placeholder="e.g. Blue Team 3" />
+        <Input id="ctf-team" name="team" defaultValue={state.team} maxLength={32} autoComplete="off" placeholder="e.g. Blue Team 3" />
       </div>
 
       {requiresPasscode ? (

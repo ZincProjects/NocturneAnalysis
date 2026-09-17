@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Download, Droplet } from "lucide-react";
 
+import { Countdown } from "@/components/ctf/countdown";
 import { FlagForm } from "@/components/ctf/flag-form";
 import { HintsPanel } from "@/components/ctf/hints-panel";
 import { Markdown } from "@/components/shared/markdown";
@@ -48,6 +49,12 @@ export default async function CtfChallengePage({ params }: { params: Promise<{ s
                   <Badge variant="success">
                     <CheckCircle2 className="size-3" aria-hidden /> Solved
                   </Badge>
+                ) : null}
+                {live && detail.event.ends_at ? (
+                  // Also refreshes the page when the round ends, closing the form.
+                  <span className="ml-auto text-muted-foreground">
+                    Time left <Countdown size="sm" target={detail.event.ends_at} serverNow={detail.event.server_now} />
+                  </span>
                 ) : null}
               </div>
               <div className="flex flex-wrap items-baseline justify-between gap-3">
@@ -101,7 +108,7 @@ export default async function CtfChallengePage({ params }: { params: Promise<{ s
           {detail.explanation_md ? (
             <Card className="border-primary/40">
               <CardHeader>
-                <CardTitle>What you just learned</CardTitle>
+                <CardTitle>{detail.solved ? "What you just learned" : "Write-up"}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Markdown>{detail.explanation_md}</Markdown>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -60,8 +60,16 @@ export function EventForm({
 }) {
   const [state, action, pending] = useActionState<AdminFormState, FormData>(updateEvent, { error: null });
   const [mode, setMode] = useState<"keep" | "set" | "clear">("keep");
-  const [start, setStart] = useState(() => toLocalInput(startsAt));
-  const [end, setEnd] = useState(() => toLocalInput(endsAt));
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+
+  // Filled in after mounting: the server renders in UTC, and a wall-clock
+  // value computed there would be hours off for the organiser - and saved
+  // that way.
+  useEffect(() => {
+    setStart(toLocalInput(startsAt));
+    setEnd(toLocalInput(endsAt));
+  }, [startsAt, endsAt]);
 
   // The server has no idea which time zone the organiser is in, so send
   // absolute instants rather than the wall-clock strings the inputs hold.
@@ -94,6 +102,7 @@ export function EventForm({
           <Input id="event-end" type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} required />
         </div>
       </div>
+      <p className="text-xs text-muted-foreground">Times are in your browser&apos;s time zone.</p>
       <div className="flex flex-wrap gap-2">
         <span className="text-xs text-muted-foreground self-center">Quick set:</span>
         {[1, 1.5, 2].map((hours) => (

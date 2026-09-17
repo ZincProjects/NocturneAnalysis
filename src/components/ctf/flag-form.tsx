@@ -41,7 +41,7 @@ export function FlagForm({
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!value.trim() || lockSeconds > 0) return;
+    if (pending || !value.trim() || lockSeconds > 0) return;
 
     startTransition(async () => {
       const result = await submitFlag(slug, value);
@@ -102,6 +102,15 @@ export function FlagForm({
             id="flag-input"
             value={value}
             onChange={(event) => setValue(event.target.value)}
+            onKeyDown={(event) => {
+              // Submit on Enter explicitly rather than relying on implicit
+              // form submission, which some assistive and automation tools
+              // do not trigger.
+              if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
             placeholder="flag{...}"
             maxLength={200}
             autoComplete="off"
